@@ -51,10 +51,10 @@ export default function CommandOverview({ teamTasks, employees }: Props) {
       {/* Tactical Header */}
       <div className="space-y-2">
         <div className="flex items-center gap-3">
-          <div className="w-3 h-3 bg-emerald-500 rotate-45 shadow-lg shadow-emerald-500/20"></div>
+          <div className="w-3 h-3 bg-emerald-500 rotate-45 shadow-sm"></div>
           <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-400">Real-time Intelligence</h2>
         </div>
-        <h2 className="font-serif text-2xl text-slate-900 tracking-tight">
+        <h2 className="font-serif text-2xl text-slate-900 tracking-tight -tracking-[0.025em]">
           Command Dashboard
         </h2>
       </div>
@@ -90,13 +90,13 @@ export default function CommandOverview({ teamTasks, employees }: Props) {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Performance Chart */}
-        <div className="lg:col-span-2 bg-white border border-slate-100 rounded-3xl p-8 shadow-sm">
+        <div className="lg:col-span-2 bg-white border border-slate-100 rounded-2xl p-8 shadow-sm">
           <div className="flex justify-between items-center mb-8">
             <div className="space-y-1">
               <h3 className="font-mono text-xs font-black uppercase tracking-widest text-slate-400">Operational Tempo</h3>
-              <p className="font-serif text-lg text-slate-900">Task Completion Velocity</p>
+              <p className="font-serif text-lg text-slate-900 -tracking-[0.025em]">Task Completion Velocity</p>
             </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100">
+            <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-lg border border-slate-100">
                <Clock className="w-4 h-4 text-slate-400" />
                 <span className="font-mono text-xs font-black uppercase tracking-widest text-slate-500">Last 7 Cycles</span>
             </div>
@@ -153,7 +153,7 @@ export default function CommandOverview({ teamTasks, employees }: Props) {
           <div className="relative z-10 space-y-8">
             <div className="space-y-1">
               <h3 className="font-mono text-xs font-black uppercase tracking-widest text-slate-500">Threat Matrix</h3>
-              <p className="font-serif text-lg">Tactical Distribution</p>
+              <p className="font-serif text-lg -tracking-[0.025em]">Tactical Distribution</p>
             </div>
 
             <div className="space-y-6">
@@ -198,8 +198,8 @@ function KPICard({ title, value, icon, isAlert, reducedMotion }: KPICardProps) {
   return (
     <motion.div 
       whileHover={reducedMotion ? undefined : { y: -5 }}
-      className={`p-6 rounded-2xl border transition-all ${
-        isAlert ? 'bg-orange-50 border-orange-100 shadow-xl shadow-orange-500/10' : 'bg-white border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/40'
+      className={`p-6 rounded-2xl border transition-all duration-150 ${
+        isAlert ? 'bg-orange-50 border-orange-100 shadow-lg shadow-orange-500/5' : 'bg-white border-slate-100 shadow-sm hover:shadow-lg hover:shadow-slate-200/30'
       }`}
     >
       <div className="flex justify-between items-start mb-4">

@@ -58,6 +58,7 @@ export default function EditTaskModal({
             aria-labelledby="edit-task-title"
             className="relative w-full max-w-2xl bg-white border border-slate-100 shadow-2xl rounded-3xl overflow-hidden"
           >
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent"></div>
           {/* Header */}
           <div className="p-8 md:p-10 border-b border-slate-50 flex justify-between items-start">
             <div className="space-y-3">
@@ -65,14 +66,14 @@ export default function EditTaskModal({
                 <Target className="w-4 h-4 text-emerald-500" />
                 <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-400">Tactical Revision</h2>
               </div>
-              <h2 id="edit-task-title" className="font-serif text-xl text-slate-900 tracking-tight">
+              <h2 id="edit-task-title" className="font-serif text-xl text-slate-900 -tracking-[0.025em] tracking-tight">
                 Edit Mission Metadata
               </h2>
             </div>
             <button
               onClick={() => setEditingTask(null)}
               aria-label="Close dialog"
-              className="p-3 text-slate-300 hover:text-slate-900 hover:bg-slate-50 transition-all rounded-2xl"
+              className="p-3 text-slate-300 hover:text-slate-900 hover:bg-slate-50 transition-all duration-150 rounded-xl"
             >
               <X className="w-6 h-6" />
             </button>
@@ -88,7 +89,7 @@ export default function EditTaskModal({
                   type="text"
                   value={editingTask.title}
                   onChange={(e) => setEditingTask({ ...editingTask, title: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white transition-all font-serif text-base"
+                  className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white transition-all duration-150 font-serif text-base"
                 />
               </div>
 
@@ -99,7 +100,7 @@ export default function EditTaskModal({
                   value={editingTask.description}
                   onChange={(e) => setEditingTask({ ...editingTask, description: e.target.value })}
                   rows={4}
-                  className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white transition-all text-slate-600 leading-relaxed"
+                  className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white transition-all duration-150 text-slate-600 leading-relaxed"
                 />
               </div>
 
@@ -178,7 +179,7 @@ export default function EditTaskModal({
               <button
                 type="submit"
                 disabled={isUpdating}
-                className="w-full bg-slate-900 text-white font-mono text-xs font-black uppercase tracking-[0.3em] py-6 rounded-3xl hover:bg-slate-800 transition-all shadow-2xl active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-4"
+                className="w-full bg-slate-900 text-white font-mono text-xs font-black uppercase tracking-[0.3em] py-6 rounded-xl hover:bg-slate-800 transition-all duration-150 shadow-2xl active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-4"
               >
                 {isUpdating ? (
                   <motion.div animate={reducedMotion ? undefined : { rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} className="w-5 h-5 border-2 border-white border-t-transparent rounded-full" />

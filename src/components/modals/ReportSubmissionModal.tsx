@@ -47,11 +47,11 @@ export default function ReportSubmissionModal({
             <div className="flex justify-between items-start mb-8">
               <div>
                 <span className="font-mono text-xs font-black uppercase tracking-[0.3em] text-emerald-500 mb-2 block">Field Report</span>
-                <h2 id="report-submission-title" className="font-serif text-xl text-slate-900 tracking-tight pr-8">{selectedTask.title}</h2>
+                <h2 id="report-submission-title" className="font-serif text-xl text-slate-900 -tracking-[0.025em] tracking-tight pr-8">{selectedTask.title}</h2>
               </div>
               <button
                 onClick={() => setSelectedTask(null)}
-                className="text-slate-400 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 p-3 rounded-full transition-all"
+                className="text-slate-400 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 p-3 rounded-full transition-all duration-150"
                 aria-label="Close modal"
               >
                 <X className="w-5 h-5" />
@@ -66,7 +66,7 @@ export default function ReportSubmissionModal({
                   required
                   value={reportContent}
                   onChange={(e) => setReportContent(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-3xl py-4 px-6 text-slate-700 min-h-[200px] focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all resize-none font-serif text-base leading-relaxed"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-slate-700 min-h-[200px] focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all duration-150 resize-none font-serif text-base leading-relaxed"
                   placeholder="Detail the operational progress..."
                 />
               </div>
@@ -75,7 +75,7 @@ export default function ReportSubmissionModal({
                 <button
                   type="submit"
                   disabled={isSubmittingReport || !reportContent.trim()}
-                  className="bg-emerald-500 text-slate-950 font-mono text-xs font-black uppercase tracking-[0.2em] py-5 px-8 hover:bg-emerald-400 transition-all rounded-2xl shadow-xl shadow-emerald-500/10 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 w-full sm:w-auto"
+                  className="bg-emerald-500 text-slate-950 font-mono text-xs font-black uppercase tracking-[0.2em] py-5 px-8 hover:bg-emerald-400 transition-all duration-150 rounded-xl shadow-xl shadow-emerald-500/10 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 w-full sm:w-auto"
                 >
                   {isSubmittingReport ? (
                     <Activity className="w-5 h-5 animate-spin" />

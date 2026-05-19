@@ -1,3 +1,5 @@
+import { getAvatarColor } from '../lib/utils';
+
 interface AvatarProps {
   name: string;
   className?: string;
@@ -13,22 +15,9 @@ function getInitials(name: string) {
     .slice(0, 2);
 }
 
-function getColor(name: string) {
-  const colors = [
-    '#10b981', '#059669', '#0891b2', '#0284c7',
-    '#4f46e5', '#7c3aed', '#a855f7', '#d946ef',
-    '#db2777', '#e11d48', '#ea580c', '#ca8a04',
-  ];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return colors[Math.abs(hash) % colors.length];
-}
-
 export function Avatar({ name, className = '', size = 40 }: AvatarProps) {
   const initials = getInitials(name);
-  const bg = getColor(name);
+  const bg = getAvatarColor(name);
   return (
     <svg
       width={size}

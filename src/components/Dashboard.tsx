@@ -28,6 +28,7 @@ import { useTeamManagement } from "../lib/hooks/useTeamManagement";
 import { useDashboardData } from "../lib/hooks/useDashboardData";
 import { useSessionActions } from "../lib/hooks/useSessionActions";
 import { useReducedMotion } from "../lib/hooks/useReducedMotion";
+import { getDeadlineStyle } from "../lib/utils";
 
 export default function Dashboard() {
   const { profile } = useAuthStore();
@@ -51,21 +52,6 @@ export default function Dashboard() {
     if (diffDays === 0) return "Due Today";
     if (diffDays === 1) return "Due Tomorrow";
     return `Due in ${diffDays}d`;
-  }, []);
-
-  const getDeadlineStyle = useCallback((deadline: string | null | undefined, isCompleted: boolean) => {
-    if (isCompleted) return "bg-emerald-600 text-white border-emerald-700 font-bold shadow-lg opacity-70";
-    if (!deadline) return "bg-emerald-600 text-white border-emerald-700 font-bold shadow-lg";
-    const end = parseLocalDate(deadline);
-    if (isNaN(end.getTime())) return "bg-emerald-600 text-white border-emerald-700 font-bold shadow-lg";
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-    end.setHours(0, 0, 0, 0);
-    const diffTime = end.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    if (diffDays < 0) return "bg-orange-600 text-white border-orange-700 shadow-lg font-bold";
-    if (diffDays <= 3) return "bg-orange-500 text-white border-orange-600 shadow-lg font-bold";
-    return "bg-emerald-600 text-white border-emerald-700 shadow-lg font-bold";
   }, []);
 
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
@@ -327,18 +313,18 @@ export default function Dashboard() {
       <div className="min-h-dvh bg-slate-50 text-slate-900 font-sans selection:bg-emerald-100 selection:text-emerald-900">
         <nav className="border-b border-slate-200 px-6 py-4 grid grid-cols-3 items-center sticky top-0 bg-white/80 backdrop-blur-xl z-40 border-t-2 border-t-emerald-500/10 shadow-sm">
           <div className="flex items-center gap-4 justify-self-start overflow-hidden">
-            <div className="w-10 h-10 border border-slate-200 bg-white rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/5 overflow-hidden shrink-0">
+            <div className="w-10 h-10 border border-slate-200 bg-white rounded-full flex items-center justify-center shadow-sm overflow-hidden shrink-0">
               <Avatar name={profile.name} size={40} className="rounded-full" />
             </div>
             <div className="hidden sm:flex flex-col overflow-hidden">
               <div className="font-mono text-xs uppercase tracking-wide text-slate-400 font-black">Member</div>
-              <div className="font-serif text-xl text-slate-900 leading-none mt-1 truncate">{profile.name}</div>
+              <div className="font-serif text-2xl -tracking-[0.025em] text-slate-900 leading-none mt-1 truncate">{profile.name}</div>
             </div>
           </div>
           <div className="flex flex-col items-center justify-center text-center">
             <div className="flex items-center gap-3 mb-1.5">
               <Logo className="w-8 h-8" />
-              <h1 className="font-mono font-black tracking-[0.3em] uppercase leading-none text-lg text-slate-900">Tasker</h1>
+              <h1 className="font-mono font-black -tracking-[0.025em] tracking-[0.3em] uppercase leading-none text-lg text-slate-900">Tasker</h1>
             </div>
             <p className="hidden md:block text-xs font-mono uppercase tracking-[0.15em] text-slate-500 font-bold whitespace-nowrap">Raja Ramanna Centre for Advanced Technology</p>
             <p className="md:hidden text-xs font-mono uppercase tracking-[0.1em] text-slate-500 font-bold">RRCAT</p>
@@ -346,14 +332,14 @@ export default function Dashboard() {
           <div className="flex items-center gap-4 justify-self-end">
             <button type="button" className="text-right hidden sm:flex flex-col items-end group cursor-pointer" onClick={copyId} aria-label="Copy User Code">
               <div className="text-xs font-mono uppercase tracking-[0.15em] text-slate-500 font-bold mb-1 group-hover:text-emerald-600 transition-colors">User Code</div>
-              <div className="flex items-center gap-2 px-3 py-1 bg-white border border-slate-200 rounded-xl group-hover:border-emerald-500 group-hover:bg-emerald-50 transition-all shadow-sm">
+              <div className="flex items-center gap-2 px-3 py-1 bg-white border border-slate-200 rounded-xl group-hover:border-emerald-500 group-hover:bg-emerald-50 transition-all duration-150 shadow-sm">
                 <span className="font-mono text-xs text-slate-400 select-all max-w-[100px] truncate" title={profile.uid}>{profile.uid}</span>
                 <button type="button" className="hover:scale-110 transition-transform min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" aria-label="Copy User Code">
                   <Copy className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600" />
                 </button>
               </div>
             </button>
-            <button onClick={handleLogout} className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-500 hover:bg-orange-50 hover:text-orange-700 hover:border-orange-200 transition-all shadow-sm min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" title="Logout">
+            <button onClick={handleLogout} className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-500 hover:bg-orange-50 hover:text-orange-700 hover:border-orange-200 transition-all duration-150 shadow-sm min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" title="Logout">
               <LogOut className="w-4 h-4" />
             </button>
           </div>
@@ -373,7 +359,7 @@ export default function Dashboard() {
               </button>
             )}
             {isManager && (
-              <button onClick={() => setActiveTab("team")} aria-current={activeTab === "team" ? "page" : undefined} className={`whitespace-nowrap px-4 py-2 rounded-lg flex-shrink-0 font-mono text-xs uppercase font-bold tracking-widest flex items-center gap-2 transition-all focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 ${activeTab === "team" ? "bg-emerald-500 text-slate-950" : "text-slate-600 hover:bg-slate-50 border border-slate-200"}`}>
+              <button onClick={() => setActiveTab("team")} aria-current={activeTab === "team" ? "page" : undefined} className={`whitespace-nowrap px-4 py-2 rounded-xl flex-shrink-0 font-mono text-xs uppercase font-bold tracking-widest flex items-center gap-2 transition-all focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 ${activeTab === "team" ? "bg-emerald-500 text-slate-950" : "text-slate-600 hover:bg-slate-50 border border-slate-200"}`}>
                 <LayoutGrid className="w-3.5 h-3.5" /> Team
               </button>
             )}
@@ -385,7 +371,7 @@ export default function Dashboard() {
                 <Users className="w-3.5 h-3.5" /> Members
               </button>
             )}
-            <button onClick={() => setActiveTab("settings")} aria-current={activeTab === "settings" ? "page" : undefined} className={`whitespace-nowrap px-4 py-2 rounded-lg flex-shrink-0 font-mono text-xs uppercase font-bold tracking-widest flex items-center gap-2 transition-all focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 ${activeTab === "settings" ? "bg-emerald-500 text-slate-950" : "text-slate-600 hover:bg-slate-50 border border-slate-200"}`}>
+            <button onClick={() => setActiveTab("settings")} aria-current={activeTab === "settings" ? "page" : undefined} className={`whitespace-nowrap px-4 py-2 rounded-xl flex-shrink-0 font-mono text-xs uppercase font-bold tracking-widest flex items-center gap-2 transition-all focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 ${activeTab === "settings" ? "bg-emerald-500 text-slate-950" : "text-slate-600 hover:bg-slate-50 border border-slate-200"}`}>
               <Settings className="w-3.5 h-3.5" /> Settings
             </button>
           </div>
@@ -520,12 +506,12 @@ export default function Dashboard() {
           {confirmDialog.isOpen && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-8" onKeyDown={(e) => { if (e.key === 'Escape') setConfirmDialog((p) => ({ ...p, isOpen: false })); }}>
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setConfirmDialog((p) => ({ ...p, isOpen: false }))} className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl" />
-              <motion.div initial={reducedMotion ? { opacity: 0 } : { y: 20, opacity: 0, scale: 0.95 }} animate={reducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }} exit={reducedMotion ? { opacity: 0 } : { y: 20, opacity: 0, scale: 0.95 }} transition={{ type: "spring", duration: 0.5, bounce: 0 }} role="alertdialog" aria-modal="true" aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-message" className="relative w-full max-w-md bg-white border border-slate-100 shadow-2xl p-10 flex flex-col rounded-3xl overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent"></div>
+              <motion.div initial={reducedMotion ? { opacity: 0 } : { y: 20, opacity: 0, scale: 0.95 }} animate={reducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }} exit={reducedMotion ? { opacity: 0 } : { y: 20, opacity: 0, scale: 0.95 }} transition={{ type: "spring", duration: 0.5, bounce: 0 }} role="alertdialog" aria-modal="true" aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-message" className="relative w-full max-w-md bg-white border border-slate-100 shadow-xl p-10 flex flex-col rounded-3xl overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent"></div>
                 <h3 id="confirm-dialog-title" className="font-mono font-black uppercase tracking-[0.3em] text-slate-900 mb-8 text-base border-b border-slate-50 pb-6 text-center">{confirmDialog.title}</h3>
                 <p id="confirm-dialog-message" className="font-serif text-base text-slate-500 mb-12 leading-relaxed text-center">"{confirmDialog.message}"</p>
                 <div className="flex gap-6">
-                  <button autoFocus onClick={() => setConfirmDialog((p) => ({ ...p, isOpen: false }))} className="flex-1 py-4 font-mono text-xs uppercase tracking-[0.2em] text-center border border-slate-200 bg-white hover:bg-slate-50 text-slate-400 transition-all rounded-2xl font-black shadow-sm focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">Abort</button>
+                  <button autoFocus onClick={() => setConfirmDialog((p) => ({ ...p, isOpen: false }))} className="flex-1 py-4 font-mono text-xs uppercase tracking-[0.2em] text-center border border-slate-200 bg-white hover:bg-slate-50 text-slate-400 transition-all duration-150 rounded-xl font-black shadow-sm focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">Abort</button>
                   <button
                     onClick={async () => {
                       if (isConfirming) return;
@@ -536,7 +522,7 @@ export default function Dashboard() {
                       setIsConfirming(false);
                     }}
                     disabled={isConfirming}
-                    className={`flex-1 py-4 font-mono text-xs uppercase tracking-[0.2em] text-center font-black transition-all rounded-2xl shadow-xl flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 ${isConfirming ? 'opacity-50 cursor-not-allowed' : ''} ${confirmDialog.danger ? "bg-orange-50 text-orange-600 hover:bg-orange-100 border border-orange-100 shadow-orange-500/5" : "bg-emerald-500 text-slate-950 hover:bg-emerald-400 shadow-emerald-500/20"}`}
+                    className={`flex-1 py-4 font-mono text-xs uppercase tracking-[0.2em] text-center font-black transition-all duration-150 rounded-xl shadow-xl flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 ${isConfirming ? 'opacity-50 cursor-not-allowed' : ''} ${confirmDialog.danger ? "bg-orange-50 text-orange-600 hover:bg-orange-100 border border-orange-100 shadow-orange-500/5" : "bg-emerald-500 text-slate-950 hover:bg-emerald-400 shadow-emerald-500/20"}`}
                   >
                     {isConfirming ? (
                       <motion.div animate={reducedMotion ? undefined : { rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full" />
@@ -550,7 +536,7 @@ export default function Dashboard() {
 
         <AnimatePresence>
           {toastQueue[0] && (
-            <motion.div key={toastQueue[0]} initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 50, scale: 0.9 }} animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }} exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 50, scale: 0.9 }} role="status" aria-live="polite" className="fixed bottom-10 right-10 z-[120] bg-emerald-500 text-slate-950 font-mono text-xs uppercase tracking-[0.25em] font-black px-10 py-5 shadow-2xl shadow-emerald-500/30 border border-emerald-400 rounded-2xl">
+            <motion.div key={toastQueue[0]} initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 50, scale: 0.9 }} animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }} exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 50, scale: 0.9 }} role="status" aria-live="polite" className="fixed bottom-10 right-10 z-[120] bg-emerald-500 text-slate-950 font-mono text-xs uppercase tracking-[0.25em] font-black px-10 py-5 shadow-xl shadow-emerald-500/20 border border-emerald-400 rounded-xl">
               {toastQueue[0]}
             </motion.div>
           )}

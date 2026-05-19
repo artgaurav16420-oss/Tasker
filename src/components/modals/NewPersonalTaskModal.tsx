@@ -47,11 +47,11 @@ export default function NewPersonalTaskModal({
             <div className="flex justify-between items-start mb-8">
               <div>
                 <h3 className="font-mono text-xs font-black uppercase tracking-[0.3em] text-emerald-500 mb-2">Self-Assigned</h3>
-                <h2 id="personal-task-title-heading" className="font-serif text-xl text-slate-900 tracking-tight pr-8">New Personal Objective</h2>
+                <h2 id="personal-task-title-heading" className="font-serif text-xl text-slate-900 -tracking-[0.025em] tracking-tight pr-8">New Personal Objective</h2>
               </div>
               <button
                 onClick={onClose}
-                className="text-slate-400 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 p-3 rounded-full transition-all"
+                className="text-slate-400 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 p-3 rounded-full transition-all duration-150"
                 aria-label="Close new personal objective modal"
               >
                 <X className="w-5 h-5" />
@@ -77,7 +77,7 @@ export default function NewPersonalTaskModal({
                     required
                     value={newPersonalTask.title}
                     onChange={(e) => setNewPersonalTask({ ...newPersonalTask, title: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-3xl py-4 pl-16 pr-6 text-slate-900 focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all font-serif text-base"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-16 pr-6 text-slate-900 focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all duration-150 font-serif text-base"
                     placeholder="E.g., Complete security review"
                   />
                 </div>
@@ -92,7 +92,7 @@ export default function NewPersonalTaskModal({
                     type="datetime-local"
                     value={newPersonalTask.timelineEnd}
                     onChange={(e) => setNewPersonalTask({ ...newPersonalTask, timelineEnd: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-3xl py-4 pl-16 pr-6 text-slate-900 focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all font-mono text-sm"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-16 pr-6 text-slate-900 focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all duration-150 font-mono text-sm"
                   />
                 </div>
               </div>
@@ -101,7 +101,7 @@ export default function NewPersonalTaskModal({
                 <button
                   type="submit"
                   disabled={isCreating}
-                  className="bg-emerald-500 text-slate-950 font-mono text-xs font-black uppercase tracking-[0.2em] py-5 px-8 hover:bg-emerald-400 transition-all rounded-2xl shadow-xl shadow-emerald-500/10 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto flex items-center justify-center gap-3"
+                  className="bg-emerald-500 text-slate-950 font-mono text-xs font-black uppercase tracking-[0.2em] py-5 px-8 hover:bg-emerald-400 transition-all duration-150 rounded-xl shadow-xl shadow-emerald-500/10 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto flex items-center justify-center gap-3"
                 >
                   {isCreating ? (
                     <motion.div animate={reducedMotion ? undefined : { rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} className="w-5 h-5 border-2 border-slate-950 border-t-transparent rounded-full" />

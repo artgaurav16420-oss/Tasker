@@ -4,4 +4,38 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   --font-serif: "Playfair Display", ui-serif, serif;
+
+  /* Surface ladder */
+  --color-canvas: #f8fafc;
+  --color-surface-1: #ffffff;
+  --color-surface-2: #f8fafc;
+  --color-surface-3: #f1f5f9;
+  --color-hairline: #e2e8f0;
+  --color-hairline-soft: #f1f5f9;
+
+  /* Ink */
+  --color-ink-primary: #0f172a;
+  --color-ink-secondary: #64748b;
+  --color-ink-muted: #94a3b8;
+  --color-ink-inverse: #ffffff;
+
+  /* Accent */
+  --color-accent: #10b981;
+  --color-accent-hover: #34d399;
+  --color-accent-soft: #d1fae5;
+  --color-accent-border: #059669;
+
+  /* Semantic */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #f97316;
+  --color-danger-deep: #ea580c;
+  --color-info: #0ea5e9;
+  --color-review: #6366f1;
+
+  /* Shadows */
+  --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-card: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-elevated: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  --shadow-modal: 0 25px 50px -12px rgb(0 0 0 / 0.15);
 }

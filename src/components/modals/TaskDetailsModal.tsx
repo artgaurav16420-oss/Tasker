@@ -106,14 +106,15 @@ export default function TaskDetailsModal({
           aria-labelledby="task-details-title"
           className="relative w-full max-w-4xl bg-white border border-slate-100 shadow-2xl rounded-3xl overflow-hidden flex flex-col max-h-[90vh]"
         >
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent"></div>
           {/* Header */}
           <div className="p-8 md:p-12 border-b border-slate-50 flex justify-between items-start sticky top-0 bg-white z-10">
             <div className="space-y-4">
               <div className="flex items-center gap-4">
-                <div className={`w-3 h-3 rounded-full ${selectedTaskDetails.status === 'completed' ? 'bg-emerald-500' : 'bg-orange-500 shadow-lg shadow-orange-500/20 animate-pulse'}`}></div>
+                <div className={`w-3 h-3 rounded-full ${selectedTaskDetails.status === 'completed' ? 'bg-emerald-500' : 'bg-orange-500 shadow-sm animate-pulse'}`}></div>
                 <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-400">Operation Briefing</h2>
               </div>
-              <h2 id="task-details-title" className="font-serif text-2xl text-slate-900 tracking-tight leading-tight">
+              <h2 id="task-details-title" className="font-serif text-2xl text-slate-900 -tracking-[0.025em] tracking-tight leading-tight">
                 {selectedTaskDetails.title}
               </h2>
             </div>
@@ -126,7 +127,7 @@ export default function TaskDetailsModal({
                       setEditingTask(selectedTaskDetails);
                       setSelectedTaskDetails(null);
                     }}
-                    className="p-3 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all rounded-2xl border border-slate-100"
+                    className="p-3 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-150 rounded-xl border border-slate-100"
                     title="Edit Metadata"
                     aria-label="Edit task metadata"
                   >
@@ -134,7 +135,7 @@ export default function TaskDetailsModal({
                   </button>
                   <button
                     onClick={() => handleDeleteTask(selectedTaskDetails)}
-                    className="p-3 text-slate-400 hover:text-orange-600 hover:bg-orange-50 transition-all rounded-2xl border border-slate-100"
+                    className="p-3 text-slate-400 hover:text-orange-600 hover:bg-orange-50 transition-all duration-150 rounded-xl border border-slate-100"
                     title="Terminate Record"
                     aria-label="Delete task"
                   >
@@ -145,7 +146,7 @@ export default function TaskDetailsModal({
               <button
                 onClick={() => setSelectedTaskDetails(null)}
                 aria-label="Close dialog"
-                className="p-3 text-slate-400 hover:text-slate-900 hover:bg-slate-50 transition-all rounded-2xl border border-slate-100 ml-2"
+                className="p-3 text-slate-400 hover:text-slate-900 hover:bg-slate-50 transition-all duration-150 rounded-xl border border-slate-100 ml-2"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -164,12 +165,12 @@ export default function TaskDetailsModal({
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-5 bg-slate-50 rounded-3xl border border-slate-100">
+                  <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
                     <Calendar className="w-4 h-4 text-emerald-500 mb-3" />
                     <div className="font-mono text-xs uppercase tracking-widest text-slate-400 mb-1 font-bold">Assigned</div>
                     <div className="font-mono text-sm font-black text-slate-900">{new Date(selectedTaskDetails.createdAt).toLocaleDateString()}</div>
                   </div>
-                  <div className={`p-5 rounded-3xl border ${getDeadlineStyle(selectedTaskDetails.timelineEnd, selectedTaskDetails.status === 'completed')}`}>
+                  <div className={`p-5 rounded-2xl border ${getDeadlineStyle(selectedTaskDetails.timelineEnd, selectedTaskDetails.status === 'completed')}`}>
                     <Clock className="w-4 h-4 mb-3" />
                     <div className="font-mono text-xs uppercase tracking-widest opacity-80 mb-1 font-bold">Target Deadline</div>
                     <div className="font-mono text-sm font-black">{selectedTaskDetails.timelineEnd || "Open Timeline"}</div>
@@ -184,8 +185,8 @@ export default function TaskDetailsModal({
                   <div className="flex items-center gap-4">
                     <div className={`px-6 py-3 rounded-full font-mono text-xs font-black uppercase tracking-[0.2em] flex items-center gap-3 ${
                       selectedTaskDetails.status === 'completed' 
-                      ? 'bg-emerald-500 text-slate-900 shadow-xl shadow-emerald-500/20' 
-                      : 'bg-orange-500 text-white shadow-xl shadow-orange-500/20'
+                      ? 'bg-emerald-500 text-slate-900 shadow-lg shadow-emerald-500/10' 
+                      : 'bg-orange-500 text-white shadow-lg shadow-orange-500/10'
                     }`}>
                       {selectedTaskDetails.status === 'completed' ? <CheckCircle2 className="w-4 h-4" /> : <Activity className="w-4 h-4" />}
                       {selectedTaskDetails.status}
@@ -204,14 +205,14 @@ export default function TaskDetailsModal({
                     <div className="flex flex-col gap-3">
                       <button
                         onClick={() => handleStatusChange(selectedTaskDetails.id, 'completed', selectedTaskDetails)}
-                        className="w-full bg-emerald-500 text-slate-950 font-mono text-xs font-black uppercase tracking-[0.2em] py-5 rounded-2xl hover:bg-emerald-400 transition-all shadow-xl shadow-emerald-500/10 active:scale-95 flex items-center justify-center gap-3"
+                        className="w-full bg-emerald-500 text-slate-950 font-mono text-xs font-black uppercase tracking-[0.2em] py-5 rounded-xl hover:bg-emerald-400 transition-all duration-150 shadow-lg shadow-emerald-500/10 active:scale-95 flex items-center justify-center gap-3"
                       >
                         <CheckCircle2 className="w-5 h-5" /> Authorize Completion
                       </button>
                       {selectedTaskDetails.status === 'in-review' && (
                         <button
                           onClick={() => handleStatusChange(selectedTaskDetails.id, 'in-progress', selectedTaskDetails)}
-                          className="w-full border border-orange-200 text-orange-600 bg-orange-50 font-mono text-xs font-black uppercase tracking-[0.2em] py-5 rounded-2xl hover:bg-orange-100 transition-all active:scale-95"
+                          className="w-full border border-orange-200 text-orange-600 bg-orange-50 font-mono text-xs font-black uppercase tracking-[0.2em] py-5 rounded-xl hover:bg-orange-100 transition-all duration-150 active:scale-95"
                         >
                           Request Revision
                         </button>

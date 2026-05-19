@@ -40,19 +40,19 @@ export default function PersonnelRoster({
       <div className="flex items-end justify-between border-b border-slate-200 pb-8">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <div className="w-3 h-3 bg-emerald-500 rotate-45 shadow-lg shadow-emerald-500/20"></div>
+            <div className="w-3 h-3 bg-emerald-500 rotate-45 shadow-sm"></div>
             <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-400">Personnel</h2>
           </div>
-          <h2 className="font-serif text-2xl text-slate-900 tracking-tight">
+          <h2 className="font-serif text-2xl text-slate-900 -tracking-[0.025em] tracking-tight">
             Team Roster ({employees.length})
           </h2>
         </div>
       </div>
 
       {employees.length === 0 ? (
-        <div className="border-2 border-dashed border-slate-200 p-16 text-center bg-white rounded-3xl shadow-inner">
-          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center">
-            <Users className="w-8 h-8 text-slate-300" />
+        <div className="border-2 border-dashed border-slate-200 p-16 text-center bg-white rounded-2xl shadow-inner">
+          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-emerald-50/70 border border-emerald-100 flex items-center justify-center">
+            <Users className="w-8 h-8 text-emerald-400" />
           </div>
           <p className="font-mono text-xs uppercase tracking-[0.25em] text-slate-400 font-bold">
             No operatives assigned
@@ -69,7 +69,7 @@ export default function PersonnelRoster({
               initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
               animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
               transition={reducedMotion ? undefined : { delay: idx * 0.05 }}
-              className="group relative bg-white border border-slate-200 rounded-3xl p-6 hover:shadow-2xl hover:shadow-slate-200/50 hover:border-emerald-500/30 transition-all cursor-pointer shadow-lg shadow-slate-200/20"
+              className="group relative bg-white border border-slate-200 rounded-3xl p-6 hover:shadow-xl hover:shadow-slate-200/40 hover:border-emerald-500/30 transition-all duration-150 cursor-pointer shadow-sm"
               onClick={() => setSelectedEmployee(emp)}
               onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelectedEmployee(emp); } }}
               role="button"
@@ -77,7 +77,7 @@ export default function PersonnelRoster({
             >
               <button
                 onClick={(e) => { e.stopPropagation(); handleRemoveEmployee(emp.uid); }}
-                className="absolute top-4 right-4 p-2 text-slate-200 hover:text-orange-500 hover:bg-orange-50 rounded-xl transition-all z-10"
+                className="absolute top-4 right-4 p-2 text-slate-200 hover:text-orange-500 hover:bg-orange-50 rounded-xl transition-all duration-150 z-10"
                 title="Remove from Team"
                 aria-label={`Remove ${emp.name} from team`}
               >
@@ -85,11 +85,11 @@ export default function PersonnelRoster({
               </button>
 
               <div className="flex items-center gap-4 mb-6 pr-8">
-                <div className="w-14 h-14 rounded-full border border-slate-100 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0 shadow-lg shadow-emerald-500/5">
+                <div className="w-14 h-14 rounded-full border border-slate-100 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
                   <Avatar name={emp.name} size={56} className="rounded-full" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="font-serif text-xl text-slate-900 truncate group-hover:text-emerald-600 transition-colors">
+                  <h3 className="font-serif text-xl text-slate-900 -tracking-[0.025em] truncate group-hover:text-emerald-600 transition-colors duration-150">
                     {emp.name}
                   </h3>
                   <p className="font-mono text-xs uppercase tracking-widest text-slate-400 font-bold mt-1 truncate">
@@ -115,9 +115,9 @@ export default function PersonnelRoster({
                     setNewTask({ title: '', description: '', employeeId: emp.uid, timelineEnd: '', priority: 'medium' });
                     setIsTaskModalOpen(true);
                   }}
-                  className="p-4 bg-white border border-dashed border-emerald-300 rounded-2xl text-emerald-600 hover:bg-emerald-50 transition-all flex flex-col items-center justify-center group/add"
+                  className="p-4 bg-white border border-dashed border-emerald-300 rounded-2xl text-emerald-600 hover:bg-emerald-50 transition-all duration-150 flex flex-col items-center justify-center group/add"
                 >
-                  <Plus className="w-4 h-4 mb-1 group-hover/add:scale-125 transition-transform" />
+                  <Plus className="w-4 h-4 mb-1 group-hover/add:scale-125 transition-transform duration-150" />
                   <div className="font-mono text-xs uppercase tracking-widest font-bold">Assign</div>
                 </button>
               </div>

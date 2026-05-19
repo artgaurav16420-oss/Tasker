@@ -51,6 +51,7 @@ export default function TaskAssignmentModal({
           aria-labelledby="task-assignment-title"
           className="relative w-full max-w-2xl bg-white border border-slate-100 shadow-2xl rounded-3xl overflow-hidden"
         >
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent"></div>
           {/* Header */}
           <div className="p-8 md:p-10 border-b border-slate-50 flex justify-between items-start">
             <div className="space-y-3">
@@ -58,14 +59,14 @@ export default function TaskAssignmentModal({
                 <Target className="w-4 h-4 text-emerald-500" />
                 <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-400">Tactical Assignment</h2>
               </div>
-              <h2 id="task-assignment-title" className="font-serif text-xl text-slate-900 tracking-tight">
+              <h2 id="task-assignment-title" className="font-serif text-xl text-slate-900 -tracking-[0.025em] tracking-tight">
                 Initialize New Operation
               </h2>
             </div>
             <button
               onClick={onClose}
               aria-label="Close dialog"
-              className="p-3 text-slate-300 hover:text-slate-900 hover:bg-slate-50 transition-all rounded-2xl"
+              className="p-3 text-slate-300 hover:text-slate-900 hover:bg-slate-50 transition-all duration-150 rounded-xl"
             >
               <X className="w-6 h-6" />
             </button>
@@ -82,7 +83,7 @@ export default function TaskAssignmentModal({
                   value={newTask.title}
                   onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
                   placeholder="e.g. Laser Alignment Phase II"
-                  className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white transition-all font-serif text-base"
+                  className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white transition-all duration-150 font-serif text-base"
                 />
               </div>
 
@@ -94,7 +95,7 @@ export default function TaskAssignmentModal({
                   onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
                   placeholder="Detailed technical instructions..."
                   rows={4}
-                  className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white transition-all text-slate-600 leading-relaxed"
+                  className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white transition-all duration-150 text-slate-600 leading-relaxed"
                 />
               </div>
 
@@ -157,7 +158,7 @@ export default function TaskAssignmentModal({
               <button
                 type="submit"
                 disabled={isCreating}
-                className="w-full bg-emerald-500 text-slate-950 font-mono text-xs font-black uppercase tracking-[0.3em] py-6 rounded-3xl hover:bg-emerald-400 transition-all shadow-2xl shadow-emerald-500/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-4"
+                className="w-full bg-emerald-500 text-slate-950 font-mono text-xs font-black uppercase tracking-[0.3em] py-6 rounded-xl hover:bg-emerald-400 transition-all duration-150 shadow-xl shadow-emerald-500/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-4"
               >
                 {isCreating ? (
                   <motion.div animate={reducedMotion ? undefined : { rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} className="w-5 h-5 border-2 border-slate-950 border-t-transparent rounded-full" />

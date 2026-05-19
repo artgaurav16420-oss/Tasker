@@ -42,10 +42,10 @@ export default function AssignedToMeBoard({
       <div className="flex items-end justify-between border-b border-slate-200 pb-8">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <div className="w-3 h-3 bg-emerald-500 rotate-45 shadow-lg shadow-emerald-500/20"></div>
+            <div className="w-3 h-3 bg-emerald-500 rotate-45 shadow-sm"></div>
             <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-400">Tactical Display</h2>
           </div>
-          <h2 className="font-serif text-2xl text-slate-900 tracking-tight">
+          <h2 className="font-serif text-2xl text-slate-900 tracking-tight -tracking-[0.025em]">
             Assigned Operations
           </h2>
         </div>
@@ -62,7 +62,8 @@ export default function AssignedToMeBoard({
 
           <div className="grid grid-cols-1 gap-4">
             {activeTasks.length === 0 && (
-              <div className="border border-slate-200 border-dashed p-16 text-center rounded-3xl bg-white">
+              <div className="border-2 border-dashed border-slate-200 p-16 text-center rounded-2xl bg-white shadow-inner">
+                <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center"><Activity className="w-8 h-8 text-emerald-400" /></div>
                 <p className="font-mono text-xs uppercase font-bold text-slate-400 tracking-widest">No active assignments detected.</p>
                 <p className="font-serif text-sm text-slate-500 mt-3 max-w-sm mx-auto">Tasks assigned to you will appear here. Contact your manager to receive assignments.</p>
               </div>
@@ -74,7 +75,7 @@ export default function AssignedToMeBoard({
                   key={task.id}
                   initial={reducedMotion ? { opacity: 1 } : { opacity: 0, x: -20 }}
                   animate={reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
-                  className="group relative bg-white border border-slate-200 p-6 rounded-3xl hover:shadow-2xl hover:shadow-slate-200/50 transition-all border-l-4 border-l-emerald-500 shadow-lg shadow-slate-200/20 overflow-hidden cursor-pointer"
+                  className="group relative bg-white border border-slate-200 p-6 rounded-2xl hover:shadow-xl hover:shadow-slate-200/40 transition-all border-l-4 border-l-emerald-500 shadow-sm overflow-hidden cursor-pointer"
                   onClick={() => setSelectedTaskDetails(task)}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedTaskDetails(task); } }}
                   role="button"
@@ -85,7 +86,7 @@ export default function AssignedToMeBoard({
                       <div className="flex items-center gap-4">
                         <div className={`w-2.5 h-2.5 rounded-full ${task.status === 'in-review' ? 'bg-indigo-500 animate-pulse' : 'bg-emerald-500'}`}></div>
                         <span className="text-xs font-mono text-slate-500 font-bold uppercase tracking-wider">{task.status === 'in-review' ? 'Review' : task.status === 'in-progress' ? 'Active' : 'Pending'}</span>
-                        <h4 className="font-serif text-xl text-slate-900 group-hover:text-emerald-600 transition-colors">
+                        <h4 className="font-serif text-xl text-slate-900 group-hover:text-emerald-600 transition-colors duration-150 -tracking-[0.025em]">
                           {task.title}
                         </h4>
                       </div>
@@ -116,7 +117,7 @@ export default function AssignedToMeBoard({
                             e.stopPropagation();
                             setSelectedTask(task);
                           }}
-                          className="bg-emerald-500 text-slate-950 font-mono text-xs font-black uppercase tracking-[0.2em] px-8 py-3.5 rounded-xl hover:bg-emerald-400 transition-all shadow-xl shadow-emerald-500/20 active:scale-95 flex items-center gap-2"
+                          className="bg-emerald-500 text-slate-950 font-mono text-xs font-black uppercase tracking-[0.2em] px-8 py-3.5 rounded-xl hover:bg-emerald-400 transition-all duration-150 shadow-xl shadow-emerald-500/20 active:scale-95 flex items-center gap-2"
                         >
                           <FileText className="w-4 h-4" /> Submit Report
                         </button>
@@ -131,7 +132,7 @@ export default function AssignedToMeBoard({
                           e.stopPropagation();
                           setSelectedTaskDetails(task);
                         }}
-                        className="bg-white border border-slate-200 text-slate-600 font-mono text-xs font-black uppercase tracking-[0.2em] px-6 py-3.5 rounded-xl hover:bg-slate-50 transition-all active:scale-95"
+                        className="bg-white border border-slate-200 text-slate-600 font-mono text-xs font-black uppercase tracking-[0.2em] px-6 py-3.5 rounded-xl hover:bg-slate-50 transition-all duration-150 active:scale-95"
                       >
                         Details
                       </button>

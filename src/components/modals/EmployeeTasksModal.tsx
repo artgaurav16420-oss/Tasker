@@ -67,10 +67,11 @@ export default function EmployeeTasksModal({
           aria-labelledby="employee-tasks-title"
           className="relative w-full max-w-4xl bg-white border border-slate-100 shadow-2xl rounded-3xl overflow-hidden flex flex-col max-h-[90vh]"
         >
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent"></div>
           {/* Header */}
           <div className="p-8 md:p-12 border-b border-slate-50 flex justify-between items-start sticky top-0 bg-white z-10">
             <div className="flex items-center gap-6">
-              <div className="w-16 h-16 rounded-full border border-slate-100 shadow-xl shadow-emerald-500/5 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
+              <div className="w-16 h-16 rounded-full border border-slate-100 shadow-sm bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
                 <Avatar name={selectedEmployee.name} size={64} className="rounded-full" />
               </div>
               <div className="space-y-2">
@@ -78,7 +79,7 @@ export default function EmployeeTasksModal({
                   <div className="w-2.5 h-2.5 bg-emerald-500 rotate-45"></div>
                   <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-400">Personnel Dossier</h2>
                 </div>
-                <h2 id="employee-tasks-title" className="font-serif text-2xl text-slate-900 tracking-tight">
+                <h2 id="employee-tasks-title" className="font-serif text-2xl text-slate-900 -tracking-[0.025em] tracking-tight">
                   {selectedEmployee.name}
                 </h2>
               </div>
@@ -87,7 +88,7 @@ export default function EmployeeTasksModal({
             <button
               onClick={() => setSelectedEmployee(null)}
               aria-label="Close dialog"
-              className="p-3 text-slate-400 hover:text-slate-900 hover:bg-slate-50 transition-all rounded-2xl border border-slate-100"
+              className="p-3 text-slate-400 hover:text-slate-900 hover:bg-slate-50 transition-all duration-150 rounded-xl border border-slate-100"
             >
               <X className="w-5 h-5" />
             </button>
@@ -96,11 +97,11 @@ export default function EmployeeTasksModal({
           <div className="flex-1 overflow-y-auto p-8 md:p-12 space-y-12">
             {/* Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 text-center">
+              <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 text-center">
                 <div className="font-mono text-xs uppercase tracking-widest text-slate-400 mb-2 font-bold">Total Ops</div>
                 <div className="font-serif text-xl text-slate-900">{employeeTasks.length}</div>
               </div>
-              <div className="p-6 bg-emerald-50 rounded-3xl border border-emerald-100 text-center">
+              <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-100 text-center">
                 <div className="font-mono text-xs uppercase tracking-widest text-emerald-600 mb-2 font-bold">In Progress</div>
                 <div className="font-serif text-xl text-emerald-700">{activeTasks.length}</div>
               </div>
@@ -109,7 +110,7 @@ export default function EmployeeTasksModal({
                   setNewTask({ title: '', description: '', employeeId: selectedEmployee.uid, timelineEnd: '', priority: 'medium' });
                   setIsTaskModalOpen(true);
                 }}
-                className="p-6 bg-white border border-dashed border-emerald-300 rounded-3xl text-emerald-600 hover:bg-emerald-50 transition-all flex flex-col items-center justify-center group"
+                className="p-6 bg-white border border-dashed border-emerald-300 rounded-2xl text-emerald-600 hover:bg-emerald-50 transition-all duration-150 flex flex-col items-center justify-center group"
               >
                 <Plus className="w-5 h-5 mb-1 group-hover:scale-125 transition-transform" />
                 <div className="font-mono text-xs uppercase tracking-widest font-bold">New Assignment</div>
@@ -137,7 +138,7 @@ export default function EmployeeTasksModal({
                       layout
                       initial={reducedMotion ? { opacity: 1 } : { opacity: 0, x: -20 }}
                       animate={reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
-                      className="group relative bg-white border border-slate-200 p-6 rounded-3xl hover:shadow-2xl hover:shadow-slate-200/50 transition-all border-l-4 border-l-emerald-500 cursor-pointer"
+                      className="group relative bg-white border border-slate-200 p-6 rounded-2xl hover:shadow-2xl hover:shadow-slate-200/50 transition-all duration-150 border-l-4 border-l-emerald-500 cursor-pointer"
                       onClick={() => {
                         setSelectedTaskDetails(task);
                       }}
@@ -145,7 +146,7 @@ export default function EmployeeTasksModal({
                     >
                       <button
                         onClick={(e) => { e.stopPropagation(); handleDeleteTask(task); }}
-                        className="absolute top-4 right-4 p-2 text-slate-200 hover:text-orange-500 hover:bg-orange-50 rounded-xl transition-all"
+                        className="absolute top-4 right-4 p-2 text-slate-200 hover:text-orange-500 hover:bg-orange-50 rounded-xl transition-all duration-150"
                         aria-label={`Delete task: ${task.title}`}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -191,7 +192,7 @@ export default function EmployeeTasksModal({
                 {completedTasks.slice(0, 6).map((task) => (
                   <div 
                     key={task.id} 
-                    className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-center gap-4 cursor-pointer hover:bg-white transition-all group"
+                    className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-center gap-4 cursor-pointer hover:bg-white transition-all duration-150 group"
                     onClick={() => setSelectedTaskDetails(task)}
                   >
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />

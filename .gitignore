@@ -6,3 +6,6 @@ coverage/
 *.log
 .env*
 !.env.example
+awesome-design-md/
+
+awesome-design-md/

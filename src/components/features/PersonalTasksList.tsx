@@ -28,10 +28,10 @@ export default function PersonalTasksList({
       <div className="flex items-end justify-between border-b border-slate-200 pb-8">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <div className="w-3 h-3 bg-emerald-500 rounded-full shadow-lg shadow-emerald-500/20"></div>
+            <div className="w-3 h-3 bg-emerald-500 rounded-full shadow-sm"></div>
             <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-400">Self-Assigned</h2>
           </div>
-          <h2 className="font-serif text-2xl text-slate-900 tracking-tight">
+          <h2 className="font-serif text-2xl text-slate-900 tracking-tight -tracking-[0.025em]">
             My Tasks
           </h2>
         </div>
@@ -44,12 +44,13 @@ export default function PersonalTasksList({
       </div>
 
       <div className="space-y-8">
-        <h3 className="font-serif text-xl text-slate-900 tracking-tight">
+        <h3 className="font-serif text-xl text-slate-900 tracking-tight -tracking-[0.025em]">
           Active Objectives
         </h3>
 
         {activeTasks.length === 0 ? (
-          <div className="border-2 border-dashed border-slate-200 p-16 text-center text-xs font-mono tracking-[0.25em] uppercase text-slate-600 bg-white shadow-inner rounded-3xl">
+          <div className="border-2 border-dashed border-slate-200 p-16 text-center text-xs font-mono tracking-[0.25em] uppercase text-slate-600 bg-white shadow-inner rounded-2xl">
+            <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center"><CheckCircle2 className="w-8 h-8 text-emerald-400" /></div>
             No personal tasks currently active.
           </div>
         ) : (
@@ -61,12 +62,12 @@ export default function PersonalTasksList({
                   initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
                   animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
                   exit={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
-                  className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm flex items-center justify-between group hover:border-emerald-500/30 transition-all"
+                  className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm flex items-center justify-between group hover:border-emerald-500/30 transition-all duration-150"
                 >
                   <div className="flex items-center gap-4 flex-1">
                     <button
                       onClick={() => handleTogglePersonalTask(task.id, task.status)}
-                      className="text-slate-300 hover:text-emerald-500 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                      className="text-slate-300 hover:text-emerald-500 transition-colors duration-150 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
                       aria-label={`Mark "${task.title}" as completed`}
                     >
                       <Circle className="w-6 h-6" />
@@ -86,7 +87,7 @@ export default function PersonalTasksList({
                   </div>
                   <button
                     onClick={() => handleDeletePersonalTask(task.id)}
-                    className="text-slate-300 hover:text-orange-500 p-2 transition-all md:opacity-0 md:group-hover:opacity-100 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                    className="text-slate-300 hover:text-orange-500 p-2 transition-all duration-150 md:opacity-0 md:group-hover:opacity-100 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
                     aria-label={`Delete "${task.title}"`}
                   >
                     <Trash2 className="w-5 h-5" />
@@ -100,7 +101,7 @@ export default function PersonalTasksList({
 
       {completedTasks.length > 0 && (
         <div className="space-y-8 pt-8 border-t border-slate-100">
-          <h3 className="font-serif text-xl text-slate-900 tracking-tight opacity-60">
+          <h3 className="font-serif text-xl text-slate-900 tracking-tight opacity-60 -tracking-[0.025em]">
             Completed Objectives
           </h3>
           <div className="grid grid-cols-1 gap-4">

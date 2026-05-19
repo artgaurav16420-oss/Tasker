@@ -66,11 +66,11 @@ export default function AuthScreen() {
     return (
       <div className="min-h-dvh bg-slate-50 text-slate-900 flex items-center justify-center p-4 font-sans">
         <div className="w-full max-w-md text-center space-y-6">
-          <div className="bg-white rounded-3xl border border-slate-200 p-10 shadow-2xl shadow-slate-200/50">
-            <div className="w-16 h-16 bg-emerald-50 border border-emerald-200 rounded-2xl mx-auto flex items-center justify-center mb-6">
+          <div className="bg-white rounded-3xl border border-slate-200 p-10 shadow-xl shadow-slate-200/40">
+            <div className="w-16 h-16 bg-emerald-50/70 border border-emerald-200 rounded-2xl mx-auto flex items-center justify-center mb-6">
               <Mail className="w-8 h-8 text-emerald-600" />
             </div>
-            <h2 className="font-mono font-black uppercase tracking-[0.2em] text-slate-900 mb-3">Verify Your Email</h2>
+            <h2 className="font-mono font-black -tracking-[0.025em] uppercase tracking-[0.2em] text-slate-900 mb-3">Verify Your Email</h2>
             <p className="font-serif text-slate-500 text-sm leading-relaxed">
               A verification link has been sent to <span className="text-emerald-600 font-mono text-xs">{email}</span>. Click the link to activate your account, then log in.
             </p>
@@ -92,25 +92,25 @@ export default function AuthScreen() {
         <div className="flex justify-center mb-6">
           <Logo className="w-24 h-24" />
         </div>
-        <h1 className="text-2xl font-mono tracking-[0.1em] font-black mb-2 text-slate-900">Tasker</h1>
+        <h1 className="text-2xl font-mono -tracking-[0.025em] tracking-[0.1em] font-black mb-2 text-slate-900">Tasker</h1>
         <p className="text-slate-400 text-xs font-mono uppercase tracking-[0.1em] font-bold">Raja Ramanna Centre for Advanced Technology</p>
       </div>
 
-      <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-2xl shadow-slate-200/50 relative overflow-hidden">
+      <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-xl shadow-slate-200/40 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
 
         <div className="flex gap-8 mb-10 relative z-10">
           <button
             type="button"
             onClick={() => { setIsLogin(true); setError(''); }}
-            className={`flex-1 pb-3 text-xs font-mono font-bold uppercase tracking-widest transition-all border-b-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-t-lg ${isLogin ? 'border-emerald-500 text-slate-950' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+            className={`flex-1 pb-3 text-xs font-mono font-bold uppercase tracking-widest transition-all duration-150 border-b-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-t-xl ${isLogin ? 'border-emerald-500 text-slate-950' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
           >
             Login
           </button>
           <button
             type="button"
             onClick={() => { setIsLogin(false); setError(''); }}
-            className={`flex-1 pb-3 text-xs font-mono font-bold uppercase tracking-widest transition-all border-b-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-t-lg ${!isLogin ? 'border-emerald-500 text-slate-950' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+            className={`flex-1 pb-3 text-xs font-mono font-bold uppercase tracking-widest transition-all duration-150 border-b-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-t-xl ${!isLogin ? 'border-emerald-500 text-slate-950' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
           >
             Sign Up
           </button>
@@ -127,7 +127,7 @@ export default function AuthScreen() {
             <div className="space-y-2">
               <label htmlFor="auth-name" className="text-xs font-mono text-slate-400 uppercase tracking-widest block font-bold">Full Name</label>
               <div className="relative group">
-                <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-emerald-500 transition-colors" />
+                <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-emerald-500 transition-colors duration-150" />
                 <input
                   id="auth-name"
                   type="text"
@@ -145,7 +145,7 @@ export default function AuthScreen() {
           <div className="space-y-2">
             <label htmlFor="auth-email" className="text-xs font-mono text-slate-400 uppercase tracking-widest block font-bold">Email Address</label>
             <div className="relative group">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-emerald-500 transition-colors" />
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-emerald-500 transition-colors duration-150" />
               <input
                 id="auth-email"
                 type="email"
@@ -162,7 +162,7 @@ export default function AuthScreen() {
           <div className="space-y-2">
             <label htmlFor="auth-password" className="text-xs font-mono text-slate-400 uppercase tracking-widest block font-bold">Password</label>
             <div className="relative group">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-emerald-500 transition-colors" />
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-emerald-500 transition-colors duration-150" />
               <input
                 id="auth-password"
                 type={showPassword ? 'text' : 'password'}
@@ -176,7 +176,7 @@ export default function AuthScreen() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500 transition-colors p-1 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500 transition-colors duration-150 p-1 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -187,7 +187,7 @@ export default function AuthScreen() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-emerald-500 text-slate-950 rounded-xl py-4 mt-8 font-mono font-bold text-xs uppercase tracking-[0.2em] hover:bg-emerald-400 hover:shadow-xl hover:shadow-emerald-500/20 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-3 shadow-lg shadow-emerald-500/10 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+            className="w-full bg-emerald-500 text-slate-950 rounded-xl py-4 mt-8 font-mono font-bold text-xs uppercase tracking-[0.2em] hover:bg-emerald-400 hover:shadow-xl hover:shadow-emerald-500/20 active:scale-95 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-3 shadow-lg shadow-emerald-500/10 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
           >
             {loading ? (
               <motion.div animate={reducedMotion ? undefined : { rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} className="w-5 h-5 border-2 border-slate-950 border-t-transparent rounded-full" />

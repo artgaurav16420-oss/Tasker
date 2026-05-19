@@ -23,7 +23,7 @@ export default class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="min-h-[200px] flex items-center justify-center p-8">
           <div className="text-center space-y-4">
-            <div className="w-12 h-12 mx-auto rounded-full bg-orange-50 border border-orange-100 flex items-center justify-center">
+            <div className="w-12 h-12 mx-auto rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center">
               <span className="text-orange-500 font-mono text-xl font-bold">!</span>
             </div>
             <p className="font-mono text-xs uppercase tracking-widest text-slate-400 font-bold">
@@ -34,7 +34,7 @@ export default class ErrorBoundary extends Component<Props, State> {
             </p>
             <button
               onClick={this.handleReset}
-              className="mt-4 px-6 py-3 bg-emerald-500 text-slate-950 rounded-xl font-mono text-xs font-bold uppercase tracking-widest hover:bg-emerald-400 transition-all"
+              className="mt-4 px-6 py-3 bg-emerald-500 text-slate-950 rounded-xl font-mono text-xs font-bold uppercase tracking-widest hover:bg-emerald-400 transition-all duration-150"
             >
               Retry
             </button>
