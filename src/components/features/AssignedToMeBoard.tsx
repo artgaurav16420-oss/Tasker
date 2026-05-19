@@ -1,0 +1,179 @@
+import { useMemo } from "react";
+import { 
+  Activity, 
+  Clock, 
+  FileText, 
+  CheckCircle2, 
+  AlertCircle,
+  Zap 
+} from "lucide-react";
+import { motion } from "motion/react";
+import { UserProfile, Task } from "../../lib/types";
+import { getPriorityStyle } from "../../lib/utils";
+import { useReducedMotion } from "../../lib/hooks/useReducedMotion";
+
+interface Props {
+  profile: UserProfile | null;
+  myTasks: Task[];
+  superiors: UserProfile[];
+  getDeadlineStyle: (deadline: string | null | undefined, isCompleted: boolean) => string;
+  getTimeRemaining: (deadline: string) => string | null;
+  handleStatusChange: (taskId: string, newStatus: Task['status'], task?: Task) => Promise<void>;
+  setSelectedTask: (task: Task | null) => void;
+  setSelectedTaskDetails: (task: Task | null) => void;
+}
+
+export default function AssignedToMeBoard({
+  profile,
+  myTasks,
+  superiors,
+  getDeadlineStyle,
+  getTimeRemaining,
+  handleStatusChange,
+  setSelectedTask,
+  setSelectedTaskDetails,
+}: Props) {
+  const reducedMotion = useReducedMotion();
+  const activeTasks = useMemo(() => myTasks.filter(t => t.status !== "completed"), [myTasks]);
+  const completedTasks = useMemo(() => myTasks.filter(t => t.status === "completed"), [myTasks]);
+
+  return (
+    <div className="space-y-12">
+      <div className="flex items-end justify-between border-b border-slate-200 pb-8">
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <div className="w-3 h-3 bg-emerald-500 rotate-45 shadow-lg shadow-emerald-500/20"></div>
+            <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-400">Tactical Display</h2>
+          </div>
+          <h2 className="font-serif text-2xl text-slate-900 tracking-tight">
+            Assigned Operations
+          </h2>
+        </div>
+      </div>
+
+      <div className="space-y-12">
+        <section className="space-y-6">
+          <div className="flex items-center gap-6">
+            <h3 className="font-mono text-xs font-black uppercase tracking-[0.3em] text-slate-600 whitespace-nowrap">
+              Active Duty ({activeTasks.length})
+            </h3>
+            <div className="h-[1px] flex-1 bg-gradient-to-r from-slate-200 to-transparent"></div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            {activeTasks.length === 0 && (
+              <div className="border border-slate-200 border-dashed p-16 text-center rounded-3xl bg-white">
+                <p className="font-mono text-xs uppercase font-bold text-slate-400 tracking-widest">No active assignments detected.</p>
+                <p className="font-serif text-sm text-slate-500 mt-3 max-w-sm mx-auto">Tasks assigned to you will appear here. Contact your manager to receive assignments.</p>
+              </div>
+            )}
+            {activeTasks.map((task) => {
+              const manager = superiors.find(s => s.uid === task.managerId);
+              return (
+                <motion.div
+                  key={task.id}
+                  initial={reducedMotion ? { opacity: 1 } : { opacity: 0, x: -20 }}
+                  animate={reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
+                  className="group relative bg-white border border-slate-200 p-6 rounded-3xl hover:shadow-2xl hover:shadow-slate-200/50 transition-all border-l-4 border-l-emerald-500 shadow-lg shadow-slate-200/20 overflow-hidden cursor-pointer"
+                  onClick={() => setSelectedTaskDetails(task)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedTaskDetails(task); } }}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <div className="flex flex-col xl:flex-row justify-between gap-6 xl:items-center">
+                    <div className="space-y-4 flex-1">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-2.5 h-2.5 rounded-full ${task.status === 'in-review' ? 'bg-indigo-500 animate-pulse' : 'bg-emerald-500'}`}></div>
+                        <span className="text-xs font-mono text-slate-500 font-bold uppercase tracking-wider">{task.status === 'in-review' ? 'Review' : task.status === 'in-progress' ? 'Active' : 'Pending'}</span>
+                        <h4 className="font-serif text-xl text-slate-900 group-hover:text-emerald-600 transition-colors">
+                          {task.title}
+                        </h4>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-3 items-center">
+                        <div className={`px-4 py-1 rounded-lg border font-mono text-xs font-black uppercase tracking-widest shadow-md ${getPriorityStyle(task.priority)}`}>
+                          <Zap className="w-3.5 h-3.5 inline mr-1" />
+                          {task.priority || 'medium'}
+                        </div>
+                        <div className="px-3 py-1 bg-slate-50 border border-slate-100 rounded-lg flex items-center gap-2">
+                          <Activity className="w-3 h-3 text-slate-400" />
+                          <span className="font-mono text-xs font-black uppercase tracking-widest text-slate-500">
+                            From: {manager?.name || "System Master"}
+                          </span>
+                        </div>
+                        <div className={`px-4 py-1 rounded-lg border font-mono text-xs font-black uppercase tracking-widest ${getDeadlineStyle(task.timelineEnd, false)}`}>
+                          <Clock className="w-3.5 h-3.5 inline mr-1" />
+                          {task.timelineEnd ? `Target: ${task.timelineEnd}` : "Open Order"}
+                          {task.timelineEnd && <span className="ml-3 opacity-80">{getTimeRemaining(task.timelineEnd)}</span>}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 shrink-0">
+                      {task.status !== 'in-review' ? (
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedTask(task);
+                          }}
+                          className="bg-emerald-500 text-slate-950 font-mono text-xs font-black uppercase tracking-[0.2em] px-8 py-3.5 rounded-xl hover:bg-emerald-400 transition-all shadow-xl shadow-emerald-500/20 active:scale-95 flex items-center gap-2"
+                        >
+                          <FileText className="w-4 h-4" /> Submit Report
+                        </button>
+                      ) : (
+                        <div className="bg-indigo-50 text-indigo-600 border border-indigo-100 px-8 py-3.5 rounded-xl font-mono text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2">
+                          <AlertCircle className="w-4 h-4" /> Pending Review
+                        </div>
+                      )}
+                      
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedTaskDetails(task);
+                        }}
+                        className="bg-white border border-slate-200 text-slate-600 font-mono text-xs font-black uppercase tracking-[0.2em] px-6 py-3.5 rounded-xl hover:bg-slate-50 transition-all active:scale-95"
+                      >
+                        Details
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="space-y-6">
+          <div className="flex items-center gap-6">
+            <h3 className="font-mono text-xs font-black uppercase tracking-[0.3em] text-slate-400 whitespace-nowrap">
+              Operation Archive ({completedTasks.length})
+            </h3>
+            <div className="h-[1px] flex-1 bg-gradient-to-r from-slate-100 to-transparent"></div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {completedTasks.map((task) => (
+              <div 
+                key={task.id} 
+                className="bg-slate-50/50 border border-slate-200/60 p-5 rounded-2xl flex items-center justify-between group cursor-pointer hover:bg-white transition-all"
+                onClick={() => setSelectedTaskDetails(task)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedTaskDetails(task); } }}
+                role="button"
+                tabIndex={0}
+              >
+                <div className="flex items-center gap-4">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+                  <div>
+                    <h5 className="font-serif text-base text-slate-700">{task.title}</h5>
+                    <p className="font-mono text-xs uppercase tracking-widest text-slate-400 font-bold mt-1">Archived {new Date(task.updatedAt || Date.now()).toLocaleDateString()}</p>
+                  </div>
+                </div>
+                <FileText className="w-4 h-4 text-slate-300 group-hover:text-emerald-500 transition-colors" />
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}

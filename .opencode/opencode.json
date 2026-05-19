@@ -1,0 +1,19 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": [
+    ".opencode/plugins/graphify.js",
+    "superpowers@git+https://github.com/obra/superpowers.git",
+    "~/.config/opencode/node_modules/ecc-universal",
+    "~/.config/opencode/node_modules/andrej-karpathy-skills",
+    "~/.config/opencode/node_modules/caveman",
+    "~/.config/opencode/node_modules/cavekit",
+    "~/.config/opencode/node_modules/open-design",
+    "~/.config/opencode/node_modules/ruflo",
+    "~/.config/opencode/node_modules/tweakcc",
+    "~/.config/opencode/node_modules/mcp-servers",
+    "~/.config/opencode/node_modules/supabase-mcp",
+    "~/.config/opencode/node_modules/playwright-mcp",
+    "~/.config/opencode/node_modules/lighthouse-mcp",
+    "~/.config/opencode/node_modules/fetcher-mcp"
+  ]
+}
