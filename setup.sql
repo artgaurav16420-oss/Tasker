@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS public.tasks (
 -- Audit Logs Table
 CREATE TABLE IF NOT EXISTS public.logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    "taskId" UUID NOT NULL REFERENCES public.tasks(id) ON DELETE CASCADE,
+    "taskId" UUID REFERENCES public.tasks(id) ON DELETE SET NULL,
     "userId" UUID NOT NULL REFERENCES public.users(uid) ON DELETE CASCADE,
     event TEXT NOT NULL,
     "oldValue" TEXT,
@@ -80,6 +80,9 @@ CREATE OR REPLACE FUNCTION member_join_team(superior_uid UUID)
 RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   IF auth.uid() IS NULL THEN RAISE EXCEPTION 'Unauthorized'; END IF;
+  IF NOT EXISTS (SELECT 1 FROM public.users WHERE uid = superior_uid) THEN
+    RAISE EXCEPTION 'Superior not found.';
+  END IF;
   UPDATE public.users
   SET "managerIds" = array_append("managerIds", superior_uid)
   WHERE uid = auth.uid()
@@ -177,7 +180,13 @@ CREATE POLICY "Users can update own profile" ON public.users FOR UPDATE USING (a
 CREATE POLICY "Tasks viewable by related users" ON public.tasks FOR SELECT USING (
   auth.uid() = "managerId" OR auth.uid() = "employeeId"
 );
-CREATE POLICY "Managers can create tasks" ON public.tasks FOR INSERT WITH CHECK (auth.uid() = "managerId");
+CREATE POLICY "Managers can create tasks" ON public.tasks FOR INSERT WITH CHECK (
+  auth.uid() = "managerId" AND
+  ("employeeId" IS NULL OR EXISTS (
+    SELECT 1 FROM public.users u
+    WHERE u.uid = "employeeId" AND auth.uid() = ANY(u."managerIds")
+  ))
+);
 
 -- Managers can update anything on their tasks; employees can only update status to non-completed
 CREATE POLICY "Managers can delete tasks" ON public.tasks FOR DELETE USING (auth.uid() = "managerId");
@@ -185,7 +194,11 @@ CREATE POLICY "Managers can delete tasks" ON public.tasks FOR DELETE USING (auth
 CREATE POLICY "Managers can update tasks" ON public.tasks FOR UPDATE USING (
   auth.uid() = "managerId"
 ) WITH CHECK (
-  auth.uid() = "managerId"
+  auth.uid() = "managerId" AND
+  ("employeeId" IS NULL OR EXISTS (
+    SELECT 1 FROM public.users u
+    WHERE u.uid = "employeeId" AND auth.uid() = ANY(u."managerIds")
+  ))
 );
 
 -- Employees can only update status. Field integrity enforced by trigger below.
