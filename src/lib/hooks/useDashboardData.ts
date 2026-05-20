@@ -113,13 +113,22 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
 
     const limitedIds = parsedIds.slice(0, MAX_SUPERIORS_REALTIME);
 
-    supabase
-      .from("users")
-      .select("*")
-      .in("uid", limitedIds)
-      .then(({ data }) => {
-        if (!cancelled && data) setSuperiors(data as UserProfile[]);
-      });
+    void Promise.resolve(
+      supabase
+        .from("users")
+        .select("*")
+        .in("uid", limitedIds)
+        .then(({ data, error }) => {
+          if (cancelled) return;
+          if (error) {
+            console.error('Superior fetch error:', error);
+            return;
+          }
+          if (data) setSuperiors(data as UserProfile[]);
+        })
+    ).catch((err: unknown) => {
+      if (!cancelled) console.error('Superior fetch exception:', err);
+    });
 
     const currentIds = new Set(limitedIds);
 
@@ -275,7 +284,13 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
         setTeamTasks((prev) => prev.map((t) => t.id === updated.id ? updated : t));
       }
 
-      if (old?.employeeId !== updated.employeeId || old?.managerId !== updated.managerId) {
+      const affectsViewer =
+        old?.employeeId === profile.uid ||
+        old?.managerId === profile.uid ||
+        updated.employeeId === profile.uid ||
+        updated.managerId === profile.uid;
+
+      if (affectsViewer) {
         if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
         debounceTimerRef.current = setTimeout(() => fetchAll(), 300);
       }
