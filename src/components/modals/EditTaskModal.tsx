@@ -155,8 +155,8 @@ export default function EditTaskModal({
                     <option value="todo">Pending Deployment</option>
                     <option value="in-progress">In Progress</option>
                     <option value="in-review">Under Review</option>
-                    <option value="completed">Mission Accomplished</option>
                   </select>
+                  <p className="font-mono text-[10px] text-slate-400 mt-1">To complete a task, use the status action buttons.</p>
                 </div>
 
                 {/* Deadline */}
@@ -179,7 +179,7 @@ export default function EditTaskModal({
               <button
                 type="submit"
                 disabled={isUpdating}
-                className="w-full bg-slate-900 text-white font-mono text-xs font-black uppercase tracking-[0.3em] py-6 rounded-xl hover:bg-slate-800 transition-all duration-150 shadow-2xl active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-4"
+                className="w-full bg-emerald-500 text-slate-950 font-mono text-xs font-black uppercase tracking-[0.3em] py-6 rounded-xl hover:bg-emerald-400 transition-all duration-150 shadow-2xl active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-4"
               >
                 {isUpdating ? (
                   <motion.div animate={reducedMotion ? undefined : { rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} className="w-5 h-5 border-2 border-white border-t-transparent rounded-full" />
