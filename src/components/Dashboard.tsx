@@ -75,7 +75,8 @@ export default function Dashboard() {
   const [isJoining, setIsJoining] = useState(false);
   const [memberCode, setMemberCode] = useState("");
   const [isAddingMember, setIsAddingMember] = useState(false);
-  const [toastQueue, setToastQueue] = useState<string[]>([]);
+  interface Toast { message: string; type: 'success' | 'error' | 'info' }
+  const [toastQueue, setToastQueue] = useState<Toast[]>([]);
   const toastTimersRef = useRef<number[]>([]);
 
   const superiorIdsCache = useMemo(() => {
@@ -136,11 +137,12 @@ export default function Dashboard() {
   });
   const [isConfirming, setIsConfirming] = useState(false);
 
-  const showToast = useCallback((msg: string) => {
-    setToastQueue((prev) => [...prev, msg]);
+  const showToast = useCallback((msg: string, type: 'success' | 'error' | 'info' = 'info') => {
+    setToastQueue((prev) => [...prev, { message: msg, type }]);
     const timer = window.setTimeout(() => {
       setToastQueue((prev) => prev.slice(1));
-    }, 3000);
+      toastTimersRef.current = toastTimersRef.current.filter(t => t !== timer);
+    }, type === 'error' ? 6000 : 3000);
     toastTimersRef.current.push(timer);
   }, []);
 
@@ -536,8 +538,12 @@ export default function Dashboard() {
 
         <AnimatePresence>
           {toastQueue[0] && (
-            <motion.div key={toastQueue[0]} initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 50, scale: 0.9 }} animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }} exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 50, scale: 0.9 }} role="status" aria-live="polite" className="fixed bottom-10 right-10 z-[120] bg-emerald-500 text-slate-950 font-mono text-xs uppercase tracking-[0.25em] font-black px-10 py-5 shadow-xl shadow-emerald-500/20 border border-emerald-400 rounded-xl">
-              {toastQueue[0]}
+            <motion.div key={toastQueue[0].message + toastQueue[0].type} initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 50, scale: 0.9 }} animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }} exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 50, scale: 0.9 }} role="status" aria-live="polite" className={`fixed bottom-10 right-10 z-[120] font-mono text-xs uppercase tracking-[0.25em] font-black px-10 py-5 border rounded-xl shadow-xl ${
+              toastQueue[0].type === 'error' ? 'bg-orange-500 text-white border-orange-400 shadow-orange-500/20' :
+              toastQueue[0].type === 'success' ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-emerald-500/20' :
+              'bg-slate-800 text-white border-slate-700 shadow-slate-500/20'
+            }`}>
+              {toastQueue[0].message}
             </motion.div>
           )}
         </AnimatePresence>

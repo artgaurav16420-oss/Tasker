@@ -10,7 +10,7 @@ interface UseTaskOperationsParams {
   selectedTaskDetails: Task | null;
   setSelectedTaskDetails: (t: Task | null) => void;
   setConfirmDialog: Dispatch<SetStateAction<ConfirmDialogState>>;
-  showToast: (msg: string) => void;
+  showToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
   setIsCreatingTask?: (v: boolean) => void;
   setIsUpdatingTask?: (v: boolean) => void;
   setIsDeletingTask?: (v: boolean) => void;
@@ -77,10 +77,10 @@ export function useTaskOperations({
 
       setIsTaskModalOpen(false);
       setNewTask({ title: '', description: '', employeeId: '', timelineEnd: '', priority: 'medium' });
-      showToast('Task created successfully');
+      showToast('Task created successfully', 'success');
     } catch (err) {
       console.error(err);
-      showToast('Failed to create task. Please try again.');
+      showToast('Failed to create task. Please try again.', 'error');
     } finally {
       setIsCreatingTask?.(false);
     }
@@ -91,7 +91,7 @@ export function useTaskOperations({
     if (!profile || !editingTask) return;
 
     if (profile.uid !== editingTask.managerId) {
-      showToast('Unauthorized: Only the task manager can modify this operation.');
+      showToast('Unauthorized: Only the task manager can modify this operation.', 'error');
       return;
     }
 
@@ -122,10 +122,10 @@ export function useTaskOperations({
       if (selectedTaskDetails?.id === editingTask.id) {
         setSelectedTaskDetails(serverTask);
       }
-      showToast('Task updated successfully');
+      showToast('Task updated successfully', 'success');
     } catch (err) {
       console.error(err);
-      showToast('Failed to update task. Please try again.');
+      showToast('Failed to update task. Please try again.', 'error');
     } finally {
       setIsUpdatingTask?.(false);
     }
@@ -135,7 +135,7 @@ export function useTaskOperations({
     if (!profile || !task) return;
 
     if (profile.uid !== task.managerId) {
-      showToast('Unauthorized: Only the creator can terminate this operation.');
+      showToast('Unauthorized: Only the creator can terminate this operation.', 'error');
       return;
     }
 
@@ -150,11 +150,11 @@ export function useTaskOperations({
         try {
           await supabase.from('tasks').delete().eq('id', task.id).throwOnError();
           onTaskDeleted?.(task.id, task.managerId, task.employeeId);
-          showToast('Task and associated reports purged.');
+          showToast('Task and associated reports purged.', 'success');
           setSelectedTaskDetails(null);
         } catch (err) {
           console.error(err);
-          showToast('Failed to delete task. Please try again.');
+          showToast('Failed to delete task. Please try again.', 'error');
         } finally {
           setIsDeletingTask?.(false);
           setConfirmDialog((p) => ({ ...p, isOpen: false }));
@@ -168,7 +168,7 @@ export function useTaskOperations({
       if (!profile) return;
       if (!task) return;
       if (newStatus === 'completed' && profile?.uid !== task.managerId) {
-        showToast('Only the manager can finalize this task.');
+        showToast('Only the manager can finalize this task.', 'error');
         return;
       }
 
@@ -196,10 +196,10 @@ export function useTaskOperations({
         setSelectedTaskDetails({ ...selectedTaskDetails, status: newStatus });
       }
 
-      showToast(`Status updated to ${newStatus}`);
+      showToast(`Status updated to ${newStatus}`, 'success');
     } catch (err) {
       console.error(err);
-      showToast(`Failed to update status to ${newStatus}. Please try again.`);
+      showToast(`Failed to update status to ${newStatus}. Please try again.`, 'error');
     }
   };
 
@@ -228,10 +228,10 @@ export function useTaskOperations({
       }
       setNewPersonalTask({ title: '', timelineEnd: '' });
       setIsPersonalTaskModalOpen(false);
-      showToast('Personal task added');
+      showToast('Personal task added', 'success');
     } catch (err) {
       console.error(err);
-      showToast('Operation failed. Please try again.');
+      showToast('Operation failed. Please try again.', 'error');
     }
   };
 
@@ -247,7 +247,7 @@ export function useTaskOperations({
       onPersonalTaskToggled?.(taskId, newStatus as PersonalTask['status']);
     } catch (err) {
       console.error(err);
-      showToast('Failed to update task. Please try again.');
+      showToast('Failed to update task. Please try again.', 'error');
     } finally {
       setIsTogglingPersonalTask?.(false);
     }
@@ -264,10 +264,10 @@ export function useTaskOperations({
         try {
           await supabase.from('personal_tasks').delete().eq('id', taskId).throwOnError();
           onPersonalTaskDeleted?.(taskId);
-          showToast('Task Deleted');
+          showToast('Task Deleted', 'success');
         } catch (err) {
           console.error(err);
-          showToast('Operation failed. Please try again.');
+          showToast('Operation failed. Please try again.', 'error');
         }
         setConfirmDialog((p) => ({ ...p, isOpen: false }));
       },
@@ -285,13 +285,13 @@ export function useTaskOperations({
     e.preventDefault();
     if (!profile || !selectedTask) return;
     if (!reportContent.trim()) {
-      showToast('Operation report must contain data.');
+      showToast('Operation report must contain data.', 'error');
       return;
     }
     setIsSubmittingReport(true);
     try {
       if (profile.uid !== selectedTask.employeeId && profile.uid !== selectedTask.managerId) {
-        showToast('Unauthorized: You are not linked to this operation.');
+        showToast('Unauthorized: You are not linked to this operation.', 'error');
         return;
       }
 
@@ -315,7 +315,7 @@ export function useTaskOperations({
       setSelectedTask(null);
     } catch (err) {
       console.error(err);
-      showToast('Operation failed. Please try again.');
+      showToast('Operation failed. Please try again.', 'error');
     } finally {
       setIsSubmittingReport(false);
     }
