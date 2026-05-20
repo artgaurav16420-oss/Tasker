@@ -15,6 +15,8 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [recoveryKey, setRecoveryKey] = useState(0);
+
   const employeesRef = useRef(employees);
   const myTasksRef = useRef(myTasks);
   const teamTasksRef = useRef(teamTasks);
@@ -26,42 +28,9 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const profileUidRef = useRef(profile?.uid ?? null);
   const requestSeqRef = useRef(0);
-  const cancelledRef = useRef(false);
   const initialFetchDoneRef = useRef(false);
   const superiorSeqRef = useRef(0);
   const mountedRef = useRef(true);
-
-  useEffect(() => {
-    employeesRef.current = employees;
-  }, [employees]);
-
-  useEffect(() => {
-    myTasksRef.current = myTasks;
-  }, [myTasks]);
-
-  useEffect(() => {
-    teamTasksRef.current = teamTasks;
-  }, [teamTasks]);
-
-  useEffect(() => {
-    managedReportsRef.current = managedReports;
-  }, [managedReports]);
-
-  useEffect(() => {
-    personalTasksRef.current = personalTasks;
-  }, [personalTasks]);
-
-  useEffect(() => {
-    superiorsRef.current = superiors;
-  }, [superiors]);
-
-  useEffect(() => {
-    profileRef.current = profile;
-  }, [profile]);
-
-  useEffect(() => {
-    profileUidRef.current = profile?.uid ?? null;
-  }, [profile?.uid]);
 
   useEffect(() => {
     return () => { mountedRef.current = false; };
@@ -89,7 +58,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
       supabase.from("personal_tasks").select("*").eq("userId", uid),
     ]);
 
-    if (cancelledRef.current || seq !== requestSeqRef.current) return;
+    if (seq !== requestSeqRef.current) return;
     if (!mountedRef.current) return;
 
     const hasError = employeesRes.error || myTasksRes.error || teamTasksRes.error || managedReportsRes.error || personalTasksRes.error;
@@ -107,6 +76,20 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
     setIsLoading(false);
     initialFetchDoneRef.current = true;
   }, []);
+
+  const refetchRef = useRef(refetch);
+
+  useEffect(() => {
+    employeesRef.current = employees;
+    myTasksRef.current = myTasks;
+    teamTasksRef.current = teamTasks;
+    managedReportsRef.current = managedReports;
+    personalTasksRef.current = personalTasks;
+    superiorsRef.current = superiors;
+    profileRef.current = profile;
+    profileUidRef.current = profile?.uid ?? null;
+    refetchRef.current = refetch;
+  }, [employees, myTasks, teamTasks, managedReports, personalTasks, superiors, profile, refetch]);
 
   // Fetch logic for superiors based on superiorIds
   useEffect(() => {
@@ -369,7 +352,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
         if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
           if (!cancelled && initialFetchDoneRef.current) {
             setTimeout(() => {
-              if (!cancelled) refetch();
+              if (!cancelled) setRecoveryKey(k => k + 1);
             }, 1000);
           }
         }
@@ -380,7 +363,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
       supabase.removeChannel(channel);
     };
-  }, [profile?.uid, refetch]);
+  }, [profile?.uid, recoveryKey]);
 
   return {
     employees,
