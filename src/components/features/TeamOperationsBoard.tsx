@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { Plus, ChevronDown, ChevronUp, Trash2, Calendar, Clock, FileText, CheckCircle2, Zap, Activity } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Task, UserProfile } from "../../lib/types";
@@ -7,10 +8,6 @@ import { useReducedMotion } from "../../lib/hooks/useReducedMotion";
 interface Props {
   teamTasks: Task[];
   setIsTaskModalOpen: (isOpen: boolean) => void;
-  teamGroupedActiveTasks: Record<string, Task[]>;
-  teamGroupedCompletedTasks: Record<string, Task[]>;
-  collapsedGroups: Record<string, boolean>;
-  setCollapsedGroups: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   employees: UserProfile[];
   getDeadlineStyle: (deadline: string | null | undefined, isCompleted: boolean) => string;
   getTimeRemaining: (deadline: string) => string | null;
@@ -28,12 +25,30 @@ export default function TeamOperationsBoard({
   handleStatusChange,
   getDeadlineStyle,
   getTimeRemaining,
-  teamGroupedActiveTasks,
-  teamGroupedCompletedTasks,
-  collapsedGroups,
-  setCollapsedGroups,
 }: Props) {
   const reducedMotion = useReducedMotion();
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
+
+  const teamGroupedActiveTasks = useMemo(() => {
+    const grouped: Record<string, Task[]> = {};
+    teamTasks.filter((t) => t.status !== "completed").forEach((task) => {
+      const empId = task.employeeId || "unknown";
+      if (!grouped[empId]) grouped[empId] = [];
+      grouped[empId].push(task);
+    });
+    return grouped;
+  }, [teamTasks]);
+
+  const teamGroupedCompletedTasks = useMemo(() => {
+    const grouped: Record<string, Task[]> = {};
+    teamTasks.filter((t) => t.status === "completed").forEach((task) => {
+      const empId = task.employeeId || "unknown";
+      if (!grouped[empId]) grouped[empId] = [];
+      grouped[empId].push(task);
+    });
+    return grouped;
+  }, [teamTasks]);
+
   return (
     <div className="space-y-12">
       <div className="flex items-end justify-between border-b border-slate-200 pb-8">

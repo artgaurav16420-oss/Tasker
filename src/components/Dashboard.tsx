@@ -54,7 +54,6 @@ export default function Dashboard() {
     return `Due in ${diffDays}d`;
   }, []);
 
-  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const [activeTab, setActiveTab] = useState<"command" | "assigned-to-me" | "my-tasks" | "team" | "personnel" | "settings">("assigned-to-me");
 
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
@@ -89,26 +88,6 @@ export default function Dashboard() {
   const { employees, myTasks, teamTasks, managedReports, personalTasks, superiors, error, isLoading, refetch } = useDashboardData(profile, superiorIdsCache);
 
 
-
-  const teamGroupedActiveTasks = useMemo(() => {
-    const grouped: Record<string, Task[]> = {};
-    teamTasks.filter((t) => t.status !== "completed").forEach((task) => {
-      const empId = task.employeeId || "unknown";
-      if (!grouped[empId]) grouped[empId] = [];
-      grouped[empId].push(task);
-    });
-    return grouped;
-  }, [teamTasks]);
-
-  const teamGroupedCompletedTasks = useMemo(() => {
-    const grouped: Record<string, Task[]> = {};
-    teamTasks.filter((t) => t.status === "completed").forEach((task) => {
-      const empId = task.employeeId || "unknown";
-      if (!grouped[empId]) grouped[empId] = [];
-      grouped[empId].push(task);
-    });
-    return grouped;
-  }, [teamTasks]);
 
   const isManager = employees.length > 0;
   const isOperative = superiors.length > 0 || myTasks.length > 0;
@@ -424,10 +403,6 @@ export default function Dashboard() {
                   handleStatusChange={handleStatusChange}
                   getDeadlineStyle={getDeadlineStyle}
                   getTimeRemaining={getTimeRemaining}
-                  teamGroupedActiveTasks={teamGroupedActiveTasks}
-                  teamGroupedCompletedTasks={teamGroupedCompletedTasks}
-                  collapsedGroups={collapsedGroups}
-                  setCollapsedGroups={setCollapsedGroups}
                 />
               </ErrorBoundary>
             )}
