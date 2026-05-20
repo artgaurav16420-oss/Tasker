@@ -25,26 +25,6 @@ export const getDeadlineStyle = (deadline: string | null | undefined, isComplete
   return 'bg-emerald-600 text-white border-emerald-700 shadow-lg font-bold';
 };
 
-export const getStatusDotColor = (status: Task['status']) => {
-  switch (status) {
-    case 'completed': return 'bg-emerald-500';
-    case 'in-progress': return 'bg-sky-500';
-    case 'in-review': return 'bg-indigo-500 animate-pulse';
-    case 'todo': return 'bg-orange-500';
-    default: return 'bg-slate-400';
-  }
-};
-
-export const getStatusLabel = (status: Task['status']) => {
-  switch (status) {
-    case 'completed': return 'Completed';
-    case 'in-progress': return 'Active';
-    case 'in-review': return 'Review';
-    case 'todo': return 'Pending';
-    default: return status;
-  }
-};
-
 const AVATAR_COLORS = [
   '#10b981', '#059669', '#0891b2', '#0284c7',
   '#4f46e5', '#7c3aed', '#a855f7', '#d946ef',

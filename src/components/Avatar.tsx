@@ -7,6 +7,7 @@ interface AvatarProps {
 }
 
 function getInitials(name: string) {
+  if (!name || name.trim() === '') return '?';
   return name
     .split(' ')
     .map((n) => n[0])
