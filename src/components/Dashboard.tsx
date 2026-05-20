@@ -86,7 +86,7 @@ export default function Dashboard() {
   }, [profile?.managerIds]);
 
   // Custom Hook for Data Fetching & Subscriptions
-  const { employees, myTasks, teamTasks, managedReports, personalTasks, setPersonalTasks, setEmployees, setMyTasks, setTeamTasks, setManagedReports, setSuperiors, superiors, error, isLoading, refetch } = useDashboardData(profile, superiorIdsCache);
+  const { employees, myTasks, teamTasks, managedReports, personalTasks, superiors, error, isLoading, refetch } = useDashboardData(profile, superiorIdsCache);
 
 
 
@@ -181,33 +181,14 @@ export default function Dashboard() {
     setIsUpdatingTask,
     setIsDeletingTask,
     setIsTogglingPersonalTask,
-    onPersonalTaskCreated: (task: PersonalTask) => {
-      setPersonalTasks((prev) => [...prev, task]);
-    },
-    onTaskCreated: (task: Task) => {
-      setTeamTasks((prev) => [...prev, task]);
-    },
-    onTaskUpdated: (task: Task) => {
-      setTeamTasks((prev) => prev.map((t) => t.id === task.id ? task : t));
-      setMyTasks((prev) => prev.map((t) => t.id === task.id ? task : t));
-    },
-    onTaskDeleted: (taskId: string) => {
-      setTeamTasks((prev) => prev.filter((t) => t.id !== taskId));
-      setMyTasks((prev) => prev.filter((t) => t.id !== taskId));
-    },
-    onStatusChanged: (taskId: string, newStatus: Task['status']) => {
-      setTeamTasks((prev) => prev.map((t) => t.id === taskId ? { ...t, status: newStatus } : t));
-      setMyTasks((prev) => prev.map((t) => t.id === taskId ? { ...t, status: newStatus } : t));
-    },
-    onPersonalTaskToggled: (taskId: string, newStatus: string) => {
-      setPersonalTasks((prev) => prev.map((t) => t.id === taskId ? { ...t, status: newStatus as PersonalTask['status'] } : t));
-    },
-    onPersonalTaskDeleted: (taskId: string) => {
-      setPersonalTasks((prev) => prev.filter((t) => t.id !== taskId));
-    },
-    onReportCreated: (report: Report) => {
-      setManagedReports((prev) => [...prev, report]);
-    },
+    onPersonalTaskCreated: () => {},
+    onTaskCreated: () => {},
+    onTaskUpdated: () => {},
+    onTaskDeleted: () => {},
+    onStatusChanged: () => {},
+    onPersonalTaskToggled: () => {},
+    onPersonalTaskDeleted: () => {},
+    onReportCreated: () => {},
   });
 
   const {
@@ -219,18 +200,10 @@ export default function Dashboard() {
     profile,
     showToast,
     setConfirmDialog,
-    onEmployeeAdded: (employee: UserProfile) => {
-      setEmployees((prev) => [...prev, employee]);
-    },
-    onEmployeeRemoved: (employeeId: string) => {
-      setEmployees((prev) => prev.filter((e) => e.uid !== employeeId));
-    },
-    onSuperiorAdded: (superior: UserProfile) => {
-      setSuperiors((prev) => [...prev, superior]);
-    },
-    onSuperiorRemoved: (superiorId: string) => {
-      setSuperiors((prev) => prev.filter((s) => s.uid !== superiorId));
-    },
+    onEmployeeAdded: () => { refetch(); },
+    onEmployeeRemoved: () => { refetch(); },
+    onSuperiorAdded: () => { refetch(); },
+    onSuperiorRemoved: () => { refetch(); },
     refetchData: refetch,
   });
 
