@@ -1,6 +1,6 @@
 import { Component, ReactNode } from 'react';
 
-interface Props { children: ReactNode }
+interface Props { children: ReactNode; onRetry?: () => void }
 interface State { hasError: boolean; error: Error | null; resetKey: number }
 
 export default class ErrorBoundary extends Component<Props, State> {
@@ -16,6 +16,7 @@ export default class ErrorBoundary extends Component<Props, State> {
 
   handleReset = () => {
     this.setState((prev) => ({ hasError: false, error: null, resetKey: prev.resetKey + 1 }));
+    this.props.onRetry?.();
   };
 
   render() {

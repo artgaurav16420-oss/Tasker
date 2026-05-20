@@ -311,7 +311,7 @@ export default function Dashboard() {
   }
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary onRetry={refetch}>
       <div className="min-h-dvh bg-slate-50 text-slate-900 font-sans selection:bg-emerald-100 selection:text-emerald-900">
         <nav className="border-b border-slate-200 px-6 py-4 grid grid-cols-3 items-center sticky top-0 bg-white/80 backdrop-blur-xl z-40 border-t-2 border-t-emerald-500/10 shadow-sm">
           <div className="flex items-center gap-4 justify-self-start overflow-hidden">
@@ -497,12 +497,24 @@ export default function Dashboard() {
         </div>
 
         {/* Modals */}
-        <TaskAssignmentModal isOpen={isTaskModalOpen} onClose={() => setIsTaskModalOpen(false)} newTask={newTask} setNewTask={setNewTask} employees={employees} handleCreateTask={handleCreateTask} isCreating={isCreatingTask} />
-        <ReportSubmissionModal selectedTask={selectedTask} setSelectedTask={setSelectedTask} reportContent={reportContent} setReportContent={setReportContent} handleSubmitReport={handleSubmitReport} isSubmittingReport={isSubmittingReport} />
-        <EmployeeTasksModal selectedEmployee={selectedEmployee} setSelectedEmployee={setSelectedEmployee} teamTasks={teamTasks} setNewTask={setNewTask} setIsTaskModalOpen={setIsTaskModalOpen} handleDeleteTask={handleDeleteTask} handleStatusChange={handleStatusChange} setSelectedTaskDetails={setSelectedTaskDetails} getDeadlineStyle={getDeadlineStyle} getTimeRemaining={getTimeRemaining} />
-        <TaskDetailsModal selectedTaskDetails={selectedTaskDetails} setSelectedTaskDetails={setSelectedTaskDetails} managedReports={managedReports} profile={profile} handleStatusChange={handleStatusChange} setEditingTask={setEditingTask} handleDeleteTask={handleDeleteTask} getDeadlineStyle={getDeadlineStyle} getTimeRemaining={getTimeRemaining} />
-        <EditTaskModal editingTask={editingTask} setEditingTask={setEditingTask} employees={employees} handleUpdateTask={handleUpdateTask} isUpdating={isUpdatingTask} />
-        <NewPersonalTaskModal isOpen={isPersonalTaskModalOpen} onClose={() => setIsPersonalTaskModalOpen(false)} newPersonalTask={newPersonalTask} setNewPersonalTask={setNewPersonalTask} handleCreatePersonalTask={handleCreatePersonalTask} />
+        <ErrorBoundary>
+          <TaskAssignmentModal isOpen={isTaskModalOpen} onClose={() => setIsTaskModalOpen(false)} newTask={newTask} setNewTask={setNewTask} employees={employees} handleCreateTask={handleCreateTask} isCreating={isCreatingTask} />
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <ReportSubmissionModal selectedTask={selectedTask} setSelectedTask={setSelectedTask} reportContent={reportContent} setReportContent={setReportContent} handleSubmitReport={handleSubmitReport} isSubmittingReport={isSubmittingReport} />
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <EmployeeTasksModal selectedEmployee={selectedEmployee} setSelectedEmployee={setSelectedEmployee} teamTasks={teamTasks} setNewTask={setNewTask} setIsTaskModalOpen={setIsTaskModalOpen} handleDeleteTask={handleDeleteTask} handleStatusChange={handleStatusChange} setSelectedTaskDetails={setSelectedTaskDetails} getDeadlineStyle={getDeadlineStyle} getTimeRemaining={getTimeRemaining} />
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <TaskDetailsModal selectedTaskDetails={selectedTaskDetails} setSelectedTaskDetails={setSelectedTaskDetails} managedReports={managedReports} profile={profile} handleStatusChange={handleStatusChange} setEditingTask={setEditingTask} handleDeleteTask={handleDeleteTask} getDeadlineStyle={getDeadlineStyle} getTimeRemaining={getTimeRemaining} />
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <EditTaskModal editingTask={editingTask} setEditingTask={setEditingTask} employees={employees} handleUpdateTask={handleUpdateTask} isUpdating={isUpdatingTask} />
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <NewPersonalTaskModal isOpen={isPersonalTaskModalOpen} onClose={() => setIsPersonalTaskModalOpen(false)} newPersonalTask={newPersonalTask} setNewPersonalTask={setNewPersonalTask} handleCreatePersonalTask={handleCreatePersonalTask} />
+        </ErrorBoundary>
 
         <AnimatePresence>
           {confirmDialog.isOpen && (
