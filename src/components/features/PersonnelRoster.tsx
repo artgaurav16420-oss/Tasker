@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useMemo } from "react";
 import { Avatar } from "../Avatar";
 import {
   Users,
@@ -29,11 +29,18 @@ export default function PersonnelRoster({
   setIsTaskModalOpen,
 }: Props) {
   const reducedMotion = useReducedMotion();
-  const getActiveTaskCount = (uid: string) =>
-    teamTasks.filter(t => t.employeeId === uid && t.status !== "completed").length;
 
-  const getTotalTaskCount = (uid: string) =>
-    teamTasks.filter(t => t.employeeId === uid).length;
+  const taskCountsByUser = useMemo(() => {
+    const counts: Record<string, { active: number; total: number }> = {};
+    employees.forEach(emp => { counts[emp.uid] = { active: 0, total: 0 }; });
+    teamTasks.forEach(task => {
+      if (task.employeeId && counts[task.employeeId]) {
+        counts[task.employeeId].total++;
+        if (task.status !== "completed") counts[task.employeeId].active++;
+      }
+    });
+    return counts;
+  }, [employees, teamTasks]);
 
   return (
     <div className="space-y-8 pb-12">
@@ -102,12 +109,12 @@ export default function PersonnelRoster({
                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 text-center">
                   <Activity className="w-4 h-4 text-emerald-500 mx-auto mb-2" />
                   <div className="font-mono text-xs uppercase tracking-widest text-slate-400 font-bold">Active</div>
-                  <div className="font-serif text-xl text-slate-900 mt-1">{getActiveTaskCount(emp.uid)}</div>
+                  <div className="font-serif text-xl text-slate-900 mt-1">{(taskCountsByUser[emp.uid] || { active: 0, total: 0 }).active}</div>
                 </div>
                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 text-center">
                   <Calendar className="w-4 h-4 text-indigo-500 mx-auto mb-2" />
                   <div className="font-mono text-xs uppercase tracking-widest text-slate-400 font-bold">Total</div>
-                  <div className="font-serif text-xl text-slate-900 mt-1">{getTotalTaskCount(emp.uid)}</div>
+                  <div className="font-serif text-xl text-slate-900 mt-1">{(taskCountsByUser[emp.uid] || { active: 0, total: 0 }).total}</div>
                 </div>
                 <button
                   onClick={(e) => {

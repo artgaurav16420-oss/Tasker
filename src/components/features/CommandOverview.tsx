@@ -17,9 +17,10 @@ interface Props {
 }
 
 export default function CommandOverview({ teamTasks, employees }: Props) {
+  const activeTeamTasks = useMemo(() => teamTasks.filter(t => t.status !== 'completed'), [teamTasks]);
   const reducedMotion = useReducedMotion();
   const gradientId = useId();
-  const activeOps = useMemo(() => teamTasks.filter(t => t.status !== 'completed').length, [teamTasks]);
+  const activeOps = useMemo(() => activeTeamTasks.length, [activeTeamTasks]);
   const criticalOps = useMemo(() => teamTasks.filter(t => t.priority === 'critical' && t.status !== 'completed').length, [teamTasks]);
   const completionRate = useMemo(() => teamTasks.length > 0
     ? Math.round((teamTasks.reduce((count, t) => t.status === 'completed' ? count + 1 : count, 0) / teamTasks.length) * 100)
@@ -157,10 +158,10 @@ export default function CommandOverview({ teamTasks, employees }: Props) {
             </div>
 
             <div className="space-y-6">
-              <PriorityRow label="Critical" count={criticalOps} total={teamTasks.length} color="bg-orange-600" reducedMotion={reducedMotion} />
-              <PriorityRow label="High" count={teamTasks.filter(t => t.priority === 'high').length} total={teamTasks.length} color="bg-orange-500" reducedMotion={reducedMotion} />
-              <PriorityRow label="Medium" count={teamTasks.filter(t => t.priority === 'medium').length} total={teamTasks.length} color="bg-emerald-500" reducedMotion={reducedMotion} />
-              <PriorityRow label="Low" count={teamTasks.filter(t => t.priority === 'low').length} total={teamTasks.length} color="bg-slate-600" reducedMotion={reducedMotion} />
+              <PriorityRow label="Critical" count={criticalOps} total={activeTeamTasks.length} color="bg-orange-600" reducedMotion={reducedMotion} />
+              <PriorityRow label="High" count={activeTeamTasks.filter(t => t.priority === 'high').length} total={activeTeamTasks.length} color="bg-orange-500" reducedMotion={reducedMotion} />
+              <PriorityRow label="Medium" count={activeTeamTasks.filter(t => t.priority === 'medium').length} total={activeTeamTasks.length} color="bg-emerald-500" reducedMotion={reducedMotion} />
+              <PriorityRow label="Low" count={activeTeamTasks.filter(t => t.priority === 'low').length} total={activeTeamTasks.length} color="bg-slate-600" reducedMotion={reducedMotion} />
             </div>
 
             <div className="pt-6 border-t border-slate-800">
