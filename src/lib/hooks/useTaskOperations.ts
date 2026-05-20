@@ -18,7 +18,7 @@ interface UseTaskOperationsParams {
   onPersonalTaskCreated?: (task: PersonalTask) => void;
   onTaskCreated?: (task: Task) => void;
   onTaskUpdated?: (task: Task) => void;
-  onTaskDeleted?: (taskId: string, managerId: string, employeeId: string | null) => void;
+  onTaskDeleted?: (taskId: string) => void;
   onStatusChanged?: (taskId: string, newStatus: Task['status']) => void;
   onPersonalTaskToggled?: (taskId: string, newStatus: PersonalTask['status']) => void;
   onPersonalTaskDeleted?: (taskId: string) => void;
@@ -102,7 +102,6 @@ export function useTaskOperations({
         employeeId: editingTask.employeeId,
         status: editingTask.status,
         priority: editingTask.priority,
-        updatedAt: Date.now(),
       };
       payload.timelineEnd = editingTask.timelineEnd || null;
 
@@ -148,7 +147,7 @@ export function useTaskOperations({
         setIsDeletingTask?.(true);
         try {
           await supabase.from('tasks').delete().eq('id', task.id).throwOnError();
-          onTaskDeleted?.(task.id, task.managerId, task.employeeId);
+          onTaskDeleted?.(task.id);
           showToast('Task and associated reports purged.', 'success');
           setSelectedTaskDetails(null);
         } catch (err) {
