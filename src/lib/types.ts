@@ -2,21 +2,20 @@ export interface UserProfile {
   uid: string;
   email: string;
   name: string;
-  managerId?: string;
   managerIds?: string[];
-  createdAt: number;
+  createdAt: string;
 }
 
 export interface Task {
   id: string;
   title: string;
-  description: string;
+  description: string | null;
   managerId: string;
-  employeeId: string;
+  employeeId: string | null;
   status: 'todo' | 'in-progress' | 'in-review' | 'completed';
   priority: 'low' | 'medium' | 'high' | 'critical';
-  timelineEnd?: string;
-  createdAt: number;
+  timelineEnd?: string | null;
+  createdAt: string;
   updatedAt: number;
 }
 
@@ -26,7 +25,7 @@ export interface Report {
   employeeId: string;
   managerId: string;
   content: string;
-  createdAt: number;
+  createdAt: string;
 }
 
 export interface PersonalTask {
@@ -34,9 +33,8 @@ export interface PersonalTask {
   title: string;
   status: 'todo' | 'completed';
   userId: string;
-  timelineEnd?: string;
-  createdAt: number;
-  updatedAt: number;
+  timelineEnd?: string | null;
+  createdAt: string;
 }
 
 export interface AuditLog {
@@ -44,9 +42,9 @@ export interface AuditLog {
   taskId: string;
   userId: string;
   event: string;
-  oldValue?: string;
-  newValue?: string;
-  createdAt: number;
+  oldValue: string | null;
+  newValue: string | null;
+  createdAt: string;
 }
 
 export interface NewTaskForm {
@@ -54,7 +52,7 @@ export interface NewTaskForm {
   description: string;
   employeeId: string;
   timelineEnd: string;
-  priority: string;
+  priority: Task['priority'];
 }
 
 export interface NewPersonalTaskForm {
@@ -68,5 +66,5 @@ export interface ConfirmDialogState {
   message: string;
   confirmText: string;
   danger?: boolean;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
 }

@@ -81,12 +81,9 @@ export default function Dashboard() {
 
   const superiorIdsCache = useMemo(() => {
     if (!profile) return "[]";
-    const ids = new Set([
-      ...(profile.managerIds || []),
-      ...(profile.managerId ? [profile.managerId] : []),
-    ]);
+    const ids = new Set([...(profile.managerIds || [])]);
     return JSON.stringify(Array.from(ids).sort());
-  }, [profile?.managerIds, profile?.managerId]);
+  }, [profile?.managerIds]);
 
   // Custom Hook for Data Fetching & Subscriptions
   const { employees, myTasks, teamTasks, managedReports, personalTasks, setPersonalTasks, setEmployees, setMyTasks, setTeamTasks, setManagedReports, setSuperiors, superiors, error, isLoading, refetch } = useDashboardData(profile, superiorIdsCache);

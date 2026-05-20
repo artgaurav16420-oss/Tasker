@@ -7,8 +7,14 @@ import {
   ShieldCheck
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { UserProfile, NewTaskForm } from "../../lib/types";
+import { UserProfile, NewTaskForm, Task } from "../../lib/types";
 import { useReducedMotion } from "../../lib/hooks/useReducedMotion";
+
+const VALID_PRIORITIES = ['low', 'medium', 'high', 'critical'] as const;
+
+function isValidPriority(value: string): value is Task['priority'] {
+  return (VALID_PRIORITIES as readonly string[]).includes(value);
+}
 
 interface Props {
   isOpen: boolean;
@@ -127,7 +133,7 @@ export default function TaskAssignmentModal({
                     <select
                       required
                       value={newTask.priority || 'medium'}
-                      onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
+                      onChange={(e) => { if (isValidPriority(e.target.value)) setNewTask({ ...newTask, priority: e.target.value }); }}
                       className="w-full bg-slate-50 border border-slate-100 pl-11 pr-5 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 appearance-none font-mono text-xs font-bold uppercase tracking-wider cursor-pointer"
                     >
                       <option value="low">LOW - ROUTINE</option>

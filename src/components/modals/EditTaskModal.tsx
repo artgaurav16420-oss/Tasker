@@ -97,7 +97,7 @@ export default function EditTaskModal({
               <div className="space-y-2">
                 <label className="font-mono text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Mission Specs</label>
                 <textarea
-                  value={editingTask.description}
+                  value={editingTask.description || ''}
                   onChange={(e) => setEditingTask({ ...editingTask, description: e.target.value })}
                   rows={4}
                   className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white transition-all duration-150 text-slate-600 leading-relaxed"
@@ -112,7 +112,7 @@ export default function EditTaskModal({
                     <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                     <select
                       required
-                      value={editingTask.employeeId}
+                      value={editingTask.employeeId || ''}
                       onChange={(e) => setEditingTask({ ...editingTask, employeeId: e.target.value })}
                       className="w-full bg-slate-50 border border-slate-100 pl-11 pr-5 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 appearance-none font-mono text-xs font-bold uppercase tracking-wider cursor-pointer"
                     >
