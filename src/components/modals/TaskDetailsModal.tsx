@@ -1,4 +1,3 @@
-import { useCallback, useEffect, useState } from "react";
 import { 
   X, 
   Calendar, 
@@ -13,9 +12,9 @@ import {
   History,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { UserProfile, Task, Report, AuditLog } from "../../lib/types";
-import { supabase } from "../../lib/supabase/client";
+import { UserProfile, Task, Report } from "../../lib/types";
 import { useReducedMotion } from "../../lib/hooks/useReducedMotion";
+import { useAuditLogs } from "../../lib/hooks/useAuditLogs";
 
 interface Props {
   selectedTaskDetails: Task | null;
@@ -40,50 +39,8 @@ export default function TaskDetailsModal({
   getDeadlineStyle,
   getTimeRemaining,
 }: Props) {
-  const [logs, setLogs] = useState<AuditLog[]>([]);
-  const [isLoadingLogs, setIsLoadingLogs] = useState(false);
-  const [logsError, setLogsError] = useState<string | null>(null);
+  const { logs, isLoading: isLoadingLogs, error: logsError } = useAuditLogs(selectedTaskDetails?.id ?? null);
   const reducedMotion = useReducedMotion();
-
-  const fetchLogs = useCallback(async () => {
-    if (!selectedTaskDetails?.id) return;
-    setIsLoadingLogs(true);
-    setLogsError(null);
-    try {
-      const { data } = await supabase
-        .from('logs')
-        .select('*')
-        .eq('taskId', selectedTaskDetails.id)
-        .order('createdAt', { ascending: false });
-      if (data) setLogs(data);
-    } catch (err) {
-      console.error(err);
-      setLogsError('Failed to load audit logs.');
-      setLogs([]);
-      setIsLoadingLogs(false);
-    }
-  }, [selectedTaskDetails?.id]);
-
-  useEffect(() => {
-    if (selectedTaskDetails?.id) {
-      fetchLogs();
-
-      const channel = supabase
-        .channel(`logs:${selectedTaskDetails.id}`)
-        .on(
-          'postgres_changes',
-          { event: 'INSERT', schema: 'public', table: 'logs', filter: `taskId=eq.${selectedTaskDetails.id}` },
-          (payload) => {
-            setLogs((prev) => [payload.new as AuditLog, ...prev]);
-          }
-        )
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }
-  }, [selectedTaskDetails?.id, fetchLogs]);
 
   if (!selectedTaskDetails) return null;
 
@@ -293,7 +250,6 @@ export default function TaskDetailsModal({
                   ) : logsError ? (
                     <div className="text-center py-8">
                       <p className="font-mono text-xs text-orange-500">{logsError}</p>
-                      <button onClick={() => { setLogsError(null); fetchLogs(); }} className="mt-2 px-4 py-2 text-xs font-mono text-emerald-500 hover:text-emerald-400">Retry</button>
                     </div>
                   ) : logs.length === 0 ? (
                     <div className="p-12 text-center rounded-3xl border-2 border-dashed border-slate-100 bg-slate-50/30">
