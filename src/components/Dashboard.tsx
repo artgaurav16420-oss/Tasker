@@ -532,8 +532,11 @@ export default function Dashboard() {
                       setIsConfirming(true);
                       try {
                         await Promise.resolve(confirmDialog.onConfirm());
-                      } catch { /* handled inside callback */ }
-                      setIsConfirming(false);
+                      } catch (err) {
+                        console.error('Confirm dialog error:', err);
+                      } finally {
+                        setIsConfirming(false);
+                      }
                     }}
                     disabled={isConfirming}
                     className={`flex-1 py-4 font-mono text-xs uppercase tracking-[0.2em] text-center font-black transition-all duration-150 rounded-xl shadow-xl flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 ${isConfirming ? 'opacity-50 cursor-not-allowed' : ''} ${confirmDialog.danger ? "bg-orange-50 text-orange-600 hover:bg-orange-100 border border-orange-100 shadow-orange-500/5" : "bg-emerald-500 text-slate-950 hover:bg-emerald-400 shadow-emerald-500/20"}`}
