@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { 
   X, 
   Calendar, 
@@ -42,25 +42,30 @@ export default function TaskDetailsModal({
 }: Props) {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [isLoadingLogs, setIsLoadingLogs] = useState(false);
+  const [logsError, setLogsError] = useState<string | null>(null);
   const reducedMotion = useReducedMotion();
+
+  const fetchLogs = useCallback(async () => {
+    if (!selectedTaskDetails?.id) return;
+    setIsLoadingLogs(true);
+    setLogsError(null);
+    try {
+      const { data } = await supabase
+        .from('logs')
+        .select('*')
+        .eq('taskId', selectedTaskDetails.id)
+        .order('createdAt', { ascending: false });
+      if (data) setLogs(data);
+    } catch (err) {
+      console.error(err);
+      setLogsError('Failed to load audit logs.');
+      setLogs([]);
+      setIsLoadingLogs(false);
+    }
+  }, [selectedTaskDetails?.id]);
 
   useEffect(() => {
     if (selectedTaskDetails?.id) {
-      const fetchLogs = async () => {
-        setIsLoadingLogs(true);
-        try {
-          const { data } = await supabase
-            .from('logs')
-            .select('*')
-            .eq('taskId', selectedTaskDetails.id)
-            .order('createdAt', { ascending: false });
-          if (data) setLogs(data);
-        } catch (err) {
-          console.error(err);
-        } finally {
-          setIsLoadingLogs(false);
-        }
-      };
       fetchLogs();
 
       const channel = supabase
@@ -78,7 +83,7 @@ export default function TaskDetailsModal({
         supabase.removeChannel(channel);
       };
     }
-  }, [selectedTaskDetails?.id]);
+  }, [selectedTaskDetails?.id, fetchLogs]);
 
   if (!selectedTaskDetails) return null;
 
@@ -284,6 +289,11 @@ export default function TaskDetailsModal({
                   {isLoadingLogs ? (
                     <div className="flex justify-center p-8">
                       <Activity className="w-6 h-6 text-emerald-500 animate-spin" />
+                    </div>
+                  ) : logsError ? (
+                    <div className="text-center py-8">
+                      <p className="font-mono text-xs text-orange-500">{logsError}</p>
+                      <button onClick={() => { setLogsError(null); fetchLogs(); }} className="mt-2 px-4 py-2 text-xs font-mono text-emerald-500 hover:text-emerald-400">Retry</button>
                     </div>
                   ) : logs.length === 0 ? (
                     <div className="p-12 text-center rounded-3xl border-2 border-dashed border-slate-100 bg-slate-50/30">
