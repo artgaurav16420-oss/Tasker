@@ -40,11 +40,12 @@ export default function EmployeeTasksModal({
   getTimeRemaining,
 }: Props) {
   const reducedMotion = useReducedMotion();
-  if (!selectedEmployee) return null;
 
-  const employeeTasks = useMemo(() => teamTasks.filter(t => t.employeeId === selectedEmployee.uid), [teamTasks, selectedEmployee.uid]);
+  const employeeTasks = useMemo(() => teamTasks.filter(t => t.employeeId === selectedEmployee?.uid), [teamTasks, selectedEmployee?.uid]);
   const activeTasks = useMemo(() => employeeTasks.filter(t => t.status !== 'completed'), [employeeTasks]);
   const completedTasks = useMemo(() => employeeTasks.filter(t => t.status === 'completed'), [employeeTasks]);
+
+  if (!selectedEmployee) return null;
 
   return (
     <AnimatePresence>
