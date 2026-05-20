@@ -35,8 +35,10 @@ export default function Dashboard() {
   const reducedMotion = useReducedMotion();
 
   const parseLocalDate = (dateStr: string) => {
-    const [y, m, d] = dateStr.split('-').map(Number);
-    return new Date(y, m - 1, d);
+    if (!dateStr) return null;
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return null;
+    return date;
   };
 
   const getTimeRemaining = useCallback((deadline: string) => {
@@ -44,7 +46,7 @@ export default function Dashboard() {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
     const end = parseLocalDate(deadline);
-    if (isNaN(end.getTime())) return null;
+    if (!end || isNaN(end.getTime())) return null;
     end.setHours(0, 0, 0, 0);
     const diffTime = end.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
