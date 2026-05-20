@@ -59,25 +59,24 @@ export function useTaskOperations({
         employeeId: newTask.employeeId,
         status: 'todo',
         priority: newTask.priority || 'medium',
-        updatedAt: Date.now(),
       };
       if (newTask.timelineEnd) payload.timelineEnd = newTask.timelineEnd;
       const { data: createdTask, error: insertError } = await supabase.from('tasks').insert(payload).select().single();
       if (insertError) throw insertError;
       if (!createdTask) throw new Error('Task was created but no data returned. Check RLS policies.');
 
-      await supabase.from('logs').insert({
-        taskId: (createdTask as Record<string, unknown>).id as string,
-        userId: profile.uid,
-        event: 'TASK_CREATED',
-        newValue: 'Operation Initialized'
-      });
-
       onTaskCreated?.(createdTask as Task);
 
       setIsTaskModalOpen(false);
       setNewTask({ title: '', description: '', employeeId: '', timelineEnd: '', priority: 'medium' });
       showToast('Task created successfully', 'success');
+
+      void supabase.from('logs').insert({
+        taskId: (createdTask as Record<string, unknown>).id as string,
+        userId: profile.uid,
+        event: 'TASK_CREATED',
+        newValue: 'Operation Initialized'
+      }).then(({ error }) => { if (error) console.error('Failed to create audit log:', error); });
     } catch (err) {
       console.error(err);
       showToast('Failed to create task. Please try again.', 'error');
@@ -166,7 +165,10 @@ export function useTaskOperations({
   const handleStatusChange = async (taskId: string, newStatus: Task['status'], task?: Task) => {
     try {
       if (!profile) return;
-      if (!task) return;
+      if (!task) {
+        showToast('Task data not available. Please refresh.', 'error');
+        return;
+      }
       if (newStatus === 'completed' && profile?.uid !== task.managerId) {
         showToast('Only the manager can finalize this task.', 'error');
         return;
@@ -176,19 +178,11 @@ export function useTaskOperations({
 
       const { data: updatedTask } = await supabase
         .from('tasks')
-        .update({ status: newStatus, updatedAt: Date.now() })
+        .update({ status: newStatus })
         .eq('id', taskId)
         .select()
         .single()
         .throwOnError();
-
-      await supabase.from('logs').insert({
-        taskId,
-        userId: profile.uid,
-        event: 'STATUS_TRANSITION',
-        oldValue: oldStatus,
-        newValue: newStatus
-      });
 
       onStatusChanged?.(taskId, newStatus);
 
@@ -197,6 +191,14 @@ export function useTaskOperations({
       }
 
       showToast(`Status updated to ${newStatus}`, 'success');
+
+      void supabase.from('logs').insert({
+        taskId,
+        userId: profile.uid,
+        event: 'STATUS_TRANSITION',
+        oldValue: oldStatus,
+        newValue: newStatus
+      }).then(({ error }) => { if (error) console.error('Failed to create audit log:', error); });
     } catch (err) {
       console.error(err);
       showToast(`Failed to update status to ${newStatus}. Please try again.`, 'error');
@@ -218,20 +220,21 @@ export function useTaskOperations({
         userId: profile.uid,
       };
       if (newPersonalTask.timelineEnd) payload.timelineEnd = newPersonalTask.timelineEnd;
-      const { data: createdTask } = await supabase
+      const { data: createdTask, error: insertError } = await supabase
         .from('personal_tasks')
         .insert(payload)
         .select()
         .single();
-      if (createdTask) {
-        onPersonalTaskCreated?.(createdTask as PersonalTask);
-      }
+      if (insertError) throw insertError;
+      if (!createdTask) throw new Error('Personal task was created but no data returned.');
+
+      onPersonalTaskCreated?.(createdTask as PersonalTask);
       setNewPersonalTask({ title: '', timelineEnd: '' });
       setIsPersonalTaskModalOpen(false);
       showToast('Personal task added', 'success');
     } catch (err) {
       console.error(err);
-      showToast('Operation failed. Please try again.', 'error');
+      showToast('Failed to add personal task. Please try again.', 'error');
     }
   };
 
