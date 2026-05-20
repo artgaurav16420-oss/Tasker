@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import type { RealtimePostgresChangesPayload, RealtimeChannel } from "@supabase/supabase-js";
 import { supabase } from "../supabase/client";
 import { Task, UserProfile, PersonalTask, Report } from "../types";
 
@@ -21,7 +22,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
   const personalTasksRef = useRef(personalTasks);
   const superiorsRef = useRef(superiors);
   const profileRef = useRef(profile);
-  const activeChannelsRef = useRef<Map<string, any>>(new Map());
+  const activeChannelsRef = useRef<Map<string, RealtimeChannel>>(new Map());
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const profileUidRef = useRef(profile?.uid ?? null);
   const requestSeqRef = useRef(0);
@@ -235,22 +236,28 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
 
     fetchAll();
 
-    const handleUserChange = (payload: any) => {
-      const newManagerIds = ((payload.new as any)?.managerIds || []) as string[];
-      const oldManagerIds = ((payload.old as any)?.managerIds || []) as string[];
+    const handleUserChange = (payload: RealtimePostgresChangesPayload<{ uid: string; managerIds: string[]; name: string; email: string; createdAt: string }>) => {
+      const newManagerIds = (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE')
+        ? ((payload.new as Record<string, unknown>)?.managerIds as string[] | undefined) || []
+        : [];
+      const oldManagerIds = (payload.eventType === 'UPDATE' || payload.eventType === 'DELETE')
+        ? ((payload.old as Record<string, unknown>)?.managerIds as string[] | undefined) || []
+        : [];
+      const safeNewManagerIds = Array.isArray(newManagerIds) ? newManagerIds : [];
+      const safeOldManagerIds = Array.isArray(oldManagerIds) ? oldManagerIds : [];
 
       const relationshipTouchesViewer =
-        newManagerIds.includes(profile.uid) ||
-        oldManagerIds.includes(profile.uid);
+        safeNewManagerIds.includes(profile.uid) ||
+        safeOldManagerIds.includes(profile.uid);
 
-      const changedUid = (payload.new as any)?.uid || (payload.old as any)?.uid;
+      const changedUid = (payload.new as Record<string, unknown>)?.uid as string | undefined || (payload.old as Record<string, unknown>)?.uid as string | undefined;
       const relevantIds = new Set([
         ...employeesRef.current.map(e => e.uid),
         ...superiorsRef.current.map(s => s.uid),
         profile.uid
       ]);
 
-      if (relationshipTouchesViewer || relevantIds.has(changedUid)) {
+      if (relationshipTouchesViewer || (changedUid !== undefined && relevantIds.has(changedUid))) {
         if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
         debounceTimerRef.current = setTimeout(() => {
           fetchAll();
@@ -258,7 +265,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
       }
     };
 
-    const handleTaskInsert = (payload: any) => {
+    const handleTaskInsert = (payload: RealtimePostgresChangesPayload<Task>) => {
       if (cancelled) return;
       const task = payload.new as Task;
       if (task.employeeId === profile.uid) {
@@ -269,7 +276,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
       }
     };
 
-    const handleTaskUpdate = (payload: any) => {
+    const handleTaskUpdate = (payload: RealtimePostgresChangesPayload<Task>) => {
       if (cancelled) return;
       const updated = payload.new as Task;
       const old = payload.old as Task;
@@ -291,7 +298,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
       }
     };
 
-    const handleTaskDelete = (payload: any) => {
+    const handleTaskDelete = (payload: RealtimePostgresChangesPayload<Task>) => {
       if (cancelled) return;
       const old = payload.old as Task;
       if (!old?.id) return;
@@ -304,7 +311,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
       }
     };
 
-    const handleReportChange = async (payload: any) => {
+    const handleReportChange = async (payload: RealtimePostgresChangesPayload<Report>) => {
       if (cancelled) return;
       if (payload.eventType === 'INSERT') {
         const report = payload.new as Report;
@@ -320,7 +327,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
       }
     };
 
-    const handlePersonalTaskInsert = (payload: any) => {
+    const handlePersonalTaskInsert = (payload: RealtimePostgresChangesPayload<PersonalTask>) => {
       if (cancelled) return;
       const task = payload.new as PersonalTask;
       setPersonalTasks((prev) => {
@@ -329,14 +336,14 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
       });
     };
 
-    const handlePersonalTaskUpdate = (payload: any) => {
+    const handlePersonalTaskUpdate = (payload: RealtimePostgresChangesPayload<PersonalTask>) => {
       if (cancelled) return;
       const updated = payload.new as PersonalTask;
       if (!updated?.id) return;
       setPersonalTasks((prev) => prev.map((t) => t.id === updated.id ? updated : t));
     };
 
-    const handlePersonalTaskDelete = (payload: any) => {
+    const handlePersonalTaskDelete = (payload: RealtimePostgresChangesPayload<PersonalTask>) => {
       if (cancelled) return;
       const old = payload.old as PersonalTask;
       if (!old?.id) return;
