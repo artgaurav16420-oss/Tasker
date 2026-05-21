@@ -5,11 +5,10 @@ All AI agents working in this codebase must follow these rules. No exceptions.
 ---
 
 ## Tech Stack
-- React 19, Vite, TypeScript, Tailwind CSS v4 (no PostCSS config — `@tailwindcss/vite` plugin)
+- React 19, Vite, TypeScript, Tailwind CSS v4 (`@tailwindcss/vite` plugin, **no** PostCSS config)
 - Zustand (`src/lib/store.ts`) — **auth-only**. All data state lives in hook-local `useState` + Realtime subscriptions
-- Supabase (Auth, Postgres, Realtime)
+- Supabase (Auth, Postgres, Realtime). Auth uses `sessionStorage` — sessions don't survive tab close.
 - Framer Motion (`motion/react`), Lucide React (icons), Recharts (charts)
-- `@tailwindcss/vite`, `@vitejs/plugin-react`
 - `@/` path alias maps to project root (not `src/`)
 
 ## Entrypoint & Module Layout
@@ -25,7 +24,7 @@ index.html → src/main.tsx → App.tsx → AuthScreen | Dashboard
 npm run dev      # Vite dev server on port 3000, host 0.0.0.0
 npm run build    # production build
 npm run preview  # preview production build locally
-npm run lint     # TypeScript type-check only (tsc --noEmit), NOT a linter
+npm run lint     # TypeScript type-check only (tsc --noEmit), NOT a linter. No ESLint/Prettier.
 npm run clean    # Uses rimraf — works cross-platform
 ```
 No test framework. No CI pipeline.
@@ -85,7 +84,7 @@ All accept **email or UUID string** for `resolveUserId()` in `useTeamManagement`
 ## Design System
 
 - **Colors**: `slate` (text/backgrounds), `emerald` (primary action), `sky`/`orange`/`indigo` for status accents
-- **Typography**: `font-mono` (JetBrains Mono) + `tracking-widest` for technical labels; `font-serif` (Playfair Display) **italic** for headers
+- **Typography**: `font-sans` (Inter) for body; `font-mono` (JetBrains Mono) + `tracking-widest` for technical labels; `font-serif` (Playfair Display) **italic** for headers
 - **Zero-Hallucination Policy**: Do not invent new UI designs, color schemes, or layouts. Stick strictly to this design system.
 - **Animations**: All modals and list transitions **must** use `AnimatePresence` + `motion.div` from `motion/react`
 
@@ -105,4 +104,4 @@ All accept **email or UUID string** for `resolveUserId()` in `useTeamManagement`
 
 **Modals** (`src/components/modals/`): `TaskAssignmentModal`, `ReportSubmissionModal`, `EditTaskModal`, `EmployeeTasksModal`, `NewPersonalTaskModal`, `TaskDetailsModal`
 
-**Data Flow**: Dashboard fetches via hooks → Realtime updates store → Modals call hooks for mutations → UI renders from store
+**Data Flow**: Dashboard fetches via hooks → Realtime subscriptions → Modals call hooks for mutations → UI renders from hook-local state

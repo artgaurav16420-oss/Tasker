@@ -162,14 +162,14 @@ export default function Dashboard() {
     setIsUpdatingTask,
     setIsDeletingTask,
     setIsTogglingPersonalTask,
-    onPersonalTaskCreated: () => {},
-    onTaskCreated: () => {},
-    onTaskUpdated: () => {},
-    onTaskDeleted: () => {},
-    onStatusChanged: () => {},
-    onPersonalTaskToggled: () => {},
-    onPersonalTaskDeleted: () => {},
-    onReportCreated: () => {},
+    onPersonalTaskCreated: refetch,
+    onTaskCreated: refetch,
+    onTaskUpdated: refetch,
+    onTaskDeleted: refetch,
+    onStatusChanged: refetch,
+    onPersonalTaskToggled: refetch,
+    onPersonalTaskDeleted: refetch,
+    onReportCreated: refetch,
   });
 
   const {
@@ -181,10 +181,8 @@ export default function Dashboard() {
     profile,
     showToast,
     setConfirmDialog,
-    onEmployeeAdded: () => { refetch(); },
-    onEmployeeRemoved: () => { refetch(); },
-    onSuperiorAdded: () => { refetch(); },
-    onSuperiorRemoved: () => { refetch(); },
+    onEmployeeAdded: () => {},
+    onSuperiorAdded: () => {},
     refetchData: refetch,
   });
 

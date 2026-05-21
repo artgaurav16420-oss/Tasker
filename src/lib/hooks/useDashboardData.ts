@@ -50,12 +50,13 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
 
     setError(null);
 
-    const [employeesRes, myTasksRes, teamTasksRes, managedReportsRes, personalTasksRes] = await Promise.all([
-      supabase.from("users").select("*").contains("managerIds", [uid]),
+    const [employeesRes, myTasksRes, teamTasksRes, managedReportsRes, personalTasksRes, profileRes] = await Promise.all([
+      supabase.from("users").select("*").filter("managerIds", "cs", `{${uid}}`),
       supabase.from("tasks").select("*").eq("employeeId", uid),
       supabase.from("tasks").select("*").eq("managerId", uid),
       supabase.from("reports").select("*").or(`managerId.eq.${uid},employeeId.eq.${uid}`),
       supabase.from("personal_tasks").select("*").eq("userId", uid),
+      supabase.from("users").select("uid, managerIds").eq("uid", uid).maybeSingle(),
     ]);
 
     if (seq !== requestSeqRef.current) return;
@@ -72,6 +73,15 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
     if (teamTasksRes.data) setTeamTasks(teamTasksRes.data as Task[]);
     if (managedReportsRes.data) setManagedReports(managedReportsRes.data as Report[]);
     if (personalTasksRes.data) setPersonalTasks(personalTasksRes.data as PersonalTask[]);
+
+    const latestManagerIds = (profileRes.data as { managerIds?: string[] } | null)?.managerIds ?? [];
+    if (latestManagerIds.length > 0) {
+      const limited = latestManagerIds.slice(0, MAX_SUPERIORS_REALTIME);
+      const { data: superiorsData } = await supabase.from("users").select("*").in("uid", limited);
+      if (superiorsData) setSuperiors(superiorsData as UserProfile[]);
+    } else {
+      setSuperiors([]);
+    }
 
     setIsLoading(false);
     initialFetchDoneRef.current = true;
@@ -201,7 +211,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
       setError(null);
 
       const [employeesRes, myTasksRes, teamTasksRes, managedReportsRes, personalTasksRes] = await Promise.all([
-        supabase.from("users").select("*").contains("managerIds", [profile.uid]),
+        supabase.from("users").select("*").filter("managerIds", "cs", `{${profile.uid}}`),
         supabase.from("tasks").select("*").eq("employeeId", profile.uid),
         supabase.from("tasks").select("*").eq("managerId", profile.uid),
         supabase.from("reports").select("*").or(`managerId.eq.${profile.uid},employeeId.eq.${profile.uid}`),
@@ -228,15 +238,25 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
 
     fetchAll();
 
+    const parsePgArray = (val: unknown): string[] => {
+      if (Array.isArray(val)) return val;
+      if (typeof val === 'string') {
+        const trimmed = val.replace(/^\{|\}$/g, '');
+        if (!trimmed) return [];
+        return trimmed.split(',');
+      }
+      return [];
+    };
+
     const handleUserChange = (payload: RealtimePostgresChangesPayload<{ uid: string; managerIds: string[]; name: string; email: string; createdAt: string }>) => {
-      const newManagerIds = (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE')
-        ? ((payload.new as Record<string, unknown>)?.managerIds as string[] | undefined) || []
-        : [];
-      const oldManagerIds = (payload.eventType === 'UPDATE' || payload.eventType === 'DELETE')
-        ? ((payload.old as Record<string, unknown>)?.managerIds as string[] | undefined) || []
-        : [];
-      const safeNewManagerIds = Array.isArray(newManagerIds) ? newManagerIds : [];
-      const safeOldManagerIds = Array.isArray(oldManagerIds) ? oldManagerIds : [];
+      const newManagerIdsRaw = (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE')
+        ? ((payload.new as Record<string, unknown>)?.managerIds as unknown)
+        : undefined;
+      const oldManagerIdsRaw = (payload.eventType === 'UPDATE' || payload.eventType === 'DELETE')
+        ? ((payload.old as Record<string, unknown>)?.managerIds as unknown)
+        : undefined;
+      const safeNewManagerIds = parsePgArray(newManagerIdsRaw);
+      const safeOldManagerIds = parsePgArray(oldManagerIdsRaw);
 
       const relationshipTouchesViewer =
         safeNewManagerIds.includes(profile.uid) ||

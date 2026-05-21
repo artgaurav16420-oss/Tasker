@@ -46,7 +46,8 @@
       "Skill(graphify)",
       "Bash(mkdir -p graphify-out)",
       "Bash(python -c \"import graphify\")",
-      "Bash(pip install *)"
+      "Bash(pip install *)",
+      "Bash(Test-Path *)"
     ]
   }
 }

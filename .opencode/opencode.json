@@ -14,6 +14,46 @@
     "~/.config/opencode/node_modules/supabase-mcp",
     "~/.config/opencode/node_modules/playwright-mcp",
     "~/.config/opencode/node_modules/lighthouse-mcp",
-    "~/.config/opencode/node_modules/fetcher-mcp"
-  ]
+    "~/.config/opencode/node_modules/fetcher-mcp",
+    "~/.config/opencode/plugins/claude-mem.js"
+  ],
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
+      },
+      "enabled": true
+    }
+  },
+  "formatter": true,
+  "lsp": true,
+  "permission": {
+    "edit": {
+      ".env*": "ask"
+    },
+    "bash": {
+      "npm install": "ask",
+      "npm run build": "ask",
+      "npm run dev": "ask"
+    }
+  },
+  "watcher": {
+    "ignore": ["dist/**", "node_modules/**"]
+  },
+  "command": {
+    "lint": {
+      "template": "npm run lint",
+      "description": "TypeScript type-check"
+    },
+    "dev": {
+      "template": "npm run dev",
+      "description": "Start dev server on :3000"
+    },
+    "rebuild": {
+      "template": "npm run clean && npm run build",
+      "description": "Clean + production build"
+    }
+  }
 }

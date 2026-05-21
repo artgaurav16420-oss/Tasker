@@ -59,19 +59,19 @@ export function useTeamManagement({
         return;
       }
 
+      let superiorProfile: UserProfile | null = null;
+      const { data: profileData } = await supabase.from("users").select("*").eq("uid", targetUid).maybeSingle();
+      superiorProfile = profileData as UserProfile | null;
+
       const { error } = await supabase.rpc('member_join_team', {
         superior_uid: targetUid
       });
 
       if (error) throw error;
 
-      const { data: superiorData } = await supabase.from('users').select('*').eq('uid', targetUid).maybeSingle();
-      if (superiorData) {
-        onSuperiorAdded?.(superiorData as UserProfile);
-      }
-
       showToast("Successfully connected with superior!");
       setManagerCode("");
+      if (superiorProfile) onSuperiorAdded?.(superiorProfile);
       refetchData?.();
     } catch (err: unknown) {
       console.error(err);
@@ -99,6 +99,10 @@ export function useTeamManagement({
         return;
       }
 
+      let memberProfile: UserProfile | null = null;
+      const { data: profileData } = await supabase.from("users").select("*").eq("uid", targetUid).maybeSingle();
+      memberProfile = profileData as UserProfile | null;
+
       const { error: rpcError } = await supabase.rpc('add_team_member', {
         admin_uid: profile.uid,
         member_uid: targetUid
@@ -113,13 +117,9 @@ export function useTeamManagement({
         return;
       }
 
-      const { data: memberData } = await supabase.from('users').select('*').eq('uid', targetUid).maybeSingle();
-      if (memberData) {
-        onEmployeeAdded?.(memberData as UserProfile);
-      }
-
       showToast("Operative successfully added to team!");
       setMemberCode("");
+      if (memberProfile) onEmployeeAdded?.(memberProfile);
       refetchData?.();
     } catch (err: unknown) {
       console.error(err);
