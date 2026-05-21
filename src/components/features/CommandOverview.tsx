@@ -53,9 +53,9 @@ export default function CommandOverview({ teamTasks, employees }: Props) {
       <div className="space-y-2">
         <div className="flex items-center gap-3">
           <div className="w-3 h-3 bg-emerald-500 rotate-45 shadow-sm"></div>
-          <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-400">Real-time Intelligence</h2>
+          <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-500 dark:text-slate-400">Real-time Intelligence</h2>
         </div>
-        <h2 className="font-serif text-2xl text-slate-900 tracking-tight -tracking-[0.025em]">
+        <h2 className="font-serif text-2xl text-slate-900 dark:text-slate-100 tracking-tight -tracking-[0.025em]">
           Command Dashboard
         </h2>
       </div>
@@ -91,15 +91,15 @@ export default function CommandOverview({ teamTasks, employees }: Props) {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Performance Chart */}
-        <div className="lg:col-span-2 bg-white border border-slate-100 rounded-2xl p-8 shadow-sm">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl p-8 shadow-sm dark:shadow-slate-900/20">
           <div className="flex justify-between items-center mb-8">
             <div className="space-y-1">
-              <h3 className="font-mono text-xs font-black uppercase tracking-widest text-slate-400">Operational Tempo</h3>
-              <p className="font-serif text-lg text-slate-900 -tracking-[0.025em]">Task Completion Velocity</p>
+              <h3 className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Operational Tempo</h3>
+              <p className="font-serif text-lg text-slate-900 dark:text-slate-100 -tracking-[0.025em]">Task Completion Velocity</p>
             </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-lg border border-slate-100">
+            <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-100 dark:border-slate-700">
                <Clock className="w-4 h-4 text-slate-400" />
-                <span className="font-mono text-xs font-black uppercase tracking-widest text-slate-500">Last 7 Cycles</span>
+                <span className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Last 7 Cycles</span>
             </div>
           </div>
           
@@ -150,7 +150,7 @@ export default function CommandOverview({ teamTasks, employees }: Props) {
         </div>
 
         {/* Priority Breakdown */}
-        <div className="bg-slate-900 rounded-3xl p-8 text-white relative overflow-hidden shadow-xl shadow-slate-900/20">
+        <div className="bg-slate-900 dark:bg-slate-800 rounded-3xl p-8 text-white relative overflow-hidden shadow-xl shadow-slate-900/20">
           <div className="relative z-10 space-y-8">
             <div className="space-y-1">
               <h3 className="font-mono text-xs font-black uppercase tracking-widest text-slate-500">Threat Matrix</h3>
@@ -200,17 +200,17 @@ function KPICard({ title, value, icon, isAlert, reducedMotion }: KPICardProps) {
     <motion.div 
       whileHover={reducedMotion ? undefined : { y: -5 }}
       className={`p-6 rounded-2xl border transition-all duration-150 ${
-        isAlert ? 'bg-orange-50 border-orange-100 shadow-lg shadow-orange-500/5' : 'bg-white border-slate-100 shadow-sm hover:shadow-lg hover:shadow-slate-200/30'
+        isAlert ? 'bg-orange-50 dark:bg-orange-500/10 border-orange-100 dark:border-orange-500/20 shadow-lg shadow-orange-500/5' : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm dark:shadow-slate-900/20 hover:shadow-lg hover:shadow-slate-200/30 dark:hover:shadow-slate-900/30'
       }`}
     >
       <div className="flex justify-between items-start mb-4">
-        <div className={`p-3 rounded-2xl ${isAlert ? 'bg-white border border-orange-100' : 'bg-slate-50 border border-slate-50'}`}>
+        <div className={`p-3 rounded-2xl ${isAlert ? 'bg-white dark:bg-slate-800 border border-orange-100 dark:border-orange-500/20' : 'bg-slate-50 dark:bg-slate-900 border border-slate-50 dark:border-slate-700'}`}>
           {icon}
         </div>
       </div>
       <div className="space-y-1">
-        <h4 className="font-mono text-xs font-black uppercase tracking-widest text-slate-400">{title}</h4>
-        <div className={`font-serif text-xl font-bold ${isAlert ? 'text-orange-600' : 'text-slate-900'}`}>
+        <h4 className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">{title}</h4>
+        <div className={`font-serif text-xl font-bold ${isAlert ? 'text-orange-600' : 'text-slate-900 dark:text-slate-100'}`}>
           {value}
         </div>
       </div>
@@ -231,7 +231,7 @@ function PriorityRow({ label, count, total, color, reducedMotion }: PriorityRowP
   return (
     <div className="space-y-2">
       <div className="flex justify-between items-end">
-        <span className="font-mono text-xs font-black uppercase tracking-widest text-slate-400">{label}</span>
+        <span className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">{label}</span>
         <span className="font-mono text-xs font-black text-white">{count}</span>
       </div>
       <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">

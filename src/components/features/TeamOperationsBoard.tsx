@@ -51,13 +51,13 @@ export default function TeamOperationsBoard({
 
   return (
     <div className="space-y-12">
-      <div className="flex items-end justify-between border-b border-slate-200 pb-8">
+      <div className="flex items-end justify-between border-b border-slate-200 dark:border-slate-700 pb-8">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 bg-emerald-500 rotate-45 shadow-sm"></div>
-            <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-400">Tactical Control</h2>
+            <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-500 dark:text-slate-400">Tactical Control</h2>
           </div>
-          <h2 className="font-serif text-2xl text-slate-900 tracking-tight -tracking-[0.025em]">
+          <h2 className="font-serif text-2xl text-slate-900 dark:text-slate-100 tracking-tight -tracking-[0.025em]">
             Team Operations
           </h2>
         </div>
@@ -71,13 +71,13 @@ export default function TeamOperationsBoard({
 
       <div className="space-y-12">
         <div className="space-y-8">
-          <h3 className="font-serif text-xl text-slate-900 tracking-tight -tracking-[0.025em]">
+          <h3 className="font-serif text-xl text-slate-900 dark:text-slate-100 tracking-tight -tracking-[0.025em]">
             Active Operations
           </h3>
           <div className="flex flex-col gap-10">
             {teamTasks.filter((t) => t.status !== "completed").length === 0 && (
-              <div className="border-2 border-dashed border-slate-200 p-16 text-center text-xs font-mono tracking-[0.25em] uppercase text-slate-600 bg-white shadow-inner rounded-2xl">
-                <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center"><Activity className="w-8 h-8 text-emerald-400" /></div>
+              <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 p-16 text-center text-xs font-mono tracking-[0.25em] uppercase text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 shadow-inner rounded-2xl">
+                <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 flex items-center justify-center"><Activity className="w-8 h-8 text-emerald-400" /></div>
                 No active team operations detected.
               </div>
             )}
@@ -97,11 +97,11 @@ export default function TeamOperationsBoard({
                     onClick={toggleGroup}
                   >
                     <div className={`w-2 h-2 rotate-45 shrink-0 shadow-sm ${!employee && employeeId !== "unknown" ? "bg-slate-400 shadow-slate-500/20" : "bg-emerald-500 shadow-emerald-500/20"}`}></div>
-                    <h3 className={`font-mono text-xs font-black uppercase tracking-[0.3em] whitespace-nowrap transition-colors border-none p-0 bg-transparent flex items-center ${!employee && employeeId !== "unknown" ? "text-slate-400 group-hover/header:text-slate-600 line-through" : "text-slate-600 group-hover/header:text-emerald-600"}`}>
-                      Assigned To: {employeeName} <span className="ml-2 opacity-60 no-underline">({activeEmployeeTasks.length})</span>
-                    </h3>
-                    <div className="h-[1px] flex-1 bg-gradient-to-r from-slate-200 to-transparent"></div>
-                    <div className="text-slate-400 group-hover/header:text-emerald-600 transition-colors bg-white p-2 rounded-full border border-slate-100 shadow-sm min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" tabIndex={0} role="button" aria-label={isCollapsed ? "Expand group" : "Collapse group"}>
+                     <h3 className={`font-mono text-xs font-black uppercase tracking-[0.3em] whitespace-nowrap transition-colors border-none p-0 bg-transparent flex items-center ${!employee && employeeId !== "unknown" ? "text-slate-400 dark:text-slate-500 group-hover/header:text-slate-600 dark:group-hover/header:text-slate-400 line-through" : "text-slate-600 dark:text-slate-400 group-hover/header:text-emerald-600"}`}>
+                       Assigned To: {employeeName} <span className="ml-2 opacity-60 no-underline">({activeEmployeeTasks.length})</span>
+                     </h3>
+                     <div className="h-[1px] flex-1 bg-gradient-to-r from-slate-200 dark:from-slate-700 to-transparent"></div>
+                     <div className="text-slate-400 dark:text-slate-500 group-hover/header:text-emerald-600 dark:group-hover/header:text-emerald-400 transition-colors bg-white dark:bg-slate-800 p-2 rounded-full border border-slate-100 dark:border-slate-700 shadow-sm dark:shadow-slate-900/20 min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" tabIndex={0} role="button" aria-label={isCollapsed ? "Expand group" : "Collapse group"}>
                       {isCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
                     </div>
                   </div>
@@ -115,12 +115,13 @@ export default function TeamOperationsBoard({
                         className="overflow-hidden"
                       >
                         <div className="grid grid-cols-1 gap-4 pb-6 px-1">
-                          {activeEmployeeTasks.map((task) => (
+                          {activeEmployeeTasks.map((task, idx) => (
                             <motion.div
                               key={task.id}
                               initial={reducedMotion ? { opacity: 1 } : { x: -20, opacity: 0 }}
                               animate={reducedMotion ? { opacity: 1 } : { x: 0, opacity: 1 }}
-                              className="border border-slate-200 bg-white py-3 px-4 hover:border-emerald-500/40 hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-150 group cursor-pointer text-left focus:outline-none relative rounded-2xl shadow-sm"
+                              transition={reducedMotion ? undefined : { delay: idx * 0.03 }}
+                              className="border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-3 px-4 hover:border-emerald-500/40 hover:shadow-xl dark:hover:shadow-slate-900/30 hover:shadow-emerald-500/5 transition-all duration-150 group cursor-pointer text-left focus:outline-none relative rounded-2xl shadow-sm dark:shadow-slate-900/20 active:scale-[0.98]"
                               onClick={() => setSelectedTaskDetails(task)}
                               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedTaskDetails(task); } }}
                               role="button"
@@ -128,7 +129,7 @@ export default function TeamOperationsBoard({
                             >
                               <button
                                 onClick={(e) => { e.stopPropagation(); handleDeleteTask(task); }}
-                                className="absolute top-2 right-2 text-slate-200 hover:text-orange-500 hover:bg-orange-50 transition-all duration-150 p-2 rounded-xl z-10 min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                                className="absolute top-2 right-2 text-slate-200 dark:text-slate-600 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-slate-700 transition-all duration-150 p-2 rounded-xl z-10 min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
                                 title="Terminate Operation"
                                 aria-label={`Delete task: ${task.title}`}
                               >
@@ -138,12 +139,12 @@ export default function TeamOperationsBoard({
                                 <div className="flex-1 flex flex-col md:flex-row md:items-center gap-3">
                                   <div className="flex items-center gap-3 min-w-[200px]">
                                     <div className="w-2 h-2 rounded-full shadow-lg shrink-0" style={{ color: task.status === "in-review" ? "#6366f1" : task.status === "in-progress" ? "#0ea5e9" : "#f59e0b", background: "currentColor" }}></div>
-                                    <span className="text-xs font-mono text-slate-500 font-bold uppercase tracking-wider">{task.status === "in-review" ? "Review" : task.status === "in-progress" ? "Active" : "Pending"}</span>
-                                    <h3 className="font-serif text-base text-slate-900 group-hover:text-emerald-600 transition-colors duration-150 tracking-tight -tracking-[0.025em] truncate flex-1">
+                                    <span className="text-xs font-mono text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">{task.status === "in-review" ? "Review" : task.status === "in-progress" ? "Active" : "Pending"}</span>
+                                    <h3 className="font-serif text-base text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 transition-colors duration-150 tracking-tight -tracking-[0.025em] truncate flex-1" title={task.title}>
                                       {task.title}
                                     </h3>
                                   </div>
-                                  <div className="hidden md:block h-5 w-[1px] bg-slate-100 shrink-0"></div>
+                                  <div className="hidden md:block h-5 w-[1px] bg-slate-100 dark:bg-slate-700 shrink-0"></div>
                                   <div className="flex flex-wrap items-center gap-3 text-xs font-mono uppercase tracking-widest font-bold flex-1">
                                     <div className={`flex items-center gap-2 border px-3 py-1 rounded-lg font-black shadow-lg ${getPriorityStyle(task.priority)}`}>
                                       <Zap className="w-3.5 h-3.5" /> {task.priority || 'medium'}
@@ -174,7 +175,7 @@ export default function TeamOperationsBoard({
                                     Resolve
                                   </button>
                                   )}
-                                  <button onClick={(e) => { e.stopPropagation(); setSelectedTaskDetails(task); }} className="bg-white border border-slate-200 text-slate-700 font-mono text-xs font-bold uppercase tracking-widest py-2.5 px-6 hover:bg-slate-50 hover:text-slate-950 transition-all duration-150 flex justify-center items-center gap-2 rounded-xl shadow-sm whitespace-nowrap focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">
+                                  <button onClick={(e) => { e.stopPropagation(); setSelectedTaskDetails(task); }} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-mono text-xs font-bold uppercase tracking-widest py-2.5 px-6 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-950 dark:hover:text-slate-100 transition-all duration-150 flex justify-center items-center gap-2 rounded-xl shadow-sm dark:shadow-slate-900/20 whitespace-nowrap focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">
                                     <FileText className="w-3 h-3" /> View Progress
                                   </button>
                                 </div>
@@ -192,13 +193,13 @@ export default function TeamOperationsBoard({
         </div>
 
         <div className="space-y-8">
-          <h3 className="font-serif text-xl text-slate-900 tracking-tight -tracking-[0.025em]">
+          <h3 className="font-serif text-xl text-slate-900 dark:text-slate-100 tracking-tight -tracking-[0.025em]">
             Completed Operations
           </h3>
           <div className="flex flex-col gap-10">
             {teamTasks.filter((t) => t.status === "completed").length === 0 && (
-              <div className="border border-slate-100 p-16 text-center text-xs font-mono tracking-[0.25em] uppercase text-slate-500 bg-slate-50/50 rounded-2xl">
-                <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center"><CheckCircle2 className="w-8 h-8 text-slate-300" /></div>
+              <div className="border border-slate-100 dark:border-slate-700 p-16 text-center text-xs font-mono tracking-[0.25em] uppercase text-slate-500 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-900/50 rounded-2xl">
+                <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 flex items-center justify-center"><CheckCircle2 className="w-8 h-8 text-slate-300 dark:text-slate-500" /></div>
                 No archived operations.
               </div>
             )}
@@ -212,11 +213,11 @@ export default function TeamOperationsBoard({
                 <div key={`team_completed_${employeeId}`} className="space-y-6">
                   <div className={`flex items-center gap-6 px-1 cursor-pointer group/header ${!employee && employeeId !== "unknown" ? "opacity-60" : ""}`} onClick={toggleGroup}>
                     <div className={`w-2 h-2 rotate-45 shrink-0 ${!employee && employeeId !== "unknown" ? "bg-slate-300" : "bg-slate-500"}`}></div>
-                    <h3 className={`font-mono text-xs font-black uppercase tracking-[0.3em] whitespace-nowrap transition-colors border-none p-0 bg-transparent flex items-center ${!employee && employeeId !== "unknown" ? "text-slate-400 group-hover/header:text-slate-600 line-through" : "text-slate-700 group-hover/header:text-slate-900"}`}>
+                    <h3 className={`font-mono text-xs font-black uppercase tracking-[0.3em] whitespace-nowrap transition-colors border-none p-0 bg-transparent flex items-center ${!employee && employeeId !== "unknown" ? "text-slate-400 dark:text-slate-500 group-hover/header:text-slate-600 dark:group-hover/header:text-slate-400 line-through" : "text-slate-700 dark:text-slate-300 group-hover/header:text-slate-900 dark:group-hover/header:text-slate-100"}`}>
                       Assigned To: {employeeName} <span className="ml-2 opacity-80 no-underline">({tasks.length})</span>
                     </h3>
-                    <div className="h-[1px] flex-1 bg-gradient-to-r from-slate-200 to-transparent"></div>
-                    <div className="text-slate-500 group-hover/header:text-slate-700 transition-colors bg-white p-2 rounded-full border border-slate-100 shadow-sm min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" tabIndex={0} role="button" aria-label={isCollapsed ? "Expand group" : "Collapse group"}>
+                    <div className="h-[1px] flex-1 bg-gradient-to-r from-slate-200 dark:from-slate-700 to-transparent"></div>
+                    <div className="text-slate-500 dark:text-slate-400 group-hover/header:text-slate-700 dark:group-hover/header:text-slate-300 transition-colors bg-white dark:bg-slate-800 p-2 rounded-full border border-slate-100 dark:border-slate-700 shadow-sm dark:shadow-slate-900/20 min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" tabIndex={0} role="button" aria-label={isCollapsed ? "Expand group" : "Collapse group"}>
                       {isCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
                     </div>
                   </div>
@@ -224,11 +225,11 @@ export default function TeamOperationsBoard({
                     {!isCollapsed && (
                       <motion.div initial={reducedMotion ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }} animate={reducedMotion ? { height: "auto", opacity: 1 } : { height: "auto", opacity: 1 }} exit={reducedMotion ? { height: 0, opacity: 0 } : { height: 0, opacity: 0 }} transition={reducedMotion ? { duration: 0 } : { duration: 0.4, ease: "circOut" }} className="overflow-hidden">
                         <div className="grid grid-cols-1 gap-4 pb-6 px-1">
-                          {tasks.map((task) => (
-                            <motion.div key={task.id} initial={reducedMotion ? { opacity: 1 } : { x: -20, opacity: 0 }} animate={reducedMotion ? { opacity: 1 } : { x: 0, opacity: 1 }} className="border border-slate-100 bg-white/60 py-3 px-4 hover:border-emerald-500/20 hover:bg-white transition-all group cursor-pointer text-left focus:outline-none relative rounded-2xl shadow-sm" onClick={() => setSelectedTaskDetails(task)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedTaskDetails(task); } }} role="button" tabIndex={0}>
+                          {tasks.map((task, idx) => (
+                            <motion.div key={task.id} initial={reducedMotion ? { opacity: 1 } : { x: -20, opacity: 0 }} animate={reducedMotion ? { opacity: 1 } : { x: 0, opacity: 1 }} transition={reducedMotion ? undefined : { delay: idx * 0.03 }} className="border border-slate-100 dark:border-slate-700 bg-white/60 dark:bg-slate-800/60 py-3 px-4 hover:border-emerald-500/20 hover:bg-white dark:hover:bg-slate-700 transition-all group cursor-pointer text-left focus:outline-none relative rounded-2xl shadow-sm dark:shadow-slate-900/20" onClick={() => setSelectedTaskDetails(task)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedTaskDetails(task); } }} role="button" tabIndex={0}>
                               <button
                                 onClick={(e) => { e.stopPropagation(); handleDeleteTask(task); }}
-                                className="absolute top-2 right-2 text-slate-200 hover:text-orange-500 hover:bg-orange-50 transition-all p-2 rounded-xl z-10"
+                                className="absolute top-2 right-2 text-slate-200 dark:text-slate-600 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-slate-700 transition-all p-2 rounded-xl z-10"
                                 title="Purge Record"
                                 aria-label={`Delete task: ${task.title}`}
                               >
@@ -238,11 +239,11 @@ export default function TeamOperationsBoard({
                                 <div className="flex-1 flex flex-col md:flex-row md:items-center gap-3">
                                   <div className="flex items-center gap-3 min-w-[200px]">
                                     <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                                    <h3 className="font-serif text-base text-slate-900 group-hover:text-emerald-600 transition-colors duration-150 tracking-tight -tracking-[0.025em] truncate flex-1">
+                                    <h3 className="font-serif text-base text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 transition-colors duration-150 tracking-tight -tracking-[0.025em] truncate flex-1" title={task.title}>
                                       {task.title}
                                     </h3>
                                   </div>
-                                  <div className="hidden md:block h-5 w-[1px] bg-slate-50 shrink-0"></div>
+                                  <div className="hidden md:block h-5 w-[1px] bg-slate-50 dark:bg-slate-700 shrink-0"></div>
                                   <div className="flex flex-wrap items-center gap-3 text-xs font-mono uppercase tracking-widest font-bold flex-1">
                                     <div className="flex items-center gap-2 border border-indigo-700 px-3 py-1 rounded-lg bg-indigo-600 text-white shadow-lg font-bold opacity-70">
                                       <Calendar className="w-3.5 h-3.5" /> Assigned: {task.createdAt ? new Date(task.createdAt).toLocaleDateString() : "N/A"}
@@ -256,7 +257,7 @@ export default function TeamOperationsBoard({
                                   <div className="bg-emerald-50 border border-emerald-100 text-emerald-600 font-mono text-xs font-bold uppercase tracking-widest py-2 px-4 flex justify-center items-center gap-2 rounded-xl shadow-sm shadow-emerald-500/5 whitespace-nowrap">
                                     <CheckCircle2 className="w-3 h-3" /> Resolved
                                   </div>
-                                  <button onClick={(e) => { e.stopPropagation(); setSelectedTaskDetails(task); }} className="bg-white border border-slate-200 text-slate-700 font-mono text-xs font-bold uppercase tracking-widest py-2.5 px-6 hover:bg-slate-50 hover:text-slate-950 transition-all flex justify-center items-center gap-2 rounded-xl shadow-sm whitespace-nowrap">
+                                  <button onClick={(e) => { e.stopPropagation(); setSelectedTaskDetails(task); }} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-mono text-xs font-bold uppercase tracking-widest py-2.5 px-6 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-950 dark:hover:text-slate-100 transition-all flex justify-center items-center gap-2 rounded-xl shadow-sm dark:shadow-slate-900/20 whitespace-nowrap">
                                     <FileText className="w-3 h-3" /> View Report
                                   </button>
                                 </div>

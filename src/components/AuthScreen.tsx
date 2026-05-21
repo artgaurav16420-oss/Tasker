@@ -64,14 +64,14 @@ export default function AuthScreen() {
 
   if (verificationSent) {
     return (
-      <div className="min-h-dvh bg-slate-50 text-slate-900 flex items-center justify-center p-4 font-sans">
+      <div className="min-h-dvh bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex items-center justify-center p-4 font-sans">
         <div className="w-full max-w-md text-center space-y-6">
-          <div className="bg-white rounded-3xl border border-slate-200 p-10 shadow-xl shadow-slate-200/40">
-            <div className="w-16 h-16 bg-emerald-50/70 border border-emerald-200 rounded-2xl mx-auto flex items-center justify-center mb-6">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-10 shadow-xl shadow-slate-200/40 dark:shadow-slate-900/40">
+            <div className="w-16 h-16 bg-emerald-50/70 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl mx-auto flex items-center justify-center mb-6">
               <Mail className="w-8 h-8 text-emerald-600" />
             </div>
-            <h2 className="font-mono font-black -tracking-[0.025em] uppercase tracking-[0.2em] text-slate-900 mb-3">Verify Your Email</h2>
-            <p className="font-serif text-slate-500 text-sm leading-relaxed">
+            <h2 className="font-mono font-black -tracking-[0.025em] uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100 mb-3">Verify Your Email</h2>
+            <p className="font-serif text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
               A verification link has been sent to <span className="text-emerald-600 font-mono text-xs">{email}</span>. Click the link to activate your account, then log in.
             </p>
             <button
@@ -92,32 +92,32 @@ export default function AuthScreen() {
         <div className="flex justify-center mb-6">
           <Logo className="w-24 h-24" />
         </div>
-        <h1 className="text-2xl font-mono -tracking-[0.025em] tracking-[0.1em] font-black mb-2 text-slate-900">Tasker</h1>
-        <p className="text-slate-400 text-xs font-mono uppercase tracking-[0.1em] font-bold">Raja Ramanna Centre for Advanced Technology</p>
+        <h1 className="text-2xl font-mono -tracking-[0.025em] tracking-[0.1em] font-black mb-2 text-slate-900 dark:text-slate-100">Tasker</h1>
+        <p className="text-slate-400 dark:text-slate-500 text-xs font-mono uppercase tracking-[0.1em] font-bold">Raja Ramanna Centre for Advanced Technology</p>
       </div>
 
-      <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-xl shadow-slate-200/40 relative overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-8 shadow-xl shadow-slate-200/40 dark:shadow-slate-900/40 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
 
         <div className="flex gap-8 mb-10 relative z-10">
           <button
             type="button"
             onClick={() => { setIsLogin(true); setError(''); }}
-            className={`flex-1 pb-3 text-xs font-mono font-bold uppercase tracking-widest transition-all duration-150 border-b-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-t-xl ${isLogin ? 'border-emerald-500 text-slate-950' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+            className={`flex-1 pb-3 text-xs font-mono font-bold uppercase tracking-widest transition-all duration-150 border-b-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-t-xl ${isLogin ? 'border-emerald-500 text-slate-950' : 'border-transparent text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400'}`}
           >
             Login
           </button>
           <button
             type="button"
             onClick={() => { setIsLogin(false); setError(''); }}
-            className={`flex-1 pb-3 text-xs font-mono font-bold uppercase tracking-widest transition-all duration-150 border-b-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-t-xl ${!isLogin ? 'border-emerald-500 text-slate-950' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+            className={`flex-1 pb-3 text-xs font-mono font-bold uppercase tracking-widest transition-all duration-150 border-b-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-t-xl ${!isLogin ? 'border-emerald-500 text-slate-950' : 'border-transparent text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400'}`}
           >
             Sign Up
           </button>
         </div>
 
         {error && (
-          <div id="auth-error" className="mb-8 p-4 bg-orange-50 border border-orange-200 rounded-xl text-orange-600 text-xs font-mono font-bold relative z-10" role="alert">
+          <div id="auth-error" className="mb-8 p-4 bg-orange-50 dark:bg-slate-800 border border-orange-200 dark:border-orange-500/30 rounded-xl text-orange-600 dark:text-orange-400 text-xs font-mono font-bold relative z-10" role="alert">
             {error}
           </div>
         )}
@@ -125,9 +125,9 @@ export default function AuthScreen() {
         <form onSubmit={handleSubmit} className="space-y-6 relative z-10" aria-describedby={error ? "auth-error" : undefined}>
           {!isLogin && (
             <div className="space-y-2">
-              <label htmlFor="auth-name" className="text-xs font-mono text-slate-400 uppercase tracking-widest block font-bold">Full Name</label>
+              <label htmlFor="auth-name" className="text-xs font-mono text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-bold">Full Name</label>
               <div className="relative group">
-                <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-emerald-500 transition-colors duration-150" />
+                <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-500 group-focus-within:text-emerald-500 transition-colors duration-150" />
                 <input
                   id="auth-name"
                   type="text"
@@ -135,7 +135,7 @@ export default function AuthScreen() {
                   autoComplete="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all text-slate-900 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-emerald-500/5 transition-all text-slate-900 dark:text-slate-100 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
                   placeholder="Jane Doe"
                 />
               </div>
@@ -143,9 +143,9 @@ export default function AuthScreen() {
           )}
 
           <div className="space-y-2">
-            <label htmlFor="auth-email" className="text-xs font-mono text-slate-400 uppercase tracking-widest block font-bold">Email Address</label>
+            <label htmlFor="auth-email" className="text-xs font-mono text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-bold">Email Address</label>
             <div className="relative group">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-emerald-500 transition-colors duration-150" />
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-500 group-focus-within:text-emerald-500 transition-colors duration-150" />
               <input
                 id="auth-email"
                 type="email"
@@ -153,16 +153,16 @@ export default function AuthScreen() {
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all text-slate-900 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-emerald-500/5 transition-all text-slate-900 dark:text-slate-100 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
                 placeholder="name@rrcat.gov.in"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="auth-password" className="text-xs font-mono text-slate-400 uppercase tracking-widest block font-bold">Password</label>
+            <label htmlFor="auth-password" className="text-xs font-mono text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-bold">Password</label>
             <div className="relative group">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-emerald-500 transition-colors duration-150" />
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-500 group-focus-within:text-emerald-500 transition-colors duration-150" />
               <input
                 id="auth-password"
                 type={showPassword ? 'text' : 'password'}
@@ -170,13 +170,13 @@ export default function AuthScreen() {
                 autoComplete={isLogin ? 'current-password' : 'new-password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-4 pl-12 pr-12 text-sm focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 transition-all text-slate-900 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl py-4 pl-12 pr-12 text-sm focus:outline-none focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-emerald-500/5 transition-all text-slate-900 dark:text-slate-100 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
                 placeholder="••••••••"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500 transition-colors duration-150 p-1 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 dark:text-slate-500 hover:text-slate-500 transition-colors duration-150 p-1 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -202,13 +202,13 @@ export default function AuthScreen() {
       </div>
 
       <div className="mt-8 text-center">
-        <p className="text-xs font-mono text-slate-400 uppercase tracking-widest font-bold">Task Manager v1.0.4</p>
+        <p className="text-xs font-mono text-slate-500 dark:text-slate-400 uppercase tracking-widest font-bold">Task Manager v1.0.4</p>
       </div>
     </>
   );
 
   return (
-    <div className="min-h-dvh bg-slate-50 text-slate-900 flex items-center justify-center p-4 font-sans selection:bg-emerald-100 selection:text-emerald-900">
+    <div className="min-h-dvh bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex items-center justify-center p-4 font-sans selection:bg-emerald-100 selection:text-emerald-900">
       {reducedMotion ? (
         <div className="w-full max-w-md">
           {authContent}

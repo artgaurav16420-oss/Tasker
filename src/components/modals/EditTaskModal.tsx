@@ -9,6 +9,7 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { Task, UserProfile } from "../../lib/types";
 import { useReducedMotion } from "../../lib/hooks/useReducedMotion";
+import { useFocusTrap } from '../../lib/hooks/useFocusTrap';
 
 const VALID_PRIORITIES = ['low', 'medium', 'high', 'critical'] as const;
 const VALID_STATUSES = ['todo', 'in-progress', 'in-review', 'completed'] as const;
@@ -37,6 +38,7 @@ export default function EditTaskModal({
   isUpdating,
 }: Props) {
   const reducedMotion = useReducedMotion();
+  const focusTrapRef = useFocusTrap(editingTask != null);
   return (
     <AnimatePresence>
       {editingTask && (
@@ -50,30 +52,31 @@ export default function EditTaskModal({
           />
 
           <motion.div
+            ref={focusTrapRef}
             initial={reducedMotion ? { opacity: 0 } : { y: 50, opacity: 0, scale: 0.95 }}
             animate={reducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
             exit={reducedMotion ? { opacity: 0 } : { y: 50, opacity: 0, scale: 0.95 }}
             role="dialog"
             aria-modal="true"
             aria-labelledby="edit-task-title"
-            className="relative w-full max-w-2xl bg-white border border-slate-100 shadow-2xl rounded-3xl overflow-hidden"
+            className="relative w-full max-w-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-2xl dark:shadow-slate-900/50 rounded-3xl overflow-hidden"
           >
           <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent"></div>
           {/* Header */}
-          <div className="p-8 md:p-10 border-b border-slate-50 flex justify-between items-start">
+          <div className="p-8 md:p-10 border-b border-slate-50 dark:border-slate-700 flex justify-between items-start">
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <Target className="w-4 h-4 text-emerald-500" />
-                <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-400">Tactical Revision</h2>
+                <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-500 dark:text-slate-400">Tactical Revision</h2>
               </div>
-              <h2 id="edit-task-title" className="font-serif text-xl text-slate-900 -tracking-[0.025em] tracking-tight">
+              <h2 id="edit-task-title" className="font-serif text-xl text-slate-900 dark:text-slate-100 -tracking-[0.025em] tracking-tight">
                 Edit Mission Metadata
               </h2>
             </div>
             <button
               onClick={() => setEditingTask(null)}
               aria-label="Close dialog"
-              className="p-3 text-slate-300 hover:text-slate-900 hover:bg-slate-50 transition-all duration-150 rounded-xl"
+              className="p-3 text-slate-300 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-150 rounded-xl"
             >
               <X className="w-6 h-6" />
             </button>
@@ -83,38 +86,38 @@ export default function EditTaskModal({
             <div className="space-y-6">
               {/* Title */}
               <div className="space-y-2">
-                <label className="font-mono text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Operation Title</label>
+                <label className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1">Operation Title</label>
                 <input
                   required
                   type="text"
                   value={editingTask.title}
                   onChange={(e) => setEditingTask({ ...editingTask, title: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white transition-all duration-150 font-serif text-base"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white dark:focus:bg-slate-800 transition-all duration-150 font-serif text-base"
                 />
               </div>
 
               {/* Description */}
               <div className="space-y-2">
-                <label className="font-mono text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Mission Specs</label>
+                <label className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1">Mission Specs</label>
                 <textarea
                   value={editingTask.description || ''}
                   onChange={(e) => setEditingTask({ ...editingTask, description: e.target.value })}
                   rows={4}
-                  className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white transition-all duration-150 text-slate-600 leading-relaxed"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white dark:focus:bg-slate-800 transition-all duration-150 text-slate-600 dark:text-slate-400 leading-relaxed"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Assignee */}
                 <div className="space-y-2">
-                  <label className="font-mono text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Primary Operative</label>
+                  <label className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1">Primary Operative</label>
                   <div className="relative">
-                    <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                    <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-slate-400 pointer-events-none" />
                     <select
                       required
                       value={editingTask.employeeId || ''}
                       onChange={(e) => setEditingTask({ ...editingTask, employeeId: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-100 pl-11 pr-5 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 appearance-none font-mono text-xs font-bold uppercase tracking-wider cursor-pointer"
+                      className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 pl-11 pr-5 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 appearance-none font-mono text-xs font-bold uppercase tracking-wider cursor-pointer"
                     >
                       <option value="">Select Personnel</option>
                       {employees.map((emp) => (
@@ -126,14 +129,14 @@ export default function EditTaskModal({
 
                 {/* Priority */}
                 <div className="space-y-2">
-                  <label className="font-mono text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Threat Priority</label>
+                  <label className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1">Threat Priority</label>
                   <div className="relative">
-                    <AlertCircle className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                    <AlertCircle className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-slate-400 pointer-events-none" />
                     <select
                       required
                       value={editingTask.priority || 'medium'}
                       onChange={(e) => { if (isValidPriority(e.target.value)) setEditingTask({ ...editingTask, priority: e.target.value }); }}
-                      className="w-full bg-slate-50 border border-slate-100 pl-11 pr-5 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 appearance-none font-mono text-xs font-bold uppercase tracking-wider cursor-pointer"
+                      className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 pl-11 pr-5 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 appearance-none font-mono text-xs font-bold uppercase tracking-wider cursor-pointer"
                     >
                       <option value="low">LOW - ROUTINE</option>
                       <option value="medium">MEDIUM - STANDARD</option>
@@ -145,30 +148,30 @@ export default function EditTaskModal({
 
                 {/* Status */}
                 <div className="space-y-2">
-                  <label className="font-mono text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Live Status</label>
+                  <label className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1">Live Status</label>
                   <select
                     required
                     value={editingTask.status}
                     onChange={(e) => { if (isValidStatus(e.target.value)) setEditingTask({ ...editingTask, status: e.target.value }); }}
-                    className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 font-mono text-xs font-bold uppercase tracking-wider"
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 font-mono text-xs font-bold uppercase tracking-wider"
                   >
                     <option value="todo">Pending Deployment</option>
                     <option value="in-progress">In Progress</option>
                     <option value="in-review">Under Review</option>
                   </select>
-                  <p className="font-mono text-[10px] text-slate-400 mt-1">To complete a task, use the status action buttons.</p>
+                  <p className="font-mono text-[10px] text-slate-500 dark:text-slate-400 mt-1">To complete a task, use the status action buttons.</p>
                 </div>
 
                 {/* Deadline */}
                 <div className="space-y-2">
-                  <label className="font-mono text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Target Deadline</label>
+                  <label className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1">Target Deadline</label>
                   <div className="relative">
-                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-                    <input
-                      type="date"
-                      value={editingTask.timelineEnd ? editingTask.timelineEnd.split('T')[0] : ''}
-                      onChange={(e) => setEditingTask({ ...editingTask, timelineEnd: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-100 pl-11 pr-5 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 font-mono text-xs font-bold uppercase tracking-wider"
+                      <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-slate-400 pointer-events-none" />
+                      <input
+                        type="date"
+                        value={editingTask.timelineEnd ? editingTask.timelineEnd.split('T')[0] : ''}
+                        onChange={(e) => setEditingTask({ ...editingTask, timelineEnd: e.target.value })}
+                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 pl-11 pr-5 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 font-mono text-xs font-bold uppercase tracking-wider"
                     />
                   </div>
                 </div>

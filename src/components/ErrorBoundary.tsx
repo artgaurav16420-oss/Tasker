@@ -22,15 +22,15 @@ export default class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-[200px] flex items-center justify-center p-8">
+        <div className="min-h-[200px] flex items-center justify-center p-8 dark:bg-slate-900">
           <div className="text-center space-y-4">
-            <div className="w-12 h-12 mx-auto rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center">
+            <div className="w-12 h-12 mx-auto rounded-2xl bg-orange-50 dark:bg-slate-800 border border-orange-100 dark:border-slate-700 flex items-center justify-center">
               <span className="text-orange-500 font-mono text-xl font-bold">!</span>
             </div>
-            <p className="font-mono text-xs uppercase tracking-widest text-slate-400 font-bold">
+            <p className="font-mono text-xs uppercase tracking-widest text-slate-400 dark:text-slate-300 font-bold">
               Component Error
             </p>
-            <p className="font-serif text-slate-500 text-base max-w-md">
+            <p className="font-serif text-slate-500 text-base max-w-md dark:text-slate-300">
               {this.state.error?.message || 'An unexpected error occurred'}
             </p>
             <button
