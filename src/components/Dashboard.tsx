@@ -100,6 +100,8 @@ export default function Dashboard() {
 
   const orderedTabs: ("command" | "assigned-to-me" | "my-tasks" | "team" | "personnel" | "settings")[] = ["assigned-to-me", "team", "my-tasks", "personnel", "command", "settings"];
 
+  const pendingReviewRef = useRef<string | null>(null);
+
   // Ensure valid tab section on initial mount only
   useEffect(() => {
     if (initialTabSetRef.current) return;
@@ -202,6 +204,11 @@ export default function Dashboard() {
     },
     onReportCreated: (report) => {
       setManagedReports((prev) => prev.some((r) => r.id === report.id) ? prev : [...prev, report]);
+      const reviewTaskId = pendingReviewRef.current;
+      if (reviewTaskId) {
+        pendingReviewRef.current = null;
+        handleStatusChange(reviewTaskId, 'in-review');
+      }
       refetch();
     },
   });
@@ -233,6 +240,11 @@ export default function Dashboard() {
     _handleUpdateManager(e, managerCode, setManagerCode, setIsJoining);
   const handleAddMember = (e: FormEvent) =>
     _handleAddMember(e, memberCode, setMemberCode, setIsAddingMember);
+
+  const handleSubmitForReview = useCallback((task: Task) => {
+    pendingReviewRef.current = task.id;
+    setSelectedTask(task);
+  }, []);
 
   const { copyId, handleLogout } = useSessionActions({ profile, showToast });
 
@@ -415,6 +427,7 @@ export default function Dashboard() {
                   handleStatusChange={handleStatusChange}
                   setSelectedTask={setSelectedTask}
                   setSelectedTaskDetails={setSelectedTaskDetails}
+                  onSubmitForReview={handleSubmitForReview}
                 />
               </ErrorBoundary>
             )}

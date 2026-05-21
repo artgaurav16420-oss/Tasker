@@ -1,10 +1,11 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { 
   Activity, 
   Clock,
-  FileText, 
+  FileText,
   CheckCircle2, 
   AlertCircle,
+  ChevronDown,
   Zap 
 } from "lucide-react";
 import { motion } from "motion/react";
@@ -21,6 +22,7 @@ interface Props {
   handleStatusChange: (taskId: string, newStatus: Task['status'], task?: Task) => Promise<void>;
   setSelectedTask: (task: Task | null) => void;
   setSelectedTaskDetails: (task: Task | null) => void;
+  onSubmitForReview: (task: Task) => void;
 }
 
 export default function AssignedToMeBoard({
@@ -32,8 +34,22 @@ export default function AssignedToMeBoard({
   handleStatusChange,
   setSelectedTask,
   setSelectedTaskDetails,
+  onSubmitForReview,
 }: Props) {
   const reducedMotion = useReducedMotion();
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!openDropdownId) return;
+    const handleClick = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpenDropdownId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [openDropdownId]);
   const activeTasks = useMemo(() => myTasks.filter(t => t.status !== "completed"), [myTasks]);
   const completedTasks = useMemo(() => myTasks.filter(t => t.status === "completed"), [myTasks]);
 
@@ -110,21 +126,50 @@ export default function AssignedToMeBoard({
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 shrink-0">
-                      {task.status !== 'in-review' ? (
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedTask(task);
-                          }}
-                          className="bg-emerald-500 text-slate-950 font-mono text-xs font-black uppercase tracking-[0.2em] px-8 py-3.5 rounded-xl hover:bg-emerald-400 transition-all duration-150 shadow-xl shadow-emerald-500/20 active:scale-95 flex items-center gap-2"
-                        >
-                          <FileText className="w-4 h-4" /> Submit Report
-                        </button>
-                      ) : (
+                    <div className="flex items-center gap-3 shrink-0" ref={dropdownRef}>
+                      {task.status === 'in-review' ? (
                         <div className="bg-indigo-50 text-indigo-600 border border-indigo-100 px-8 py-3.5 rounded-xl font-mono text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2">
                           <AlertCircle className="w-4 h-4" /> Pending Review
                         </div>
+                      ) : (
+                        <>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenDropdownId(openDropdownId === task.id ? null : task.id);
+                            }}
+                            className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-mono text-xs font-black uppercase tracking-[0.2em] px-6 py-3.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-150 active:scale-95 flex items-center gap-2"
+                          >
+                            {task.status === 'in-progress' ? 'In Progress' : 'Pending'}
+                            <ChevronDown className="w-4 h-4" />
+                          </button>
+                          {openDropdownId === task.id && (
+                            <div className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 py-2 overflow-hidden">
+                              {task.status === 'todo' && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleStatusChange(task.id, 'in-progress', task);
+                                    setOpenDropdownId(null);
+                                  }}
+                                  className="w-full text-left px-5 py-3 font-mono text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                                >
+                                  In Progress
+                                </button>
+                              )}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setOpenDropdownId(null);
+                                  onSubmitForReview(task);
+                                }}
+                                className="w-full text-left px-5 py-3 font-mono text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                              >
+                                Submit for Review
+                              </button>
+                            </div>
+                          )}
+                        </>
                       )}
                       
                       <button 
