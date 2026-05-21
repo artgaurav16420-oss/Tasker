@@ -89,7 +89,7 @@ export default function Dashboard() {
   }, [profile?.managerIds]);
 
   // Custom Hook for Data Fetching & Subscriptions
-  const { employees, setEmployees, myTasks, teamTasks, managedReports, personalTasks, superiors, setSuperiors, error, isLoading, refetch } = useDashboardData(profile, superiorIdsCache);
+  const { employees, setEmployees, myTasks, setMyTasks, teamTasks, setTeamTasks, managedReports, setManagedReports, personalTasks, setPersonalTasks, superiors, setSuperiors, error, isLoading, refetch } = useDashboardData(profile, superiorIdsCache);
 
 
 
@@ -164,14 +164,42 @@ export default function Dashboard() {
     setIsUpdatingTask,
     setIsDeletingTask,
     setIsTogglingPersonalTask,
-    onPersonalTaskCreated: refetch,
-    onTaskCreated: refetch,
-    onTaskUpdated: refetch,
-    onTaskDeleted: refetch,
-    onStatusChanged: refetch,
-    onPersonalTaskToggled: refetch,
-    onPersonalTaskDeleted: refetch,
-    onReportCreated: refetch,
+    onPersonalTaskCreated: (task) => {
+      setPersonalTasks((prev) => prev.some((t) => t.id === task.id) ? prev : [...prev, task]);
+      refetch();
+    },
+    onTaskCreated: (task) => {
+      if (task.employeeId === profile?.uid) setMyTasks((prev) => prev.some((t) => t.id === task.id) ? prev : [...prev, task]);
+      if (task.managerId === profile?.uid) setTeamTasks((prev) => prev.some((t) => t.id === task.id) ? prev : [...prev, task]);
+      refetch();
+    },
+    onTaskUpdated: (task) => {
+      setMyTasks((prev) => prev.map((t) => t.id === task.id ? task : t));
+      setTeamTasks((prev) => prev.map((t) => t.id === task.id ? task : t));
+      refetch();
+    },
+    onTaskDeleted: (taskId) => {
+      setMyTasks((prev) => prev.filter((t) => t.id !== taskId));
+      setTeamTasks((prev) => prev.filter((t) => t.id !== taskId));
+      refetch();
+    },
+    onStatusChanged: (taskId, newStatus) => {
+      setMyTasks((prev) => prev.map((t) => t.id === taskId ? { ...t, status: newStatus } : t));
+      setTeamTasks((prev) => prev.map((t) => t.id === taskId ? { ...t, status: newStatus } : t));
+      refetch();
+    },
+    onPersonalTaskToggled: (taskId, newStatus) => {
+      setPersonalTasks((prev) => prev.map((t) => t.id === taskId ? { ...t, status: newStatus } : t));
+      refetch();
+    },
+    onPersonalTaskDeleted: (taskId) => {
+      setPersonalTasks((prev) => prev.filter((t) => t.id !== taskId));
+      refetch();
+    },
+    onReportCreated: (report) => {
+      setManagedReports((prev) => prev.some((r) => r.id === report.id) ? prev : [...prev, report]);
+      refetch();
+    },
   });
 
   const {
@@ -184,7 +212,9 @@ export default function Dashboard() {
     showToast,
     setConfirmDialog,
     onEmployeeAdded: (emp) => setEmployees((prev) => prev.some((e) => e.uid === emp.uid) ? prev : [...prev, emp]),
+    onEmployeeRemoved: (employeeId) => setEmployees((prev) => prev.filter((e) => e.uid !== employeeId)),
     onSuperiorAdded: (sup) => setSuperiors((prev) => prev.some((s) => s.uid === sup.uid) ? prev : [...prev, sup]),
+    onSuperiorRemoved: (superiorId) => setSuperiors((prev) => prev.filter((s) => s.uid !== superiorId)),
     refetchData: refetch,
   });
 
