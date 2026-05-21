@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { 
   Activity, 
   Clock,
@@ -38,12 +38,11 @@ export default function AssignedToMeBoard({
 }: Props) {
   const reducedMotion = useReducedMotion();
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!openDropdownId) return;
     const handleClick = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (!(e.target as HTMLElement).closest('[data-dropdown]')) {
         setOpenDropdownId(null);
       }
     };
@@ -91,7 +90,7 @@ export default function AssignedToMeBoard({
                   key={task.id}
                   initial={reducedMotion ? { opacity: 1 } : { opacity: 0, x: -20 }}
                   animate={reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
-                  className="group relative bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 rounded-2xl hover:shadow-xl hover:shadow-slate-200/40 dark:hover:shadow-slate-900/40 transition-all border-l-4 border-l-emerald-500 shadow-sm dark:shadow-slate-900/20 overflow-hidden cursor-pointer active:scale-[0.98]"
+                  className="group relative bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 rounded-2xl hover:shadow-xl hover:shadow-slate-200/40 dark:hover:shadow-slate-900/40 transition-all border-l-4 border-l-emerald-500 shadow-sm dark:shadow-slate-900/20 cursor-pointer active:scale-[0.98]"
                   onClick={() => setSelectedTaskDetails(task)}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedTaskDetails(task); } }}
                   role="button"
@@ -126,7 +125,7 @@ export default function AssignedToMeBoard({
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 shrink-0" ref={dropdownRef}>
+                    <div className="flex items-center gap-3 shrink-0 relative" data-dropdown>
                       {task.status === 'in-review' ? (
                         <div className="bg-indigo-50 text-indigo-600 border border-indigo-100 px-8 py-3.5 rounded-xl font-mono text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2">
                           <AlertCircle className="w-4 h-4" /> Pending Review
