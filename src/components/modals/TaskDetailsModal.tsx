@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { UserProfile, Task, Report } from "../../lib/types";
+import { formatDate } from "../../lib/utils";
 import { useReducedMotion } from "../../lib/hooks/useReducedMotion";
 import { useFocusTrap } from '../../lib/hooks/useFocusTrap';
 import { useAuditLogs } from "../../lib/hooks/useAuditLogs";
@@ -133,7 +134,7 @@ export default function TaskDetailsModal({
                   <div className="p-5 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700">
                     <Calendar className="w-4 h-4 text-emerald-500 mb-3" />
                     <div className="font-mono text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1 font-bold">Assigned</div>
-                    <div className="font-mono text-sm font-black text-slate-900 dark:text-slate-100">{new Date(selectedTaskDetails.createdAt).toLocaleDateString()}</div>
+                    <div className="font-mono text-sm font-black text-slate-900 dark:text-slate-100">{formatDate(selectedTaskDetails.createdAt)}</div>
                   </div>
                   <div className={`p-5 rounded-2xl border ${getDeadlineStyle(selectedTaskDetails.timelineEnd, selectedTaskDetails.status === 'completed')}`}>
                     <Clock className="w-4 h-4 mb-3" />

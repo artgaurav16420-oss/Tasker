@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import { UserProfile, Task } from "../../lib/types";
-import { getPriorityStyle } from "../../lib/utils";
+import { getPriorityStyle, formatDate } from "../../lib/utils";
 import { useReducedMotion } from "../../lib/hooks/useReducedMotion";
 
 interface Props {
@@ -104,7 +104,7 @@ export default function AssignedToMeBoard({
                         </div>
                         <div className={`px-4 py-1 rounded-lg border font-mono text-xs font-black uppercase tracking-widest ${getDeadlineStyle(task.timelineEnd, false)}`}>
                           <Clock className="w-3.5 h-3.5 inline mr-1" />
-                          {task.timelineEnd ? `Target: ${new Date(task.timelineEnd).toLocaleDateString()}` : "Open Order"}
+                          {task.timelineEnd ? `Target: ${formatDate(task.timelineEnd)}` : "Open Order"}
                           {task.timelineEnd && <span className="ml-3 opacity-80">{getTimeRemaining(task.timelineEnd)}</span>}
                         </div>
                       </div>
@@ -166,7 +166,7 @@ export default function AssignedToMeBoard({
                   <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
                   <div>
                     <h5 className="font-serif text-base text-slate-700 dark:text-slate-300">{task.title}</h5>
-                    <p className="font-mono text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold mt-1">Archived {new Date(task.updatedAt || Date.now()).toLocaleDateString()}</p>
+                    <p className="font-mono text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold mt-1">Archived {formatDate(task.updatedAt)}</p>
                   </div>
                 </div>
                 <FileText className="w-4 h-4 text-slate-300 dark:text-slate-500 group-hover:text-emerald-500 transition-colors" />

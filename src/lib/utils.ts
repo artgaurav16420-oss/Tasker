@@ -38,3 +38,13 @@ export const getAvatarColor = (name: string) => {
   }
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 };
+
+export const formatDate = (date: string | number | Date | null | undefined): string => {
+  if (!date) return 'N/A';
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return 'N/A';
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
+};

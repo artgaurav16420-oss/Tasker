@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { Plus, ChevronDown, ChevronUp, Trash2, Calendar, Clock, FileText, CheckCircle2, Zap, Activity } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Task, UserProfile } from "../../lib/types";
-import { getPriorityStyle } from "../../lib/utils";
+import { getPriorityStyle, formatDate } from "../../lib/utils";
 import { useReducedMotion } from "../../lib/hooks/useReducedMotion";
 
 interface Props {
@@ -150,7 +150,7 @@ export default function TeamOperationsBoard({
                                       <Zap className="w-3.5 h-3.5" /> {task.priority || 'medium'}
                                     </div>
                                     <div className={`flex items-center gap-2 border border-indigo-700 px-3 py-1 rounded-lg bg-indigo-600 text-white shadow-lg font-bold ${task.status === "completed" ? "opacity-70" : ""}`}>
-                                      <Calendar className="w-3.5 h-3.5" /> Assigned: {task.createdAt ? new Date(task.createdAt).toLocaleDateString() : "N/A"}
+                                      <Calendar className="w-3.5 h-3.5" /> Assigned: {formatDate(task.createdAt)}
                                     </div>
                                     <div className={`flex items-center gap-2 border px-3 py-1 rounded-lg font-black ${getDeadlineStyle(task.timelineEnd, task.status === "completed")}`}>
                                       <Clock className={`w-3.5 h-3.5 ${task.timelineEnd && task.status !== "completed" ? "animate-pulse" : ""}`} /> Deadline: {task.timelineEnd || "Open Timeline"}
@@ -246,7 +246,7 @@ export default function TeamOperationsBoard({
                                   <div className="hidden md:block h-5 w-[1px] bg-slate-50 dark:bg-slate-700 shrink-0"></div>
                                   <div className="flex flex-wrap items-center gap-3 text-xs font-mono uppercase tracking-widest font-bold flex-1">
                                     <div className="flex items-center gap-2 border border-indigo-700 px-3 py-1 rounded-lg bg-indigo-600 text-white shadow-lg font-bold opacity-70">
-                                      <Calendar className="w-3.5 h-3.5" /> Assigned: {task.createdAt ? new Date(task.createdAt).toLocaleDateString() : "N/A"}
+                                      <Calendar className="w-3.5 h-3.5" /> Assigned: {formatDate(task.createdAt)}
                                     </div>
                                     <div className={`flex items-center gap-2 border px-3 py-1 rounded-lg font-black ${getDeadlineStyle(task.timelineEnd, true)}`}>
                                       <Clock className="w-3.5 h-3.5" /> Deadline: {task.timelineEnd || "Archived"}

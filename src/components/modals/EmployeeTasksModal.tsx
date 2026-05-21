@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { UserProfile, Task, NewTaskForm } from "../../lib/types";
+import { formatDate } from "../../lib/utils";
 import { useReducedMotion } from "../../lib/hooks/useReducedMotion";
 import { useFocusTrap } from '../../lib/hooks/useFocusTrap';
 
@@ -205,7 +206,7 @@ export default function EmployeeTasksModal({
                         {task.title}
                       </div>
                       <div className="font-mono text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold mt-1">
-                        Completed {new Date(task.updatedAt || Date.now()).toLocaleDateString()}
+                        Completed {formatDate(task.updatedAt)}
                       </div>
                     </div>
                   </div>

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Plus, CheckCircle2, Circle, Clock, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { PersonalTask } from "../../lib/types";
+import { formatDate } from "../../lib/utils";
 import { useReducedMotion } from "../../lib/hooks/useReducedMotion";
 
 interface Props {
@@ -79,7 +80,7 @@ export default function PersonalTasksList({
                         <div className="flex items-center gap-2 mt-1">
                           <Clock className="w-3.5 h-3.5 text-orange-500" />
                           <span className="font-mono text-xs uppercase font-bold text-slate-500 dark:text-slate-400">
-                            Due: {new Date(task.timelineEnd).toLocaleDateString()}
+                            Due: {formatDate(task.timelineEnd)}
                             <span className="ml-2 text-orange-600">({getTimeRemaining(task.timelineEnd)})</span>
                           </span>
                         </div>
