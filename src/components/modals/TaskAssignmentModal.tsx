@@ -104,8 +104,8 @@ export default function TaskAssignmentModal({
                   onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
                   placeholder="Detailed technical instructions..."
                   rows={4}
-                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white dark:focus:bg-slate-800 transition-all duration-150 text-slate-600 dark:text-slate-400 leading-relaxed"
-                />
+className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white dark:focus:bg-slate-800 transition-all duration-150 font-serif text-base text-slate-600 dark:text-slate-400 leading-relaxed"
+/>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

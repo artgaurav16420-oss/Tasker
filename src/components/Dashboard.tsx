@@ -89,7 +89,7 @@ export default function Dashboard() {
   }, [profile?.managerIds]);
 
   // Custom Hook for Data Fetching & Subscriptions
-  const { employees, myTasks, teamTasks, managedReports, personalTasks, superiors, error, isLoading, refetch } = useDashboardData(profile, superiorIdsCache);
+  const { employees, setEmployees, myTasks, teamTasks, managedReports, personalTasks, superiors, setSuperiors, error, isLoading, refetch } = useDashboardData(profile, superiorIdsCache);
 
 
 
@@ -183,8 +183,8 @@ export default function Dashboard() {
     profile,
     showToast,
     setConfirmDialog,
-    onEmployeeAdded: () => {},
-    onSuperiorAdded: () => {},
+    onEmployeeAdded: (emp) => setEmployees((prev) => prev.some((e) => e.uid === emp.uid) ? prev : [...prev, emp]),
+    onSuperiorAdded: (sup) => setSuperiors((prev) => prev.some((s) => s.uid === sup.uid) ? prev : [...prev, sup]),
     refetchData: refetch,
   });
 
@@ -293,9 +293,6 @@ export default function Dashboard() {
                 </button>
               </div>
             </button>
-            <button onClick={handleLogout} className="p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-orange-50 hover:text-orange-700 hover:border-orange-200 transition-all duration-150 shadow-sm min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" title="Logout">
-              <LogOut className="w-4 h-4" />
-            </button>
             <button
               onClick={() => useThemeStore.getState().toggleTheme()}
               className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all duration-150 shadow-sm min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100"
@@ -303,6 +300,9 @@ export default function Dashboard() {
               aria-label="Toggle dark mode"
             >
               <SunMoon className="w-4 h-4" />
+            </button>
+            <button onClick={handleLogout} className="p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-orange-50 hover:text-orange-700 hover:border-orange-200 transition-all duration-150 shadow-sm min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" title="Logout">
+              <LogOut className="w-4 h-4" />
             </button>
           </div>
         </nav>

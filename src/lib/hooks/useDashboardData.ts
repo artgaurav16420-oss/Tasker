@@ -402,11 +402,13 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
 
   return {
     employees,
+    setEmployees,
     myTasks,
     teamTasks,
     managedReports,
     personalTasks,
     superiors,
+    setSuperiors,
     error,
     isLoading,
     refetch,
