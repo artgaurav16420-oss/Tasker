@@ -68,7 +68,7 @@ export default function AuthScreen() {
         <div className="w-full max-w-md text-center space-y-6">
           <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-10 shadow-xl shadow-slate-200/40 dark:shadow-slate-900/40">
             <div className="w-16 h-16 bg-emerald-50/70 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl mx-auto flex items-center justify-center mb-6">
-              <Mail className="w-8 h-8 text-emerald-600" />
+              <Mail className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
             </div>
             <h2 className="font-mono font-black -tracking-[0.025em] uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100 mb-3">Verify Your Email</h2>
             <p className="font-serif text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
@@ -103,21 +103,21 @@ export default function AuthScreen() {
           <button
             type="button"
             onClick={() => { setIsLogin(true); setError(''); }}
-            className={`flex-1 pb-3 text-xs font-mono font-bold uppercase tracking-widest transition-all duration-150 border-b-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-t-xl ${isLogin ? 'border-emerald-500 text-slate-950' : 'border-transparent text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400'}`}
+            className={`flex-1 pb-3 text-xs font-mono font-bold uppercase tracking-widest transition-all duration-150 border-b-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-t-xl ${isLogin ? 'border-emerald-500 text-slate-950 dark:text-slate-100' : 'border-transparent text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400'}`}
           >
             Login
           </button>
           <button
             type="button"
             onClick={() => { setIsLogin(false); setError(''); }}
-            className={`flex-1 pb-3 text-xs font-mono font-bold uppercase tracking-widest transition-all duration-150 border-b-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-t-xl ${!isLogin ? 'border-emerald-500 text-slate-950' : 'border-transparent text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400'}`}
+            className={`flex-1 pb-3 text-xs font-mono font-bold uppercase tracking-widest transition-all duration-150 border-b-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-t-xl ${!isLogin ? 'border-emerald-500 text-slate-950 dark:text-slate-100' : 'border-transparent text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400'}`}
           >
             Sign Up
           </button>
         </div>
 
         {error && (
-          <div id="auth-error" className="mb-8 p-4 bg-orange-50 dark:bg-slate-800 border border-orange-200 dark:border-orange-500/30 rounded-xl text-orange-600 dark:text-orange-400 text-xs font-mono font-bold relative z-10" role="alert">
+          <div id="auth-error" className="mb-8 p-4 bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/30 rounded-xl text-orange-600 dark:text-orange-400 text-xs font-mono font-bold relative z-10" role="alert">
             {error}
           </div>
         )}
