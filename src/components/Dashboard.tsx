@@ -98,14 +98,18 @@ export default function Dashboard() {
 
   const initialTabSetRef = useRef(false);
 
+  const orderedTabs: ("command" | "assigned-to-me" | "my-tasks" | "team" | "personnel" | "settings")[] = ["assigned-to-me", "team", "my-tasks", "personnel", "command", "settings"];
+
   // Ensure valid tab section on initial mount only
   useEffect(() => {
     if (initialTabSetRef.current) return;
     initialTabSetRef.current = true;
-    if (activeTab === "command" && !isManager) setActiveTab("assigned-to-me");
-    if (activeTab === "assigned-to-me" && !isOperative) setActiveTab("my-tasks");
-    if ((activeTab === "team" || activeTab === "personnel") && !isManager) setActiveTab("my-tasks");
-    if (isManager && activeTab === "assigned-to-me") setActiveTab("command");
+    const available = orderedTabs.filter((tab) => {
+      if (tab === "assigned-to-me") return isOperative;
+      if (tab === "team" || tab === "personnel" || tab === "command") return isManager;
+      return true;
+    });
+    if (!available.includes(activeTab)) setActiveTab(available[0]);
   }, [isManager, isOperative]);
 
   const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState>({
@@ -340,11 +344,6 @@ export default function Dashboard() {
         <div id="main-content" className="max-w-[1600px] mx-auto p-6 grid grid-cols-12 gap-8 mt-4 md:mt-6">
           {/* Mobile horizontal tab bar */}
           <div className="col-span-12 md:hidden overflow-x-auto flex gap-2 px-2 py-3 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
-            {isManager && (
-              <button onClick={() => setActiveTab("command")} aria-current={activeTab === "command" ? "page" : undefined} className={`whitespace-nowrap px-4 py-2 rounded-lg flex-shrink-0 font-mono text-xs uppercase font-bold tracking-widest flex items-center gap-2 transition-all focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 ${activeTab === "command" ? "bg-emerald-500 text-slate-950" : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 border border-slate-200 dark:border-slate-700"}`}>
-                <Activity className="w-3.5 h-3.5" /> Command
-              </button>
-            )}
             {isOperative && (
               <button onClick={() => setActiveTab("assigned-to-me")} aria-current={activeTab === "assigned-to-me" ? "page" : undefined} className={`whitespace-nowrap px-4 py-2 rounded-lg flex-shrink-0 font-mono text-xs uppercase font-bold tracking-widest flex items-center gap-2 transition-all focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 ${activeTab === "assigned-to-me" ? "bg-emerald-500 text-slate-950" : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 border border-slate-200 dark:border-slate-700"}`}>
                 <Activity className="w-3.5 h-3.5" /> Assigned
@@ -363,6 +362,11 @@ export default function Dashboard() {
                 <Users className="w-3.5 h-3.5" /> Members
               </button>
             )}
+            {isManager && (
+              <button onClick={() => setActiveTab("command")} aria-current={activeTab === "command" ? "page" : undefined} className={`whitespace-nowrap px-4 py-2 rounded-lg flex-shrink-0 font-mono text-xs uppercase font-bold tracking-widest flex items-center gap-2 transition-all focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 ${activeTab === "command" ? "bg-emerald-500 text-slate-950" : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 border border-slate-200 dark:border-slate-700"}`}>
+                <Activity className="w-3.5 h-3.5" /> Command
+              </button>
+            )}
             <button onClick={() => setActiveTab("settings")} aria-current={activeTab === "settings" ? "page" : undefined} className={`whitespace-nowrap px-4 py-2 rounded-xl flex-shrink-0 font-mono text-xs uppercase font-bold tracking-widest flex items-center gap-2 transition-all focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 ${activeTab === "settings" ? "bg-emerald-500 text-slate-950" : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 border border-slate-200 dark:border-slate-700"}`}>
               <Settings className="w-3.5 h-3.5" /> Settings
             </button>
@@ -370,11 +374,6 @@ export default function Dashboard() {
 
           {/* Desktop sidebar nav */}
           <nav className="hidden md:flex md:flex-col col-span-12 md:col-span-3 lg:col-span-2 space-y-3" aria-label="Main navigation">
-            {isManager && (
-              <button onClick={() => setActiveTab("command")} aria-current={activeTab === "command" ? "page" : undefined} className={`w-full text-left px-5 py-4 font-mono text-xs uppercase font-bold tracking-[0.2em] flex items-center gap-4 transition-all rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 ${activeTab === "command" ? "bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/20" : "hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 border border-transparent dark:border-slate-700 shadow-sm"}`}>
-                <Activity className="w-4 h-4" /> Command Center
-              </button>
-            )}
             {isOperative && (
               <button onClick={() => setActiveTab("assigned-to-me")} aria-current={activeTab === "assigned-to-me" ? "page" : undefined} className={`w-full text-left px-5 py-4 font-mono text-xs uppercase font-bold tracking-[0.2em] flex items-center gap-4 transition-all rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 ${activeTab === "assigned-to-me" ? "bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/20" : "hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 border border-transparent dark:border-slate-700 shadow-sm"}`}>
                 <Activity className="w-4 h-4" /> Assigned to Me
@@ -386,11 +385,16 @@ export default function Dashboard() {
               </button>
             )}
             <button onClick={() => setActiveTab("my-tasks")} aria-current={activeTab === "my-tasks" ? "page" : undefined} className={`w-full text-left px-5 py-4 font-mono text-xs uppercase font-bold tracking-[0.2em] flex items-center gap-4 transition-all rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 ${activeTab === "my-tasks" ? "bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/20" : "hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 border border-transparent dark:border-slate-700 shadow-sm"}`}>
-                <CheckCircle className="w-4 h-4" /> My Tasks
-              </button>
+              <CheckCircle className="w-4 h-4" /> My Tasks
+            </button>
             {isManager && (
               <button onClick={() => setActiveTab("personnel")} aria-current={activeTab === "personnel" ? "page" : undefined} className={`w-full text-left px-5 py-4 font-mono text-xs uppercase font-bold tracking-[0.2em] flex items-center gap-4 transition-all rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 ${activeTab === "personnel" ? "bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/20" : "hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 border border-transparent dark:border-slate-700 shadow-sm"}`}>
                 <Users className="w-4 h-4" /> Team Members ({employees.length})
+              </button>
+            )}
+            {isManager && (
+              <button onClick={() => setActiveTab("command")} aria-current={activeTab === "command" ? "page" : undefined} className={`w-full text-left px-5 py-4 font-mono text-xs uppercase font-bold tracking-[0.2em] flex items-center gap-4 transition-all rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 ${activeTab === "command" ? "bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/20" : "hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 border border-transparent dark:border-slate-700 shadow-sm"}`}>
+                <Activity className="w-4 h-4" /> Command Center
               </button>
             )}
             <button onClick={() => setActiveTab("settings")} aria-current={activeTab === "settings" ? "page" : undefined} className={`w-full text-left px-5 py-4 font-mono text-xs uppercase font-bold tracking-[0.2em] flex items-center gap-4 transition-all rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 ${activeTab === "settings" ? "bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/20" : "hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 border border-transparent dark:border-slate-700 shadow-sm"}`}>
@@ -400,14 +404,6 @@ export default function Dashboard() {
 
           <div className="col-span-12 md:col-span-9 lg:col-span-10">
             {/* Task 5: per-tab ErrorBoundary */}
-            {activeTab === "command" && (
-              <ErrorBoundary>
-                <CommandOverview
-                  teamTasks={teamTasks}
-                  employees={employees}
-                />
-              </ErrorBoundary>
-            )}
             {activeTab === "assigned-to-me" && (
               <ErrorBoundary>
                 <AssignedToMeBoard
@@ -419,17 +415,6 @@ export default function Dashboard() {
                   handleStatusChange={handleStatusChange}
                   setSelectedTask={setSelectedTask}
                   setSelectedTaskDetails={setSelectedTaskDetails}
-                />
-              </ErrorBoundary>
-            )}
-            {activeTab === "my-tasks" && (
-              <ErrorBoundary>
-                <PersonalTasksList
-                  personalTasks={personalTasks}
-                  setIsPersonalTaskModalOpen={setIsPersonalTaskModalOpen}
-                  handleTogglePersonalTask={handleTogglePersonalTask}
-                  handleDeletePersonalTask={handleDeletePersonalTask}
-                  getTimeRemaining={getTimeRemaining}
                 />
               </ErrorBoundary>
             )}
@@ -447,6 +432,17 @@ export default function Dashboard() {
                 />
               </ErrorBoundary>
             )}
+            {activeTab === "my-tasks" && (
+              <ErrorBoundary>
+                <PersonalTasksList
+                  personalTasks={personalTasks}
+                  setIsPersonalTaskModalOpen={setIsPersonalTaskModalOpen}
+                  handleTogglePersonalTask={handleTogglePersonalTask}
+                  handleDeletePersonalTask={handleDeletePersonalTask}
+                  getTimeRemaining={getTimeRemaining}
+                />
+              </ErrorBoundary>
+            )}
             {activeTab === "personnel" && (
               <ErrorBoundary>
                 <PersonnelRoster
@@ -456,6 +452,14 @@ export default function Dashboard() {
                   setSelectedEmployee={setSelectedEmployee}
                   setNewTask={setNewTask}
                   setIsTaskModalOpen={setIsTaskModalOpen}
+                />
+              </ErrorBoundary>
+            )}
+            {activeTab === "command" && (
+              <ErrorBoundary>
+                <CommandOverview
+                  teamTasks={teamTasks}
+                  employees={employees}
                 />
               </ErrorBoundary>
             )}
