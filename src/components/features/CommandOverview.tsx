@@ -150,36 +150,31 @@ export default function CommandOverview({ teamTasks, employees }: Props) {
         </div>
 
         {/* Priority Breakdown */}
-        <div className="bg-slate-900 dark:bg-slate-800 rounded-3xl p-8 text-white relative overflow-hidden shadow-xl shadow-slate-900/20">
+        <div className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl p-8 shadow-sm dark:shadow-slate-900/20 relative overflow-hidden">
           <div className="relative z-10 space-y-8">
             <div className="space-y-1">
-              <h3 className="font-mono text-xs font-black uppercase tracking-widest text-slate-500">Threat Matrix</h3>
-              <p className="font-serif text-lg -tracking-[0.025em]">Tactical Distribution</p>
+              <h3 className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Threat Matrix</h3>
+              <p className="font-serif text-lg text-slate-900 dark:text-slate-100 -tracking-[0.025em]">Tactical Distribution</p>
             </div>
 
             <div className="space-y-6">
               <PriorityRow label="Critical" count={criticalOps} total={activeTeamTasks.length} color="bg-orange-600" reducedMotion={reducedMotion} />
               <PriorityRow label="High" count={activeTeamTasks.filter(t => t.priority === 'high').length} total={activeTeamTasks.length} color="bg-orange-500" reducedMotion={reducedMotion} />
               <PriorityRow label="Medium" count={activeTeamTasks.filter(t => t.priority === 'medium').length} total={activeTeamTasks.length} color="bg-emerald-500" reducedMotion={reducedMotion} />
-              <PriorityRow label="Low" count={activeTeamTasks.filter(t => t.priority === 'low').length} total={activeTeamTasks.length} color="bg-slate-600" reducedMotion={reducedMotion} />
+              <PriorityRow label="Low" count={activeTeamTasks.filter(t => t.priority === 'low').length} total={activeTeamTasks.length} color="bg-slate-400 dark:bg-slate-500" reducedMotion={reducedMotion} />
             </div>
 
-            <div className="pt-6 border-t border-slate-800">
+            <div className="pt-6 border-t border-slate-100 dark:border-slate-700">
                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 flex items-center justify-center">
                     <ShieldAlert className="w-5 h-5 text-emerald-500" />
                   </div>
                   <div>
-                    <div className="font-mono text-xs uppercase font-bold text-slate-500">Active Reports</div>
-                    <div className="font-mono text-xs font-black text-white">{teamTasks.filter(t => t.status === 'in-review').length} PENDING REVIEW</div>
+                    <div className="font-mono text-xs uppercase font-bold text-slate-500 dark:text-slate-400">Active Reports</div>
+                    <div className="font-mono text-xs font-black text-slate-900 dark:text-slate-100">{teamTasks.filter(t => t.status === 'in-review').length} PENDING REVIEW</div>
                   </div>
                </div>
             </div>
-          </div>
-
-          {/* Decorative mesh */}
-          <div className="absolute inset-0 opacity-20 pointer-events-none">
-            <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #1e293b 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
           </div>
         </div>
       </div>
@@ -232,9 +227,9 @@ function PriorityRow({ label, count, total, color, reducedMotion }: PriorityRowP
     <div className="space-y-2">
       <div className="flex justify-between items-end">
         <span className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">{label}</span>
-        <span className="font-mono text-xs font-black text-white">{count}</span>
+        <span className="font-mono text-xs font-black text-slate-900 dark:text-slate-100">{count}</span>
       </div>
-      <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+      <div className="h-1.5 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
         <motion.div 
           initial={reducedMotion ? { width: `${percentage}%` } : { width: 0 }}
           animate={reducedMotion ? { width: `${percentage}%` } : { width: `${percentage}%` }}
