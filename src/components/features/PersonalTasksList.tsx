@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Plus, CheckCircle2, Circle, Trash2 } from "lucide-react";
+import { Plus, CheckCircle2, Circle, Clock, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { PersonalTask } from "../../lib/types";
 import { useReducedMotion } from "../../lib/hooks/useReducedMotion";
@@ -9,6 +9,7 @@ interface Props {
   setIsPersonalTaskModalOpen: (isOpen: boolean) => void;
   handleTogglePersonalTask: (taskId: string, currentStatus: PersonalTask['status']) => Promise<void>;
   handleDeletePersonalTask: (id: string) => void;
+  getTimeRemaining: (deadline: string) => string | null;
 }
 
 export default function PersonalTasksList({
@@ -16,6 +17,7 @@ export default function PersonalTasksList({
   setIsPersonalTaskModalOpen,
   handleTogglePersonalTask,
   handleDeletePersonalTask,
+  getTimeRemaining,
 }: Props) {
   const reducedMotion = useReducedMotion();
   const activeTasks = useMemo(() => personalTasks.filter(t => t.status !== 'completed'), [personalTasks]);
@@ -73,6 +75,15 @@ export default function PersonalTasksList({
                     </button>
                     <div className="flex flex-col">
                       <span className="font-serif text-base text-slate-800 dark:text-slate-100">{task.title}</span>
+                      {task.timelineEnd && (
+                        <div className="flex items-center gap-2 mt-1">
+                          <Clock className="w-3.5 h-3.5 text-orange-500" />
+                          <span className="font-mono text-xs uppercase font-bold text-slate-500 dark:text-slate-400">
+                            Due: {new Date(task.timelineEnd).toLocaleDateString()}
+                            <span className="ml-2 text-orange-600">({getTimeRemaining(task.timelineEnd)})</span>
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <button

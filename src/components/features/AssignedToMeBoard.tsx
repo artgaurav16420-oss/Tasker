@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { 
   Activity, 
+  Clock,
   FileText, 
   CheckCircle2, 
   AlertCircle,
@@ -15,6 +16,8 @@ interface Props {
   profile: UserProfile | null;
   myTasks: Task[];
   superiors: UserProfile[];
+  getDeadlineStyle: (deadline: string | null | undefined, isCompleted: boolean) => string;
+  getTimeRemaining: (deadline: string) => string | null;
   handleStatusChange: (taskId: string, newStatus: Task['status'], task?: Task) => Promise<void>;
   setSelectedTask: (task: Task | null) => void;
   setSelectedTaskDetails: (task: Task | null) => void;
@@ -24,6 +27,8 @@ export default function AssignedToMeBoard({
   profile,
   myTasks,
   superiors,
+  getDeadlineStyle,
+  getTimeRemaining,
   handleStatusChange,
   setSelectedTask,
   setSelectedTaskDetails,
@@ -96,6 +101,11 @@ export default function AssignedToMeBoard({
                           <span className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
                             From: {manager?.name || "System Master"}
                           </span>
+                        </div>
+                        <div className={`px-4 py-1 rounded-lg border font-mono text-xs font-black uppercase tracking-widest ${getDeadlineStyle(task.timelineEnd, false)}`}>
+                          <Clock className="w-3.5 h-3.5 inline mr-1" />
+                          {task.timelineEnd ? `Target: ${new Date(task.timelineEnd).toLocaleDateString()}` : "Open Order"}
+                          {task.timelineEnd && <span className="ml-3 opacity-80">{getTimeRemaining(task.timelineEnd)}</span>}
                         </div>
                       </div>
                     </div>

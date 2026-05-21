@@ -410,6 +410,8 @@ export default function Dashboard() {
                   profile={profile}
                   myTasks={myTasks}
                   superiors={superiors}
+                  getDeadlineStyle={getDeadlineStyle}
+                  getTimeRemaining={getTimeRemaining}
                   handleStatusChange={handleStatusChange}
                   setSelectedTask={setSelectedTask}
                   setSelectedTaskDetails={setSelectedTaskDetails}
@@ -437,6 +439,7 @@ export default function Dashboard() {
                   setIsPersonalTaskModalOpen={setIsPersonalTaskModalOpen}
                   handleTogglePersonalTask={handleTogglePersonalTask}
                   handleDeletePersonalTask={handleDeletePersonalTask}
+                  getTimeRemaining={getTimeRemaining}
                 />
               </ErrorBoundary>
             )}
