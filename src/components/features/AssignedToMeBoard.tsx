@@ -182,16 +182,6 @@ export default function AssignedToMeBoard({
                           )}
                         </>
                       )}
-                      
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedTaskDetails(task);
-                        }}
-                        className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-mono text-xs font-black uppercase tracking-[0.2em] px-6 py-3.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-150 active:scale-95"
-                      >
-                        Details
-                      </button>
                     </div>
                   </div>
                 </motion.div>
