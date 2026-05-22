@@ -4,7 +4,6 @@ import {
   Clock,
   FileText,
   CheckCircle2, 
-  AlertCircle,
   ChevronDown,
   Zap 
 } from "lucide-react";
@@ -126,48 +125,44 @@ export default function AssignedToMeBoard({
                     </div>
 
                     <div className="flex items-center gap-3 shrink-0 relative" data-dropdown>
-                      {task.status === 'in-review' ? (
-                        <div className="bg-indigo-50 text-indigo-600 border border-indigo-100 px-8 py-3.5 rounded-xl font-mono text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2">
-                          <AlertCircle className="w-4 h-4" /> Pending Review
-                        </div>
-                      ) : (
-                        <>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setOpenDropdownId(openDropdownId === task.id ? null : task.id);
-                            }}
-                            className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-mono text-xs font-black uppercase tracking-[0.2em] px-6 py-3.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-150 active:scale-95 flex items-center gap-2"
-                          >
-                            {task.status === 'in-progress' ? 'In Progress' : 'Pending'}
-                            <ChevronDown className="w-4 h-4" />
-                          </button>
-                          {openDropdownId === task.id && (
-                            <div className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 py-2 overflow-hidden">
-                              {task.status === 'todo' && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleStatusChange(task.id, 'in-progress', task);
-                                    setOpenDropdownId(null);
-                                  }}
-                                  className="w-full text-left px-5 py-3 font-mono text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                                >
-                                  In Progress
-                                </button>
-                              )}
-                              {task.status === 'in-progress' && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleStatusChange(task.id, 'todo', task);
-                                    setOpenDropdownId(null);
-                                  }}
-                                  className="w-full text-left px-5 py-3 font-mono text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                                >
-                                  Revert to Pending
-                                </button>
-                              )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenDropdownId(openDropdownId === task.id ? null : task.id);
+                        }}
+                        className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-mono text-xs font-black uppercase tracking-[0.2em] px-6 py-3.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-150 active:scale-95 flex items-center gap-2"
+                      >
+                        {task.status === 'in-progress' && 'In Progress'}
+                        {task.status === 'in-review' && 'Pending Review'}
+                        {task.status === 'todo' && 'Pending'}
+                        <ChevronDown className="w-4 h-4" />
+                      </button>
+                      {openDropdownId === task.id && (
+                        <div className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 py-2 overflow-hidden">
+                          {task.status === 'todo' && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleStatusChange(task.id, 'in-progress', task);
+                                setOpenDropdownId(null);
+                              }}
+                              className="w-full text-left px-5 py-3 font-mono text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                            >
+                              Start Progress
+                            </button>
+                          )}
+                          {task.status === 'in-progress' && (
+                            <>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleStatusChange(task.id, 'todo', task);
+                                  setOpenDropdownId(null);
+                                }}
+                                className="w-full text-left px-5 py-3 font-mono text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                              >
+                                Revert to Pending
+                              </button>
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -178,9 +173,33 @@ export default function AssignedToMeBoard({
                               >
                                 Submit for Review
                               </button>
-                            </div>
+                            </>
                           )}
-                        </>
+                          {task.status === 'in-review' && (
+                            <>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleStatusChange(task.id, 'todo', task);
+                                  setOpenDropdownId(null);
+                                }}
+                                className="w-full text-left px-5 py-3 font-mono text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                              >
+                                Revert to Pending
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleStatusChange(task.id, 'in-progress', task);
+                                  setOpenDropdownId(null);
+                                }}
+                                className="w-full text-left px-5 py-3 font-mono text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                              >
+                                Revert to In Progress
+                              </button>
+                            </>
+                          )}
+                        </div>
                       )}
                     </div>
                   </div>
