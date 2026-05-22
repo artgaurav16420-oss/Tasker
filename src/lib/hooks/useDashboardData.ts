@@ -37,8 +37,9 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
   }, []);
 
   const refetch = useCallback(async () => {
-    const uid = profileUidRef.current;
-    if (!uid) return;
+    try {
+      const uid = profileUidRef.current;
+      if (!uid) return;
 
     // Cancel any pending debounced fetchAll from realtime handlers
     if (debounceTimerRef.current) {
@@ -85,6 +86,9 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
 
     setIsLoading(false);
     initialFetchDoneRef.current = true;
+  } catch (err) {
+    console.error('refetch failed:', err);
+  }
   }, []);
 
   const refetchRef = useRef(refetch);
@@ -399,6 +403,16 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
       supabase.removeChannel(channel);
     };
   }, [profile?.uid, recoveryKey]);
+
+  // Polling fallback: refetch every 5s when tab is visible
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        refetchRef.current();
+      }
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   return {
     employees,
