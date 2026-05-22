@@ -510,7 +510,7 @@ export default function Dashboard() {
           <EmployeeTasksModal selectedEmployee={selectedEmployee} setSelectedEmployee={setSelectedEmployee} teamTasks={teamTasks} setNewTask={setNewTask} setIsTaskModalOpen={setIsTaskModalOpen} handleDeleteTask={handleDeleteTask} handleStatusChange={handleStatusChange} setSelectedTaskDetails={setSelectedTaskDetails} getDeadlineStyle={getDeadlineStyle} getTimeRemaining={getTimeRemaining} />
         </ErrorBoundary>
         <ErrorBoundary>
-          <TaskDetailsModal selectedTaskDetails={selectedTaskDetails} setSelectedTaskDetails={setSelectedTaskDetails} managedReports={managedReports} profile={profile} handleStatusChange={handleStatusChange} setEditingTask={setEditingTask} handleDeleteTask={handleDeleteTask} getDeadlineStyle={getDeadlineStyle} getTimeRemaining={getTimeRemaining} />
+          <TaskDetailsModal selectedTaskDetails={selectedTaskDetails} setSelectedTaskDetails={setSelectedTaskDetails} managedReports={managedReports} profile={profile} handleStatusChange={handleStatusChange} setEditingTask={setEditingTask} handleDeleteTask={handleDeleteTask} getTimeRemaining={getTimeRemaining} />
         </ErrorBoundary>
         <ErrorBoundary>
           <EditTaskModal editingTask={editingTask} setEditingTask={setEditingTask} employees={employees} handleUpdateTask={handleUpdateTask} isUpdating={isUpdatingTask} />

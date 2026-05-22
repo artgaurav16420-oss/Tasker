@@ -1,7 +1,6 @@
 import { 
   X, 
   Calendar, 
-  Clock, 
   FileText, 
   Trash2, 
   Edit3, 
@@ -13,7 +12,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { UserProfile, Task, Report } from "../../lib/types";
-import { formatDate } from "../../lib/utils";
+import { formatDate, getPriorityStyle } from "../../lib/utils";
 import { useReducedMotion } from "../../lib/hooks/useReducedMotion";
 import { useFocusTrap } from '../../lib/hooks/useFocusTrap';
 import { useAuditLogs } from "../../lib/hooks/useAuditLogs";
@@ -26,7 +25,6 @@ interface Props {
   handleStatusChange: (taskId: string, newStatus: Task['status'], task?: Task) => Promise<void>;
   setEditingTask: (task: Task | null) => void;
   handleDeleteTask: (task: Task) => void;
-  getDeadlineStyle: (deadline: string | null | undefined, isCompleted: boolean) => string;
   getTimeRemaining: (deadline: string) => string | null;
 }
 
@@ -38,7 +36,6 @@ export default function TaskDetailsModal({
   handleStatusChange,
   setEditingTask,
   handleDeleteTask,
-  getDeadlineStyle,
   getTimeRemaining,
 }: Props) {
   const { logs, isLoading: isLoadingLogs, error: logsError } = useAuditLogs(selectedTaskDetails?.id ?? null);
@@ -49,14 +46,15 @@ export default function TaskDetailsModal({
 
   const reports = managedReports.filter(r => r.taskId === selectedTaskDetails.id);
   const isManager = profile?.uid === selectedTaskDetails.managerId;
+  const statusLabel = selectedTaskDetails.status === 'in-progress' ? 'In Progress' : selectedTaskDetails.status === 'in-review' ? 'In Review' : selectedTaskDetails.status.charAt(0).toUpperCase() + selectedTaskDetails.status.slice(1);
 
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 md:p-8">
         <motion.div
-          initial={reducedMotion ? { opacity: 0 } : { opacity: 0 }}
-          animate={reducedMotion ? { opacity: 1 } : { opacity: 1 }}
-          exit={reducedMotion ? { opacity: 0 } : { opacity: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           onClick={() => setSelectedTaskDetails(null)}
           className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl"
         />
@@ -70,232 +68,199 @@ export default function TaskDetailsModal({
           role="dialog"
           aria-modal="true"
           aria-labelledby="task-details-title"
-          className="relative w-full max-w-4xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-2xl dark:shadow-slate-900/50 rounded-3xl overflow-hidden flex flex-col max-h-[90vh]"
+          className="relative w-full max-w-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-2xl dark:shadow-slate-900/50 rounded-3xl overflow-hidden flex flex-col max-h-[90vh]"
         >
-          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent"></div>
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent"></div>
+
           {/* Header */}
-          <div className="p-8 md:p-12 border-b border-slate-50 flex justify-between items-start sticky top-0 bg-white dark:bg-slate-800 z-10">
-            <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <div className={`w-3 h-3 rounded-full ${selectedTaskDetails.status === 'completed' ? 'bg-emerald-500' : 'bg-orange-500 shadow-sm animate-pulse'}`}></div>
-                <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-500 dark:text-slate-400">Operation Briefing</h2>
+          <div className="p-6 md:p-8 border-b border-slate-100 dark:border-slate-700 flex justify-between items-start sticky top-0 bg-white dark:bg-slate-800 z-10">
+            <div className="space-y-2 flex-1 min-w-0">
+              <div className="flex items-center gap-3">
+                <div className={`w-2.5 h-2.5 rounded-full ${selectedTaskDetails.status === 'completed' ? 'bg-emerald-500' : 'bg-orange-500'}`}></div>
+                <span className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Task Details</span>
               </div>
-              <h2 id="task-details-title" className="font-serif text-2xl text-slate-900 dark:text-slate-100 -tracking-[0.025em] tracking-tight leading-tight">
+              <h2 id="task-details-title" className="font-serif text-xl text-slate-900 dark:text-slate-100 tracking-tight truncate pr-4">
                 {selectedTaskDetails.title}
               </h2>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 shrink-0">
               {isManager && (
                 <>
                   <button
-                    onClick={() => {
-                      setEditingTask(selectedTaskDetails);
-                      setSelectedTaskDetails(null);
-                    }}
-                    className="p-3 text-slate-500 dark:text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/20 transition-all duration-150 rounded-xl border border-slate-100 dark:border-slate-700"
-                    title="Edit Metadata"
-                    aria-label="Edit task metadata"
+                    onClick={() => { setEditingTask(selectedTaskDetails); setSelectedTaskDetails(null); }}
+                    className="p-2.5 text-slate-500 dark:text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/20 transition-all duration-150 rounded-xl border border-slate-100 dark:border-slate-700"
+                    title="Edit"
+                    aria-label="Edit task"
                   >
-                    <Edit3 className="w-5 h-5" />
+                    <Edit3 className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleDeleteTask(selectedTaskDetails)}
-                    className="p-3 text-slate-500 dark:text-slate-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-500/20 transition-all duration-150 rounded-xl border border-slate-100 dark:border-slate-700"
-                    title="Terminate Record"
+                    className="p-2.5 text-slate-500 dark:text-slate-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-500/20 transition-all duration-150 rounded-xl border border-slate-100 dark:border-slate-700"
+                    title="Delete"
                     aria-label="Delete task"
                   >
-                    <Trash2 className="w-5 h-5" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </>
               )}
               <button
                 onClick={() => setSelectedTaskDetails(null)}
-                aria-label="Close dialog"
-                className="p-3 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-150 rounded-xl border border-slate-100 dark:border-slate-700 ml-2"
+                aria-label="Close"
+                className="p-2.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-150 rounded-xl border border-slate-100 dark:border-slate-700"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-8 md:p-12 space-y-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              {/* Mission Specs */}
-              <div className="space-y-8">
-                <div className="space-y-4">
-                  <h3 className="font-mono text-xs font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400 border-b border-slate-50 pb-2">Technical Description</h3>
-                  <p className="text-slate-600 dark:text-slate-400 font-serif text-base leading-relaxed whitespace-pre-wrap max-w-prose">
-                    {selectedTaskDetails.description || "No tactical details provided for this operation."}
-                  </p>
-                </div>
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8">
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-5 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700">
-                    <Calendar className="w-4 h-4 text-emerald-500 mb-3" />
-                    <div className="font-mono text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1 font-bold">Assigned</div>
-                    <div className="font-mono text-sm font-black text-slate-900 dark:text-slate-100">{formatDate(selectedTaskDetails.createdAt)}</div>
-                  </div>
-                  <div className={`p-5 rounded-2xl border ${getDeadlineStyle(selectedTaskDetails.timelineEnd, selectedTaskDetails.status === 'completed')}`}>
-                    <Clock className="w-4 h-4 mb-3" />
-                    <div className="font-mono text-xs uppercase tracking-widest opacity-80 mb-1 font-bold">Target Deadline</div>
-                    <div className="font-mono text-sm font-black">{selectedTaskDetails.timelineEnd ? formatDate(selectedTaskDetails.timelineEnd) : "Open Timeline"}</div>
-                  </div>
-                </div>
-              </div>
+            {/* Description */}
+            <div>
+              <h3 className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-3">Description</h3>
+              <p className="text-slate-600 dark:text-slate-400 font-serif text-base leading-relaxed whitespace-pre-wrap">
+                {selectedTaskDetails.description || "No description provided."}
+              </p>
+            </div>
 
-              {/* Status & Actions */}
-              <div className="space-y-8">
-                <div className="space-y-4">
-                  <h3 className="font-mono text-xs font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400 border-b border-slate-50 pb-2">Operation Status</h3>
-                  <div className="flex items-center gap-4">
-                    <div className={`px-6 py-3 rounded-full font-mono text-xs font-black uppercase tracking-[0.2em] flex items-center gap-3 ${
-                      selectedTaskDetails.status === 'completed' 
-                      ? 'bg-emerald-500 text-slate-900 shadow-lg shadow-emerald-500/10' 
-                      : 'bg-orange-500 text-white shadow-lg shadow-orange-500/10'
-                    }`}>
-                      {selectedTaskDetails.status === 'completed' ? <CheckCircle2 className="w-4 h-4" /> : <Activity className="w-4 h-4" />}
-                      {selectedTaskDetails.status}
-                    </div>
-                    {selectedTaskDetails.timelineEnd && selectedTaskDetails.status !== 'completed' && (
-                      <span className="font-mono text-xs font-black text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-500/20 px-4 py-2 rounded-full border border-orange-100 dark:border-orange-500/30">
-                        {getTimeRemaining(selectedTaskDetails.timelineEnd)}
-                      </span>
-                    )}
+            {/* Key Details */}
+            <div>
+              <h3 className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-3">Key Details</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700">
+                  <Calendar className="w-4 h-4 text-emerald-500 mb-2" />
+                  <div className="font-mono text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold">Created</div>
+                  <div className="font-mono text-sm font-black text-slate-900 dark:text-slate-100 mt-1">{formatDate(selectedTaskDetails.createdAt)}</div>
+                </div>
+                <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700">
+                  <Calendar className="w-4 h-4 text-orange-500 mb-2" />
+                  <div className="font-mono text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold">Deadline</div>
+                  <div className="font-mono text-sm font-black text-slate-900 dark:text-slate-100 mt-1">{selectedTaskDetails.timelineEnd ? formatDate(selectedTaskDetails.timelineEnd) : "—"}</div>
+                  {selectedTaskDetails.timelineEnd && selectedTaskDetails.status !== 'completed' && (
+                    <div className="font-mono text-xs font-bold text-orange-600 dark:text-orange-400 mt-1">{getTimeRemaining(selectedTaskDetails.timelineEnd)}</div>
+                  )}
+                </div>
+                <div className={`p-4 rounded-2xl border ${getPriorityStyle(selectedTaskDetails.priority)}`}>
+                  <div className="font-mono text-xs uppercase tracking-widest opacity-80 font-bold">Priority</div>
+                  <div className="font-mono text-sm font-black mt-1">{selectedTaskDetails.priority || 'medium'}</div>
+                </div>
+                <div className={`p-4 rounded-2xl border ${selectedTaskDetails.status === 'completed' ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20' : selectedTaskDetails.status === 'in-review' ? 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-200 dark:border-indigo-500/20' : 'bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-700'}`}>
+                  <div className="font-mono text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold">Status</div>
+                  <div className={`font-mono text-sm font-black mt-1 flex items-center gap-2 ${selectedTaskDetails.status === 'completed' ? 'text-emerald-600' : selectedTaskDetails.status === 'in-review' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-900 dark:text-slate-100'}`}>
+                    <CheckCircle2 className="w-4 h-4" />
+                    {statusLabel}
                   </div>
                 </div>
-
-                {isManager && selectedTaskDetails.status !== 'completed' && (
-                  <div className="space-y-4 pt-4">
-                    <h3 className="font-mono text-xs font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Command Actions</h3>
-                    <div className="flex flex-col gap-3">
-                      <button
-                        onClick={() => handleStatusChange(selectedTaskDetails.id, 'completed', selectedTaskDetails)}
-                        className="w-full bg-emerald-500 text-slate-950 font-mono text-xs font-black uppercase tracking-[0.2em] py-5 rounded-xl hover:bg-emerald-400 transition-all duration-150 shadow-lg shadow-emerald-500/10 active:scale-95 flex items-center justify-center gap-3"
-                      >
-                        <CheckCircle2 className="w-5 h-5" /> Authorize Completion
-                      </button>
-                      {selectedTaskDetails.status === 'in-review' && (
-                        <button
-                          onClick={() => handleStatusChange(selectedTaskDetails.id, 'in-progress', selectedTaskDetails)}
-                          className="w-full border border-orange-200 dark:border-orange-500/30 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-500/20 font-mono text-xs font-black uppercase tracking-[0.2em] py-5 rounded-xl hover:bg-orange-100 dark:hover:bg-orange-500/30 transition-all duration-150 active:scale-95"
-                        >
-                          Request Revision
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
-            {/* Audit Trail & Field Reports */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 pt-8">
-              {/* Field Reports */}
-              <div className="space-y-8">
-                <div className="flex items-center gap-6">
-                  <h3 className="font-mono text-xs font-black uppercase tracking-[0.3em] text-slate-600 dark:text-slate-400 whitespace-nowrap flex items-center gap-3">
-                    <MessageSquare className="w-4 h-4" /> Field Reports ({reports.length})
-                  </h3>
-                  <div className="h-[1px] flex-1 bg-gradient-to-r from-slate-100 dark:from-slate-700 to-transparent"></div>
-                </div>
-
-                <div className="space-y-6">
-                  {reports.length === 0 ? (
-                    <div className="p-12 text-center rounded-3xl border-2 border-dashed border-slate-100 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/30">
-                      <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">No telemetry data recorded.</p>
-                    </div>
-                  ) : (
-                    <div className="grid gap-4">
-                      {reports.map((report, idx) => (
-                        <motion.div
-                          key={report.id}
-                          initial={reducedMotion ? { opacity: 1 } : { opacity: 0, scale: 0.98 }}
-                          animate={reducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
-                          className="p-6 bg-slate-50 dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-700 group relative overflow-hidden"
-                        >
-                          <div className="flex justify-between items-start mb-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center font-mono text-xs font-black text-slate-500 dark:text-slate-400">
-                                #{idx + 1}
-                              </div>
-                              <div className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                                Transmission Logged
-                              </div>
-                            </div>
-                            <div className="font-mono text-xs font-black text-slate-500 dark:text-slate-400">
-                              {new Date(report.createdAt).toLocaleString()}
-                            </div>
-                          </div>
-                          <div className="text-slate-700 font-serif text-base leading-relaxed pl-11">
-                            "{report.content}"
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
+            {/* Manager Actions */}
+            {isManager && selectedTaskDetails.status !== 'completed' && (
+              <div className="bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-2xl p-5">
+                <h3 className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-4">Actions</h3>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    onClick={() => handleStatusChange(selectedTaskDetails.id, 'completed', selectedTaskDetails)}
+                    className="flex-1 bg-emerald-500 text-slate-950 font-mono text-xs font-black uppercase tracking-widest py-4 rounded-xl hover:bg-emerald-400 transition-all duration-150 shadow-lg shadow-emerald-500/10 active:scale-95 flex items-center justify-center gap-2"
+                  >
+                    <CheckCircle2 className="w-4 h-4" /> Approve Completion
+                  </button>
+                  {selectedTaskDetails.status === 'in-review' && (
+                    <button
+                      onClick={() => handleStatusChange(selectedTaskDetails.id, 'in-progress', selectedTaskDetails)}
+                      className="flex-1 border border-orange-200 dark:border-orange-500/30 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-500/20 font-mono text-xs font-black uppercase tracking-widest py-4 rounded-xl hover:bg-orange-100 dark:hover:bg-orange-500/30 transition-all duration-150 active:scale-95 flex items-center justify-center gap-2"
+                    >
+                      <AlertCircle className="w-4 h-4" /> Request Changes
+                    </button>
                   )}
                 </div>
               </div>
+            )}
 
-              {/* Audit Trail */}
-              <div className="space-y-8">
-                <div className="flex items-center gap-6">
-                  <h3 className="font-mono text-xs font-black uppercase tracking-[0.3em] text-slate-600 dark:text-slate-400 whitespace-nowrap flex items-center gap-3">
-                    <History className="w-4 h-4" /> Audit Trail ({logs.length})
-                  </h3>
-                  <div className="h-[1px] flex-1 bg-gradient-to-r from-slate-100 dark:from-slate-700 to-transparent"></div>
+            {/* Field Reports */}
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <MessageSquare className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                <h3 className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Reports ({reports.length})</h3>
+                <div className="h-px flex-1 bg-slate-100 dark:bg-slate-700"></div>
+              </div>
+              {reports.length === 0 ? (
+                <div className="p-10 text-center rounded-2xl border-2 border-dashed border-slate-100 dark:border-slate-700">
+                  <p className="font-mono text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">No reports submitted yet.</p>
                 </div>
+              ) : (
+                <div className="space-y-3">
+                  {reports.map((report, idx) => (
+                    <div
+                      key={report.id}
+                      className="p-5 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700"
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="font-mono text-xs font-black text-slate-400 dark:text-slate-500">Report #{idx + 1}</span>
+                        <span className="font-mono text-xs text-slate-400 dark:text-slate-500">{new Date(report.createdAt).toLocaleString()}</span>
+                      </div>
+                      <p className="text-slate-700 dark:text-slate-300 font-serif text-sm leading-relaxed">"{report.content}"</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
-                <div className="space-y-4">
-                  {isLoadingLogs ? (
-                    <div className="flex justify-center p-8">
-                      <Activity className="w-6 h-6 text-emerald-500 animate-spin" />
-                    </div>
-                  ) : logsError ? (
-                    <div className="text-center py-8">
-                      <p className="font-mono text-xs text-orange-500">{logsError}</p>
-                    </div>
-                  ) : logs.length === 0 ? (
-                    <div className="p-12 text-center rounded-3xl border-2 border-dashed border-slate-100 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/30">
-                      <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">No audit data available.</p>
-                    </div>
-                  ) : (
-                    <div className="relative pl-6 space-y-8 border-l border-slate-100 dark:border-slate-700">
-                      {logs.map((log, idx) => (
-                        <div key={log.id} className="relative">
-                          <div className="absolute -left-[31px] top-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-800"></div>
-                          <div className="space-y-1">
-                            <div className="flex justify-between items-center">
-<span className="font-mono text-xs font-black uppercase tracking-[0.1em] text-emerald-600 dark:text-emerald-400">{log.event}</span>
-                            <span className="font-mono text-xs font-bold text-slate-500 dark:text-slate-400">{new Date(log.createdAt).toLocaleString()}</span>
-                            </div>
-                            <p className="text-slate-500 dark:text-slate-400 font-serif text-xs">
-                              {log.event === 'STATUS_TRANSITION' || log.event === 'STATUS_CHANGED' ? (
-                                <>Transit from <span className="text-slate-900 dark:text-slate-100 font-bold">{log.oldValue}</span> to <span className="text-emerald-600 dark:text-emerald-400 font-bold">{log.newValue}</span></>
-                              ) : (
-                                log.newValue || log.event
-                              )}
-                            </p>
-                          </div>
+            {/* Audit Trail */}
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <History className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                <h3 className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Activity Log ({logs.length})</h3>
+                <div className="h-px flex-1 bg-slate-100 dark:bg-slate-700"></div>
+              </div>
+              {isLoadingLogs ? (
+                <div className="flex justify-center p-8">
+                  <Activity className="w-5 h-5 text-emerald-500 animate-spin" />
+                </div>
+              ) : logsError ? (
+                <p className="text-center font-mono text-xs text-orange-500 py-4">{logsError}</p>
+              ) : logs.length === 0 ? (
+                <div className="p-10 text-center rounded-2xl border-2 border-dashed border-slate-100 dark:border-slate-700">
+                  <p className="font-mono text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">No activity recorded yet.</p>
+                </div>
+              ) : (
+                <div className="relative pl-6 space-y-6 border-l-2 border-slate-100 dark:border-slate-700">
+                  {logs.map((log) => (
+                    <div key={log.id} className="relative">
+                      <div className="absolute -left-[25px] top-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-800"></div>
+                      <div className="space-y-1">
+                        <div className="flex justify-between items-center gap-4">
+                          <span className="font-mono text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">{log.event.replace(/_/g, ' ')}</span>
+                          <span className="font-mono text-xs text-slate-400 dark:text-slate-500 shrink-0">{new Date(log.createdAt).toLocaleString()}</span>
                         </div>
-                      ))}
+                        {(log.oldValue || log.newValue) && (
+                          <p className="text-slate-500 dark:text-slate-400 font-serif text-xs">
+                            {log.oldValue && log.newValue ? (
+                              <>{log.oldValue} → <span className="text-slate-900 dark:text-slate-100 font-bold">{log.newValue}</span></>
+                            ) : (
+                              log.newValue || log.oldValue
+                            )}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  )}
+                  ))}
                 </div>
-              </div>
+              )}
             </div>
+
           </div>
-          
-          {/* Footer Decoration */}
-          <div className="p-6 bg-slate-50 dark:bg-slate-900 flex justify-center sticky bottom-0 border-t border-slate-100 dark:border-slate-700">
-             <div className="flex items-center gap-10">
-                <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                   <span className="font-mono text-xs uppercase tracking-widest font-black text-slate-500 dark:text-slate-400">Secure Line Active</span>
-                 </div>
-                 <div className="h-4 w-[1px] bg-slate-200 dark:bg-slate-700"></div>
-                 <div className="font-mono text-xs uppercase tracking-widest font-black text-slate-500 dark:text-slate-400">ID: {selectedTaskDetails.id}</div>
-             </div>
+
+          {/* Footer */}
+          <div className="px-6 md:px-8 py-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
+            <span className="font-mono text-xs text-slate-400 dark:text-slate-500">ID: {selectedTaskDetails.id.slice(0, 8)}...</span>
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
+              <span className="font-mono text-xs uppercase tracking-wider font-bold text-slate-400 dark:text-slate-500">Live</span>
+            </div>
           </div>
         </motion.div>
       </div>
