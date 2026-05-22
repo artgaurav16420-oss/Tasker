@@ -168,7 +168,7 @@ export default function EmployeeTasksModal({
                         <div className="flex flex-wrap gap-3">
                           <div className={`px-4 py-1 rounded-lg border font-mono text-xs font-black uppercase tracking-widest ${getDeadlineStyle(task.timelineEnd, false)}`}>
                             <Clock className="w-3.5 h-3.5 inline mr-1.5" />
-                            {task.timelineEnd ? `Target: ${task.timelineEnd}` : "Open Timeline"}
+                            {task.timelineEnd ? `Target: ${formatDate(task.timelineEnd)}` : "Open Timeline"}
                             {task.timelineEnd && <span className="ml-3 opacity-80">{getTimeRemaining(task.timelineEnd)}</span>}
                           </div>
                           {task.status === 'in-review' && (

@@ -139,7 +139,7 @@ export default function TaskDetailsModal({
                   <div className={`p-5 rounded-2xl border ${getDeadlineStyle(selectedTaskDetails.timelineEnd, selectedTaskDetails.status === 'completed')}`}>
                     <Clock className="w-4 h-4 mb-3" />
                     <div className="font-mono text-xs uppercase tracking-widest opacity-80 mb-1 font-bold">Target Deadline</div>
-                    <div className="font-mono text-sm font-black">{selectedTaskDetails.timelineEnd || "Open Timeline"}</div>
+                    <div className="font-mono text-sm font-black">{selectedTaskDetails.timelineEnd ? formatDate(selectedTaskDetails.timelineEnd) : "Open Timeline"}</div>
                   </div>
                 </div>
               </div>
