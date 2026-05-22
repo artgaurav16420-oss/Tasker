@@ -8,11 +8,13 @@ import {
   AlertCircle,
   MessageSquare,
   Activity,
+  Eye,
+  Clock,
   History,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { UserProfile, Task, Report } from "../../lib/types";
-import { formatDate, getPriorityStyle } from "../../lib/utils";
+import { formatDate, getPriorityStyle, getStatusStyle } from "../../lib/utils";
 import { useReducedMotion } from "../../lib/hooks/useReducedMotion";
 import { useFocusTrap } from '../../lib/hooks/useFocusTrap';
 import { useAuditLogs } from "../../lib/hooks/useAuditLogs";
@@ -76,8 +78,13 @@ export default function TaskDetailsModal({
           <div className="p-6 md:p-8 border-b border-slate-100 dark:border-slate-700 flex justify-between items-start sticky top-0 bg-white dark:bg-slate-800 z-10">
             <div className="space-y-2 flex-1 min-w-0">
               <div className="flex items-center gap-3">
-                <div className={`w-2.5 h-2.5 rounded-full ${selectedTaskDetails.status === 'completed' ? 'bg-emerald-500' : 'bg-orange-500'}`}></div>
-                <span className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Task Details</span>
+                <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border font-mono text-xs font-black uppercase tracking-widest shadow-sm ${getStatusStyle(selectedTaskDetails.status)}`}>
+                  {selectedTaskDetails.status === 'completed' && <CheckCircle2 className="w-3.5 h-3.5" />}
+                  {selectedTaskDetails.status === 'todo' && <Clock className="w-3.5 h-3.5" />}
+                  {selectedTaskDetails.status === 'in-progress' && <Activity className="w-3.5 h-3.5" />}
+                  {selectedTaskDetails.status === 'in-review' && <Eye className="w-3.5 h-3.5" />}
+                  {statusLabel}
+                </div>
               </div>
               <h2 id="task-details-title" className="font-serif text-xl text-slate-900 dark:text-slate-100 tracking-tight truncate pr-4">
                 {selectedTaskDetails.title}

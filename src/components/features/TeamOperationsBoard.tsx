@@ -1,8 +1,8 @@
 import { useState, useMemo } from "react";
-import { Plus, ChevronDown, ChevronUp, Trash2, Calendar, Clock, FileText, CheckCircle2, Zap, Activity } from "lucide-react";
+import { Plus, ChevronDown, ChevronUp, Trash2, Calendar, Clock, FileText, CheckCircle2, Zap, Activity, Eye } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Task, UserProfile } from "../../lib/types";
-import { getPriorityStyle, formatDate } from "../../lib/utils";
+import { getPriorityStyle, getStatusStyle, formatDate } from "../../lib/utils";
 import { useReducedMotion } from "../../lib/hooks/useReducedMotion";
 
 interface Props {
@@ -138,8 +138,12 @@ export default function TeamOperationsBoard({
                               <div className="flex flex-col xl:flex-row justify-between gap-4 xl:items-center pr-10">
                                 <div className="flex-1 flex flex-col md:flex-row md:items-center gap-3">
                                   <div className="flex items-center gap-3 min-w-[200px]">
-                                    <div className="w-2 h-2 rounded-full shadow-lg shrink-0" style={{ color: task.status === "in-review" ? "#6366f1" : task.status === "in-progress" ? "#0ea5e9" : "#f59e0b", background: "currentColor" }}></div>
-                                    <span className="text-xs font-mono text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">{task.status === "in-review" ? "Review" : task.status === "in-progress" ? "Active" : "Pending"}</span>
+                                    <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border font-mono text-xs font-black uppercase tracking-widest shadow-sm shrink-0 ${getStatusStyle(task.status)}`}>
+                                      {task.status === 'todo' && <Clock className="w-3.5 h-3.5" />}
+                                      {task.status === 'in-progress' && <Activity className="w-3.5 h-3.5" />}
+                                      {task.status === 'in-review' && <Eye className="w-3.5 h-3.5" />}
+                                      {task.status === 'todo' ? 'Standing By' : task.status === 'in-progress' ? 'Active' : 'Under Review'}
+                                    </div>
                                     <h3 className="font-serif text-base text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 transition-colors duration-150 tracking-tight -tracking-[0.025em] truncate flex-1" title={task.title}>
                                       {task.title}
                                     </h3>

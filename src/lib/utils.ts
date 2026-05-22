@@ -10,6 +10,15 @@ export const getPriorityStyle = (priority: Task['priority']) => {
   }
 };
 
+export const getStatusStyle = (status: Task['status']) => {
+  switch (status) {
+    case 'in-progress': return 'bg-sky-50 dark:bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-200 dark:border-sky-500/20 shadow-sky-500/5';
+    case 'in-review': return 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/20 shadow-indigo-500/5';
+    case 'completed': return 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20 shadow-emerald-500/5';
+    default: return 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-500/20 shadow-amber-500/5';
+  }
+};
+
 export const getDeadlineStyle = (deadline: string | null | undefined, isCompleted: boolean) => {
   if (isCompleted) return 'bg-emerald-600 text-white border-emerald-700 font-bold shadow-lg opacity-70';
   if (!deadline) return 'bg-emerald-600 text-white border-emerald-700 font-bold shadow-lg';

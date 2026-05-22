@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import { 
   Activity, 
   Clock,
+  Eye,
   FileText,
   CheckCircle2, 
   ChevronDown,
@@ -9,7 +10,7 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import { UserProfile, Task } from "../../lib/types";
-import { getPriorityStyle, formatDate } from "../../lib/utils";
+import { getPriorityStyle, getStatusStyle, formatDate } from "../../lib/utils";
 import { useReducedMotion } from "../../lib/hooks/useReducedMotion";
 
 interface Props {
@@ -98,8 +99,12 @@ export default function AssignedToMeBoard({
                   <div className="flex flex-col xl:flex-row justify-between gap-6 xl:items-center">
                     <div className="space-y-4 flex-1">
                       <div className="flex items-center gap-4">
-                        <div className={`w-2.5 h-2.5 rounded-full ${task.status === 'in-review' ? 'bg-indigo-500 animate-pulse' : 'bg-emerald-500'}`}></div>
-                        <span className="text-xs font-mono text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">{task.status === 'in-review' ? 'Review' : task.status === 'in-progress' ? 'Active' : 'Pending'}</span>
+                        <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border font-mono text-xs font-black uppercase tracking-widest shadow-sm ${getStatusStyle(task.status)}`}>
+                          {task.status === 'todo' && <Clock className="w-3.5 h-3.5" />}
+                          {task.status === 'in-progress' && <Activity className="w-3.5 h-3.5" />}
+                          {task.status === 'in-review' && <Eye className="w-3.5 h-3.5" />}
+                          {task.status === 'todo' ? 'Standing By' : task.status === 'in-progress' ? 'Active' : 'Under Review'}
+                        </div>
                         <h4 className="font-serif text-xl text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 transition-colors duration-150 -tracking-[0.025em]" title={task.title}>
                           {task.title}
                         </h4>
@@ -130,11 +135,18 @@ export default function AssignedToMeBoard({
                           e.stopPropagation();
                           setOpenDropdownId(openDropdownId === task.id ? null : task.id);
                         }}
-                        className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-mono text-xs font-black uppercase tracking-[0.2em] px-6 py-3.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-150 active:scale-95 flex items-center gap-2"
+                        className={`border font-mono text-xs font-black uppercase tracking-[0.2em] px-6 py-3.5 rounded-xl transition-all duration-150 active:scale-95 flex items-center gap-2 ${
+                          task.status === 'todo'
+                            ? 'bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-500/20'
+                            : task.status === 'in-progress'
+                            ? 'bg-sky-50 dark:bg-sky-500/10 border-sky-200 dark:border-sky-500/20 text-sky-600 dark:text-sky-400 hover:bg-sky-100 dark:hover:bg-sky-500/20'
+                            : 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-200 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20'
+                        }`}
                       >
-                        {task.status === 'in-progress' && 'In Progress'}
-                        {task.status === 'in-review' && 'Pending Review'}
-                        {task.status === 'todo' && 'Pending'}
+                        {task.status === 'todo' && <Clock className="w-3.5 h-3.5" />}
+                        {task.status === 'in-progress' && <Activity className="w-3.5 h-3.5" />}
+                        {task.status === 'in-review' && <Eye className="w-3.5 h-3.5" />}
+                        {task.status === 'todo' ? 'Standing By' : task.status === 'in-progress' ? 'Active' : 'Under Review'}
                         <ChevronDown className="w-4 h-4" />
                       </button>
                       {openDropdownId === task.id && (
