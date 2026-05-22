@@ -277,55 +277,34 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
       }
     };
 
-    const handleTaskInsert = (payload: RealtimePostgresChangesPayload<Task>) => {
+    const handleTaskChange = (payload: RealtimePostgresChangesPayload<Task>) => {
       if (cancelled) return;
-      const task = payload.new as Task;
-      if (task.employeeId === profile.uid) {
-        setMyTasks((prev) => prev.some((t) => t.id === task.id) ? prev : [...prev, task]);
-      }
-      if (task.managerId === profile.uid) {
-        setTeamTasks((prev) => prev.some((t) => t.id === task.id) ? prev : [...prev, task]);
-      }
-    };
-
-    const handleTaskUpdate = (payload: RealtimePostgresChangesPayload<Task>) => {
-      if (cancelled) return;
-      const updated = payload.new as Task;
+      const upd = payload.new as Task;
       const old = payload.old as Task;
-      if (!updated?.id) return;
 
-      const belongsToMe = updated.employeeId === profile.uid;
-      const managedByMe = updated.managerId === profile.uid;
-
-      if (belongsToMe) {
-        setMyTasks((prev) => prev.map((t) => t.id === updated.id ? updated : t));
-      }
-      if (managedByMe) {
-        setTeamTasks((prev) => prev.map((t) => t.id === updated.id ? updated : t));
-      }
-
-      const affectsViewer =
-        old?.employeeId === profile.uid ||
-        old?.managerId === profile.uid ||
-        updated.employeeId === profile.uid ||
-        updated.managerId === profile.uid;
-
-      if (affectsViewer) {
-        if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-        debounceTimerRef.current = setTimeout(() => fetchAll(), 300);
-      }
-    };
-
-    const handleTaskDelete = (payload: RealtimePostgresChangesPayload<Task>) => {
-      if (cancelled) return;
-      const old = payload.old as Task;
-      if (!old?.id) return;
-
-      if (old.employeeId === profile.uid) {
-        setMyTasks((prev) => prev.filter((t) => t.id !== old.id));
-      }
-      if (old.managerId === profile.uid) {
-        setTeamTasks((prev) => prev.filter((t) => t.id !== old.id));
+      if (payload.eventType === 'INSERT') {
+        if (upd.employeeId === profile.uid) {
+          setMyTasks((prev) => prev.some((t) => t.id === upd.id) ? prev : [...prev, upd]);
+        }
+        if (upd.managerId === profile.uid) {
+          setTeamTasks((prev) => prev.some((t) => t.id === upd.id) ? prev : [...prev, upd]);
+        }
+      } else if (payload.eventType === 'UPDATE') {
+        if (!upd?.id) return;
+        if (upd.employeeId === profile.uid) {
+          setMyTasks((prev) => prev.map((t) => t.id === upd.id ? upd : t));
+        }
+        if (upd.managerId === profile.uid) {
+          setTeamTasks((prev) => prev.map((t) => t.id === upd.id ? upd : t));
+        }
+      } else if (payload.eventType === 'DELETE') {
+        if (!old?.id) return;
+        if (old.employeeId === profile.uid) {
+          setMyTasks((prev) => prev.filter((t) => t.id !== old.id));
+        }
+        if (old.managerId === profile.uid) {
+          setTeamTasks((prev) => prev.filter((t) => t.id !== old.id));
+        }
       }
     };
 
@@ -372,12 +351,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
       .channel(`dashboard:${profile.uid}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "users", filter: `uid=eq.${profile.uid}` }, handleUserChange)
       .on("postgres_changes", { event: "*", schema: "public", table: "users", filter: `managerIds=cs.{${profile.uid}}` }, handleUserChange)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "tasks", filter: `employeeId=eq.${profile.uid}` }, handleTaskInsert)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "tasks", filter: `managerId=eq.${profile.uid}` }, handleTaskInsert)
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "tasks", filter: `employeeId=eq.${profile.uid}` }, handleTaskUpdate)
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "tasks", filter: `managerId=eq.${profile.uid}` }, handleTaskUpdate)
-      .on("postgres_changes", { event: "DELETE", schema: "public", table: "tasks", filter: `employeeId=eq.${profile.uid}` }, handleTaskDelete)
-      .on("postgres_changes", { event: "DELETE", schema: "public", table: "tasks", filter: `managerId=eq.${profile.uid}` }, handleTaskDelete)
+      .on("postgres_changes", { event: "*", schema: "public", table: "tasks" }, handleTaskChange)
       .on("postgres_changes", { event: "*", schema: "public", table: "reports", filter: `managerId=eq.${profile.uid}` }, handleReportChange)
       .on("postgres_changes", { event: "*", schema: "public", table: "reports", filter: `employeeId=eq.${profile.uid}` }, handleReportChange)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "personal_tasks", filter: `userId=eq.${profile.uid}` }, handlePersonalTaskInsert)
@@ -399,6 +373,25 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
       supabase.removeChannel(channel);
     };
   }, [profile?.uid, recoveryKey]);
+
+  // Fallback: periodic polling + visibility refetch for when Realtime is flaky
+  useEffect(() => {
+    if (!profile?.uid) return;
+
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') refetch();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') refetch();
+    }, 10000);
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      clearInterval(interval);
+    };
+  }, [profile?.uid, refetch]);
 
   return {
     employees,
