@@ -404,14 +404,35 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
     };
   }, [profile?.uid, recoveryKey]);
 
-  // Polling fallback: refetch every 5s when tab is visible
+  // Polling fallback: refetch every 3s when tab is visible
   useEffect(() => {
-    const timer = setInterval(() => {
+    let mounted = true;
+
+    const poll = () => {
+      if (!mounted) return;
+      if (document.visibilityState === 'visible') {
+        refetchRef.current().finally(() => {
+          if (mounted) setTimeout(poll, 3000);
+        });
+      } else {
+        if (mounted) setTimeout(poll, 3000);
+      }
+    };
+
+    const onVisible = () => {
       if (document.visibilityState === 'visible') {
         refetchRef.current();
       }
-    }, 5000);
-    return () => clearInterval(timer);
+    };
+    document.addEventListener('visibilitychange', onVisible);
+
+    const timer = setTimeout(poll, 3000);
+
+    return () => {
+      mounted = false;
+      clearTimeout(timer);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, []);
 
   return {
