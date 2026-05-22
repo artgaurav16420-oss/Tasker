@@ -100,7 +100,7 @@ export default function Dashboard() {
 
   const orderedTabs: ("command" | "assigned-to-me" | "my-tasks" | "team" | "personnel" | "settings")[] = ["assigned-to-me", "team", "my-tasks", "personnel", "command", "settings"];
 
-  const pendingReviewRef = useRef<string | null>(null);
+  const pendingReviewRef = useRef<Task | null>(null);
 
   // Ensure valid tab section on initial mount only
   useEffect(() => {
@@ -204,10 +204,10 @@ export default function Dashboard() {
     },
     onReportCreated: (report) => {
       setManagedReports((prev) => prev.some((r) => r.id === report.id) ? prev : [...prev, report]);
-      const reviewTaskId = pendingReviewRef.current;
-      if (reviewTaskId) {
+      const reviewTask = pendingReviewRef.current;
+      if (reviewTask) {
         pendingReviewRef.current = null;
-        handleStatusChange(reviewTaskId, 'in-review');
+        handleStatusChange(reviewTask.id, 'in-review', reviewTask);
       }
       refetch();
     },
@@ -242,7 +242,7 @@ export default function Dashboard() {
     _handleAddMember(e, memberCode, setMemberCode, setIsAddingMember);
 
   const handleSubmitForReview = useCallback((task: Task) => {
-    pendingReviewRef.current = task.id;
+    pendingReviewRef.current = task;
     setSelectedTask(task);
   }, []);
 
