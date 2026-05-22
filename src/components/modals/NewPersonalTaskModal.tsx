@@ -50,7 +50,7 @@ export default function NewPersonalTaskModal({
             <div className="flex justify-between items-start mb-8">
               <div>
                 <h3 className="font-mono text-xs font-black uppercase tracking-[0.3em] text-emerald-500 mb-2">Self-Assigned</h3>
-                <h2 id="personal-task-title-heading" className="font-serif text-xl text-slate-900 dark:text-slate-100 -tracking-[0.025em] tracking-tight pr-8">New Personal Objective</h2>
+                <h2 id="personal-task-title-heading" className="font-mono text-xl text-slate-900 dark:text-slate-100 -tracking-[0.025em] tracking-tight pr-8">New Personal Objective</h2>
               </div>
               <button
                 onClick={onClose}
@@ -80,7 +80,7 @@ export default function NewPersonalTaskModal({
                     required
                     value={newPersonalTask.title}
                     onChange={(e) => setNewPersonalTask({ ...newPersonalTask, title: e.target.value })}
-                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl py-4 pl-16 pr-6 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-emerald-500/5 transition-all duration-150 font-serif text-base"
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl py-4 pl-16 pr-6 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-emerald-500/5 transition-all duration-150 font-mono text-base"
                     placeholder="E.g., Complete security review"
                   />
                 </div>

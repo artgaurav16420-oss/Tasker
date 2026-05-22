@@ -256,7 +256,7 @@ export default function Dashboard() {
             <span className="text-orange-500 font-mono text-xl font-bold">!</span>
           </div>
           <p className="font-mono text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold">Profile Not Loaded</p>
-          <p className="font-serif text-base text-slate-500 dark:text-slate-400 max-w-md">Could not load your profile. This may be a network issue or missing account setup.</p>
+          <p className="font-mono text-base text-slate-500 dark:text-slate-400 max-w-md">Could not load your profile. This may be a network issue or missing account setup.</p>
           <button onClick={() => window.location.reload()} className="mt-4 px-6 py-3 bg-emerald-500 text-slate-950 rounded-xl font-mono text-xs font-bold uppercase tracking-widest hover:bg-emerald-400 transition-all focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">
             Retry
           </button>
@@ -309,7 +309,7 @@ export default function Dashboard() {
 
   return (
     <ErrorBoundary onRetry={refetch}>
-      <div className="min-h-dvh bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans selection:bg-emerald-100 selection:text-emerald-900">
+      <div className="min-h-dvh bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-mono selection:bg-emerald-100 selection:text-emerald-900">
         <SkipLink />
         <nav className="border-b border-slate-200 dark:border-slate-800 px-6 py-4 grid grid-cols-3 items-center sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl z-40 border-t-2 border-t-emerald-500/10 shadow-sm dark:shadow-none">
           <div className="flex items-center gap-4 justify-self-start overflow-hidden">
@@ -318,7 +318,7 @@ export default function Dashboard() {
             </div>
             <div className="hidden sm:flex flex-col overflow-hidden">
               <div className="font-mono text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 font-black">Member</div>
-              <div className="font-serif text-2xl -tracking-[0.025em] text-slate-900 dark:text-slate-100 leading-none mt-1 truncate">{profile.name}</div>
+              <div className="font-mono text-2xl -tracking-[0.025em] text-slate-900 dark:text-slate-100 leading-none mt-1 truncate">{profile.name}</div>
             </div>
           </div>
           <div className="flex flex-col items-center justify-center text-center">
@@ -526,7 +526,7 @@ export default function Dashboard() {
               <motion.div initial={reducedMotion ? { opacity: 0 } : { y: 20, opacity: 0, scale: 0.95 }} animate={reducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }} exit={reducedMotion ? { opacity: 0 } : { y: 20, opacity: 0, scale: 0.95 }} transition={{ type: "spring", duration: 0.5, bounce: 0 }} role="alertdialog" aria-modal="true" aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-message" className="relative w-full max-w-md bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-xl p-10 flex flex-col rounded-3xl overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent"></div>
                 <h3 id="confirm-dialog-title" className="font-mono font-black uppercase tracking-[0.3em] text-slate-900 dark:text-slate-100 mb-8 text-base border-b border-slate-50 dark:border-slate-700 pb-6 text-center">{confirmDialog.title}</h3>
-                <p id="confirm-dialog-message" className="font-serif text-base text-slate-500 dark:text-slate-400 mb-12 leading-relaxed text-center">"{confirmDialog.message}"</p>
+                <p id="confirm-dialog-message" className="font-mono text-base text-slate-500 dark:text-slate-400 mb-12 leading-relaxed text-center">"{confirmDialog.message}"</p>
                 <div className="flex gap-6">
                   <button autoFocus onClick={() => setConfirmDialog((p) => ({ ...p, isOpen: false }))} className="flex-1 py-4 font-mono text-xs uppercase tracking-[0.2em] text-center border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition-all duration-150 rounded-xl font-black shadow-sm focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">Abort</button>
                   <button

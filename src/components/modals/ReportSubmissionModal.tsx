@@ -50,7 +50,7 @@ export default function ReportSubmissionModal({
             <div className="flex justify-between items-start mb-8">
               <div>
                 <span className="font-mono text-xs font-black uppercase tracking-[0.3em] text-emerald-500 mb-2 block">Field Report</span>
-                <h2 id="report-submission-title" className="font-serif text-xl text-slate-900 dark:text-slate-100 -tracking-[0.025em] tracking-tight pr-8">{selectedTask.title}</h2>
+                <h2 id="report-submission-title" className="font-mono text-xl text-slate-900 dark:text-slate-100 -tracking-[0.025em] tracking-tight pr-8">{selectedTask.title}</h2>
               </div>
               <button
                 onClick={() => setSelectedTask(null)}
@@ -69,7 +69,7 @@ export default function ReportSubmissionModal({
                   required
                   value={reportContent}
                   onChange={(e) => setReportContent(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl py-4 px-6 text-slate-700 min-h-[200px] focus:outline-none focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-emerald-500/5 transition-all duration-150 resize-none font-serif text-base leading-relaxed"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl py-4 px-6 text-slate-700 min-h-[200px] focus:outline-none focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-emerald-500/5 transition-all duration-150 resize-none font-mono text-base leading-relaxed"
                   placeholder="Detail the operational progress..."
                 />
               </div>

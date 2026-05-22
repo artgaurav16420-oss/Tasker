@@ -50,7 +50,7 @@ export default function PersonnelRoster({
             <div className="w-3 h-3 bg-emerald-500 rotate-45 shadow-sm"></div>
             <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-500 dark:text-slate-400">Personnel</h2>
           </div>
-          <h2 className="font-serif text-2xl text-slate-900 dark:text-slate-100 -tracking-[0.025em] tracking-tight">
+          <h2 className="font-mono text-2xl text-slate-900 dark:text-slate-100 -tracking-[0.025em] tracking-tight">
             Team Roster ({employees.length})
           </h2>
         </div>
@@ -64,7 +64,7 @@ export default function PersonnelRoster({
           <p className="font-mono text-xs uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400 font-bold">
             No operatives assigned
           </p>
-          <p className="font-serif text-slate-500 dark:text-slate-400 text-sm mt-3 max-w-md mx-auto">
+          <p className="font-mono text-slate-500 dark:text-slate-400 text-sm mt-3 max-w-md mx-auto">
             Team members will appear here once they join your reporting structure via the Settings panel.
           </p>
         </div>
@@ -96,7 +96,7 @@ export default function PersonnelRoster({
                   <Avatar name={emp.name} size={56} className="rounded-full" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="font-serif text-xl text-slate-900 dark:text-slate-100 -tracking-[0.025em] truncate group-hover:text-emerald-600 transition-colors duration-150" title={emp.name}>
+                  <h3 className="font-mono text-xl text-slate-900 dark:text-slate-100 -tracking-[0.025em] truncate group-hover:text-emerald-600 transition-colors duration-150" title={emp.name}>
                     {emp.name}
                   </h3>
                   <p className="font-mono text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold mt-1 truncate" title={emp.email}>
@@ -109,12 +109,12 @@ export default function PersonnelRoster({
                 <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 text-center">
                   <Activity className="w-4 h-4 text-emerald-500 mx-auto mb-2" />
                   <div className="font-mono text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold">Active</div>
-                  <div className="font-serif text-xl text-slate-900 dark:text-slate-100 mt-1">{(taskCountsByUser[emp.uid] || { active: 0, total: 0 }).active}</div>
+                  <div className="font-mono text-xl text-slate-900 dark:text-slate-100 mt-1">{(taskCountsByUser[emp.uid] || { active: 0, total: 0 }).active}</div>
                 </div>
                 <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 text-center">
                   <Calendar className="w-4 h-4 text-indigo-500 mx-auto mb-2" />
                   <div className="font-mono text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold">Total</div>
-                  <div className="font-serif text-xl text-slate-900 dark:text-slate-100 mt-1">{(taskCountsByUser[emp.uid] || { active: 0, total: 0 }).total}</div>
+                  <div className="font-mono text-xl text-slate-900 dark:text-slate-100 mt-1">{(taskCountsByUser[emp.uid] || { active: 0, total: 0 }).total}</div>
                 </div>
                 <button
                   onClick={(e) => {

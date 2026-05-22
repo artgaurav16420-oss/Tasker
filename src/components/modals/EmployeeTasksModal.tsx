@@ -84,7 +84,7 @@ export default function EmployeeTasksModal({
                   <div className="w-2.5 h-2.5 bg-emerald-500 rotate-45"></div>
                   <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-500 dark:text-slate-400">Personnel Dossier</h2>
                 </div>
-                <h2 id="employee-tasks-title" className="font-serif text-2xl text-slate-900 dark:text-slate-100 -tracking-[0.025em] tracking-tight">
+                <h2 id="employee-tasks-title" className="font-mono text-2xl text-slate-900 dark:text-slate-100 -tracking-[0.025em] tracking-tight">
                   {selectedEmployee.name}
                 </h2>
               </div>
@@ -104,11 +104,11 @@ export default function EmployeeTasksModal({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="p-6 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 text-center">
                 <div className="font-mono text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2 font-bold">Total Ops</div>
-                <div className="font-serif text-xl text-slate-900 dark:text-slate-100">{employeeTasks.length}</div>
+                <div className="font-mono text-xl text-slate-900 dark:text-slate-100">{employeeTasks.length}</div>
               </div>
               <div className="p-6 bg-emerald-50 dark:bg-emerald-500/20 rounded-2xl border border-emerald-100 dark:border-emerald-500/30 text-center">
                 <div className="font-mono text-xs uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2 font-bold">In Progress</div>
-                <div className="font-serif text-xl text-emerald-700 dark:text-emerald-300">{activeTasks.length}</div>
+                <div className="font-mono text-xl text-emerald-700 dark:text-emerald-300">{activeTasks.length}</div>
               </div>
               <button 
                 onClick={() => {
@@ -160,7 +160,7 @@ export default function EmployeeTasksModal({
                       <div className="space-y-4">
                         <div className="flex items-center gap-4">
                           <div className={`w-2 h-2 rounded-full ${task.status === 'in-review' ? 'bg-indigo-500 animate-pulse' : 'bg-emerald-500'}`}></div>
-                          <h4 className="font-serif text-lg text-slate-900 dark:text-slate-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
+                          <h4 className="font-mono text-lg text-slate-900 dark:text-slate-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
                             {task.title}
                           </h4>
                         </div>
@@ -202,7 +202,7 @@ export default function EmployeeTasksModal({
                   >
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
                     <div className="flex-1 truncate">
-                      <div className="font-serif text-slate-900 dark:text-slate-100 truncate">
+                      <div className="font-mono text-slate-900 dark:text-slate-100 truncate">
                         {task.title}
                       </div>
                       <div className="font-mono text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold mt-1">

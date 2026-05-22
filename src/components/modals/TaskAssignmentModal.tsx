@@ -68,7 +68,7 @@ export default function TaskAssignmentModal({
                 <Target className="w-4 h-4 text-emerald-500" />
                 <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-500 dark:text-slate-400">Tactical Assignment</h2>
               </div>
-              <h2 id="task-assignment-title" className="font-serif text-xl text-slate-900 dark:text-slate-100 -tracking-[0.025em] tracking-tight">
+              <h2 id="task-assignment-title" className="font-mono text-xl text-slate-900 dark:text-slate-100 -tracking-[0.025em] tracking-tight">
                 Initialize New Operation
               </h2>
             </div>
@@ -92,7 +92,7 @@ export default function TaskAssignmentModal({
                   value={newTask.title}
                   onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
                   placeholder="e.g. Laser Alignment Phase II"
-                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white dark:focus:bg-slate-800 transition-all duration-150 font-serif text-base"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white dark:focus:bg-slate-800 transition-all duration-150 font-mono text-base"
                 />
               </div>
 
@@ -104,7 +104,7 @@ export default function TaskAssignmentModal({
                   onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
                   placeholder="Detailed technical instructions..."
                   rows={4}
-className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white dark:focus:bg-slate-800 transition-all duration-150 font-serif text-base text-slate-600 dark:text-slate-400 leading-relaxed"
+className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white dark:focus:bg-slate-800 transition-all duration-150 font-mono text-base text-slate-600 dark:text-slate-400 leading-relaxed"
 />
               </div>
 

@@ -64,14 +64,14 @@ export default function AuthScreen() {
 
   if (verificationSent) {
     return (
-      <div className="min-h-dvh bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex items-center justify-center p-4 font-sans">
+      <div className="min-h-dvh bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex items-center justify-center p-4 font-mono">
         <div className="w-full max-w-md text-center space-y-6">
           <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-10 shadow-xl shadow-slate-200/40 dark:shadow-slate-900/40">
             <div className="w-16 h-16 bg-emerald-50/70 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl mx-auto flex items-center justify-center mb-6">
               <Mail className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
             </div>
             <h2 className="font-mono font-black -tracking-[0.025em] uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100 mb-3">Verify Your Email</h2>
-            <p className="font-serif text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+            <p className="font-mono text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
               A verification link has been sent to <span className="text-emerald-600 font-mono text-xs">{email}</span>. Click the link to activate your account, then log in.
             </p>
             <button
@@ -208,7 +208,7 @@ export default function AuthScreen() {
   );
 
   return (
-    <div className="min-h-dvh bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex items-center justify-center p-4 font-sans selection:bg-emerald-100 selection:text-emerald-900">
+    <div className="min-h-dvh bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex items-center justify-center p-4 font-mono selection:bg-emerald-100 selection:text-emerald-900">
       {reducedMotion ? (
         <div className="w-full max-w-md">
           {authContent}

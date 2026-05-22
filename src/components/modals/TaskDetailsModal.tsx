@@ -86,7 +86,7 @@ export default function TaskDetailsModal({
                   {statusLabel}
                 </div>
               </div>
-              <h2 id="task-details-title" className="font-serif text-xl text-slate-900 dark:text-slate-100 tracking-tight truncate pr-4">
+              <h2 id="task-details-title" className="font-mono text-xl text-slate-900 dark:text-slate-100 tracking-tight truncate pr-4">
                 {selectedTaskDetails.title}
               </h2>
             </div>
@@ -128,7 +128,7 @@ export default function TaskDetailsModal({
             {/* Description */}
             <div>
               <h3 className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-3">Description</h3>
-              <p className="text-slate-600 dark:text-slate-400 font-serif text-base leading-relaxed whitespace-pre-wrap">
+              <p className="text-slate-600 dark:text-slate-400 font-mono text-base leading-relaxed whitespace-pre-wrap">
                 {selectedTaskDetails.description || "No description provided."}
               </p>
             </div>
@@ -209,7 +209,7 @@ export default function TaskDetailsModal({
                         <span className="font-mono text-xs font-black text-slate-400 dark:text-slate-500">Report #{idx + 1}</span>
                         <span className="font-mono text-xs text-slate-400 dark:text-slate-500">{new Date(report.createdAt).toLocaleString()}</span>
                       </div>
-                      <p className="text-slate-700 dark:text-slate-300 font-serif text-sm leading-relaxed">"{report.content}"</p>
+                      <p className="text-slate-700 dark:text-slate-300 font-mono text-sm leading-relaxed">"{report.content}"</p>
                     </div>
                   ))}
                 </div>
@@ -244,7 +244,7 @@ export default function TaskDetailsModal({
                           <span className="font-mono text-xs text-slate-400 dark:text-slate-500 shrink-0">{new Date(log.createdAt).toLocaleString()}</span>
                         </div>
                         {(log.oldValue || log.newValue) && (
-                          <p className="text-slate-500 dark:text-slate-400 font-serif text-xs">
+                          <p className="text-slate-500 dark:text-slate-400 font-mono text-xs">
                             {log.oldValue && log.newValue ? (
                               <>{log.oldValue} → <span className="text-slate-900 dark:text-slate-100 font-bold">{log.newValue}</span></>
                             ) : (

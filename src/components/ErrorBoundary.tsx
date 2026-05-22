@@ -30,7 +30,7 @@ export default class ErrorBoundary extends Component<Props, State> {
             <p className="font-mono text-xs uppercase tracking-widest text-slate-400 dark:text-slate-300 font-bold">
               Component Error
             </p>
-            <p className="font-serif text-slate-500 text-base max-w-md dark:text-slate-300">
+            <p className="font-mono text-slate-500 text-base max-w-md dark:text-slate-300">
               {this.state.error?.message || 'An unexpected error occurred'}
             </p>
             <button

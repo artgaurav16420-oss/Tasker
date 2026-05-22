@@ -44,7 +44,7 @@ export default function SettingsPanel({
         <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Settings className="w-5 h-5 text-slate-500 dark:text-slate-400" />
-            <h2 className="text-lg font-serif text-slate-800 dark:text-slate-100">Identity & Connections</h2>
+            <h2 className="text-lg font-mono text-slate-800 dark:text-slate-100">Identity & Connections</h2>
           </div>
         </div>
         

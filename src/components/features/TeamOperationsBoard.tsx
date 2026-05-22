@@ -57,7 +57,7 @@ export default function TeamOperationsBoard({
             <div className="w-3 h-3 bg-emerald-500 rotate-45 shadow-sm"></div>
             <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-500 dark:text-slate-400">Tactical Control</h2>
           </div>
-          <h2 className="font-serif text-2xl text-slate-900 dark:text-slate-100 tracking-tight -tracking-[0.025em]">
+          <h2 className="font-mono text-2xl text-slate-900 dark:text-slate-100 tracking-tight -tracking-[0.025em]">
             Team Operations
           </h2>
         </div>
@@ -71,7 +71,7 @@ export default function TeamOperationsBoard({
 
       <div className="space-y-12">
         <div className="space-y-8">
-          <h3 className="font-serif text-xl text-slate-900 dark:text-slate-100 tracking-tight -tracking-[0.025em]">
+          <h3 className="font-mono text-xl text-slate-900 dark:text-slate-100 tracking-tight -tracking-[0.025em]">
             Active Operations
           </h3>
           <div className="flex flex-col gap-10">
@@ -144,7 +144,7 @@ export default function TeamOperationsBoard({
                                       {task.status === 'in-review' && <Eye className="w-3.5 h-3.5" />}
                                       {task.status === 'todo' ? 'Standing By' : task.status === 'in-progress' ? 'Active' : 'Under Review'}
                                     </div>
-                                    <h3 className="font-serif text-base text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 transition-colors duration-150 tracking-tight -tracking-[0.025em] truncate flex-1" title={task.title}>
+                                    <h3 className="font-mono text-base text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 transition-colors duration-150 tracking-tight -tracking-[0.025em] truncate flex-1" title={task.title}>
                                       {task.title}
                                     </h3>
                                   </div>
@@ -197,7 +197,7 @@ export default function TeamOperationsBoard({
         </div>
 
         <div className="space-y-8">
-          <h3 className="font-serif text-xl text-slate-900 dark:text-slate-100 tracking-tight -tracking-[0.025em]">
+          <h3 className="font-mono text-xl text-slate-900 dark:text-slate-100 tracking-tight -tracking-[0.025em]">
             Completed Operations
           </h3>
           <div className="flex flex-col gap-10">
@@ -243,7 +243,7 @@ export default function TeamOperationsBoard({
                                 <div className="flex-1 flex flex-col md:flex-row md:items-center gap-3">
                                   <div className="flex items-center gap-3 min-w-[200px]">
                                     <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                                    <h3 className="font-serif text-base text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 transition-colors duration-150 tracking-tight -tracking-[0.025em] truncate flex-1" title={task.title}>
+                                    <h3 className="font-mono text-base text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 transition-colors duration-150 tracking-tight -tracking-[0.025em] truncate flex-1" title={task.title}>
                                       {task.title}
                                     </h3>
                                   </div>

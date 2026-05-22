@@ -69,7 +69,7 @@ export default function EditTaskModal({
                 <Target className="w-4 h-4 text-emerald-500" />
                 <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-500 dark:text-slate-400">Tactical Revision</h2>
               </div>
-              <h2 id="edit-task-title" className="font-serif text-xl text-slate-900 dark:text-slate-100 -tracking-[0.025em] tracking-tight">
+              <h2 id="edit-task-title" className="font-mono text-xl text-slate-900 dark:text-slate-100 -tracking-[0.025em] tracking-tight">
                 Edit Mission Metadata
               </h2>
             </div>
@@ -92,7 +92,7 @@ export default function EditTaskModal({
                   type="text"
                   value={editingTask.title}
                   onChange={(e) => setEditingTask({ ...editingTask, title: e.target.value })}
-                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white dark:focus:bg-slate-800 transition-all duration-150 font-serif text-base"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 p-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white dark:focus:bg-slate-800 transition-all duration-150 font-mono text-base"
                 />
               </div>
 

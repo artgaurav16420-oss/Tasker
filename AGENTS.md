@@ -84,7 +84,7 @@ All accept **email or UUID string** for `resolveUserId()` in `useTeamManagement`
 ## Design System
 
 - **Colors**: `slate` (text/backgrounds), `emerald` (primary action), `sky`/`orange`/`indigo` for status accents
-- **Typography**: `font-sans` (Inter) for body; `font-mono` (JetBrains Mono) + `tracking-widest` for technical labels; `font-serif` (Playfair Display) **italic** for headers
+- **Typography**: `font-mono` (JetBrains Mono) for all text across the entire app. Font weight (`font-black`, `font-bold`, `font-normal`), size (`text-xs` through `text-2xl`), and letter-spacing (`tracking-widest`, `tracking-tight`) provide visual hierarchy.
 - **Zero-Hallucination Policy**: Do not invent new UI designs, color schemes, or layouts. Stick strictly to this design system.
 - **Animations**: All modals and list transitions **must** use `AnimatePresence` + `motion.div` from `motion/react`
 

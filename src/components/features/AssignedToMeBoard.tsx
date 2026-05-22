@@ -60,7 +60,7 @@ export default function AssignedToMeBoard({
             <div className="w-3 h-3 bg-emerald-500 rotate-45 shadow-sm"></div>
             <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-500 dark:text-slate-400">Tactical Display</h2>
           </div>
-          <h2 className="font-serif text-2xl text-slate-900 dark:text-slate-100 tracking-tight -tracking-[0.025em]">
+          <h2 className="font-mono text-2xl text-slate-900 dark:text-slate-100 tracking-tight -tracking-[0.025em]">
             Assigned Operations
           </h2>
         </div>
@@ -80,7 +80,7 @@ export default function AssignedToMeBoard({
               <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 p-16 text-center rounded-2xl bg-white dark:bg-slate-800 shadow-inner">
                 <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 flex items-center justify-center"><Activity className="w-8 h-8 text-emerald-400" /></div>
                 <p className="font-mono text-xs uppercase font-bold text-slate-500 dark:text-slate-400 tracking-widest">No active assignments detected.</p>
-                <p className="font-serif text-sm text-slate-500 dark:text-slate-400 mt-3 max-w-sm mx-auto">Tasks assigned to you will appear here. Contact your manager to receive assignments.</p>
+                <p className="font-mono text-sm text-slate-500 dark:text-slate-400 mt-3 max-w-sm mx-auto">Tasks assigned to you will appear here. Contact your manager to receive assignments.</p>
               </div>
             )}
             {activeTasks.map((task) => {
@@ -105,7 +105,7 @@ export default function AssignedToMeBoard({
                           {task.status === 'in-review' && <Eye className="w-3.5 h-3.5" />}
                           {task.status === 'todo' ? 'Standing By' : task.status === 'in-progress' ? 'Active' : 'Under Review'}
                         </div>
-                        <h4 className="font-serif text-xl text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 transition-colors duration-150 -tracking-[0.025em]" title={task.title}>
+                        <h4 className="font-mono text-xl text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 transition-colors duration-150 -tracking-[0.025em]" title={task.title}>
                           {task.title}
                         </h4>
                       </div>
@@ -242,7 +242,7 @@ export default function AssignedToMeBoard({
                 <div className="flex items-center gap-4">
                   <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
                   <div>
-                    <h5 className="font-serif text-base text-slate-700 dark:text-slate-300">{task.title}</h5>
+                    <h5 className="font-mono text-base text-slate-700 dark:text-slate-300">{task.title}</h5>
                     <p className="font-mono text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 font-bold mt-1">Archived {formatDate(task.updatedAt)}</p>
                   </div>
                 </div>

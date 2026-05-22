@@ -55,7 +55,7 @@ export default function CommandOverview({ teamTasks, employees }: Props) {
           <div className="w-3 h-3 bg-emerald-500 rotate-45 shadow-sm"></div>
           <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-500 dark:text-slate-400">Real-time Intelligence</h2>
         </div>
-        <h2 className="font-serif text-2xl text-slate-900 dark:text-slate-100 tracking-tight -tracking-[0.025em]">
+        <h2 className="font-mono text-2xl text-slate-900 dark:text-slate-100 tracking-tight -tracking-[0.025em]">
           Command Dashboard
         </h2>
       </div>
@@ -95,7 +95,7 @@ export default function CommandOverview({ teamTasks, employees }: Props) {
           <div className="flex justify-between items-center mb-8">
             <div className="space-y-1">
               <h3 className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Operational Tempo</h3>
-              <p className="font-serif text-lg text-slate-900 dark:text-slate-100 -tracking-[0.025em]">Task Completion Velocity</p>
+              <p className="font-mono text-lg text-slate-900 dark:text-slate-100 -tracking-[0.025em]">Task Completion Velocity</p>
             </div>
             <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-100 dark:border-slate-700">
                <Clock className="w-4 h-4 text-slate-400" />
@@ -154,7 +154,7 @@ export default function CommandOverview({ teamTasks, employees }: Props) {
           <div className="relative z-10 space-y-8">
             <div className="space-y-1">
               <h3 className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Threat Matrix</h3>
-              <p className="font-serif text-lg text-slate-900 dark:text-slate-100 -tracking-[0.025em]">Tactical Distribution</p>
+              <p className="font-mono text-lg text-slate-900 dark:text-slate-100 -tracking-[0.025em]">Tactical Distribution</p>
             </div>
 
             <div className="space-y-6">
@@ -205,7 +205,7 @@ function KPICard({ title, value, icon, isAlert, reducedMotion }: KPICardProps) {
       </div>
       <div className="space-y-1">
         <h4 className="font-mono text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">{title}</h4>
-        <div className={`font-serif text-xl font-bold ${isAlert ? 'text-orange-600' : 'text-slate-900 dark:text-slate-100'}`}>
+        <div className={`font-mono text-xl font-bold ${isAlert ? 'text-orange-600' : 'text-slate-900 dark:text-slate-100'}`}>
           {value}
         </div>
       </div>

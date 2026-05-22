@@ -32,7 +32,7 @@ export default function PersonalTasksList({
             <div className="w-3 h-3 bg-emerald-500 rounded-full shadow-sm"></div>
             <h2 className="font-mono text-xs font-black uppercase tracking-[0.4em] text-slate-500 dark:text-slate-400">Self-Assigned</h2>
           </div>
-          <h2 className="font-serif text-2xl text-slate-900 dark:text-slate-100 tracking-tight -tracking-[0.025em]">
+          <h2 className="font-mono text-2xl text-slate-900 dark:text-slate-100 tracking-tight -tracking-[0.025em]">
             My Tasks
           </h2>
         </div>
@@ -45,7 +45,7 @@ export default function PersonalTasksList({
       </div>
 
       <div className="space-y-8">
-        <h3 className="font-serif text-xl text-slate-900 dark:text-slate-100 tracking-tight -tracking-[0.025em]">
+        <h3 className="font-mono text-xl text-slate-900 dark:text-slate-100 tracking-tight -tracking-[0.025em]">
           Active Objectives
         </h3>
 
@@ -75,7 +75,7 @@ export default function PersonalTasksList({
                       <Circle className="w-6 h-6" />
                     </button>
                     <div className="flex flex-col">
-                      <span className="font-serif text-base text-slate-800 dark:text-slate-100">{task.title}</span>
+                      <span className="font-mono text-base text-slate-800 dark:text-slate-100">{task.title}</span>
                       {task.timelineEnd && (
                         <div className="flex items-center gap-2 mt-1">
                           <Clock className="w-3.5 h-3.5 text-orange-500" />
@@ -103,7 +103,7 @@ export default function PersonalTasksList({
 
       {completedTasks.length > 0 && (
         <div className="space-y-8 pt-8 border-t border-slate-100 dark:border-slate-700">
-          <h3 className="font-serif text-xl text-slate-900 dark:text-slate-100 tracking-tight opacity-60 -tracking-[0.025em]">
+          <h3 className="font-mono text-xl text-slate-900 dark:text-slate-100 tracking-tight opacity-60 -tracking-[0.025em]">
             Completed Objectives
           </h3>
           <div className="grid grid-cols-1 gap-4">
@@ -125,7 +125,7 @@ export default function PersonalTasksList({
                     >
                       <CheckCircle2 className="w-6 h-6" />
                     </button>
-                    <span className="font-serif text-base text-slate-500 dark:text-slate-400 line-through">{task.title}</span>
+                    <span className="font-mono text-base text-slate-500 dark:text-slate-400 line-through">{task.title}</span>
                   </div>
                   <button
                     onClick={() => handleDeletePersonalTask(task.id)}
