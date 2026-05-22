@@ -156,6 +156,18 @@ export default function AssignedToMeBoard({
                                   In Progress
                                 </button>
                               )}
+                              {task.status === 'in-progress' && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleStatusChange(task.id, 'todo', task);
+                                    setOpenDropdownId(null);
+                                  }}
+                                  className="w-full text-left px-5 py-3 font-mono text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                                >
+                                  Revert to Pending
+                                </button>
+                              )}
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
