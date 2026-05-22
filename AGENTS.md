@@ -75,7 +75,7 @@ All accept **email or UUID string** for `resolveUserId()` in `useTeamManagement`
 
 - Cross-row mutations **must** use `supabase.rpc()` with SECURITY DEFINER. Direct client updates on foreign rows fail under RLS.
 - Client-side deletions: single-document only. No cascading deletes from UI.
-- Task status `'completed'` can only be set by the task's manager (`auth.uid() === managerId`). Employees may only set `'in-progress'` or `'in-review'`.
+- Task status `'completed'` can only be set by the task's manager (`auth.uid() === managerId`). Employees may set `'todo'`, `'in-progress'`, or `'in-review'`.
 - Reports can only be created by the task's assigned employee or manager.
 - Database triggers handle all cascading cleanups server-side.
 

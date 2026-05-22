@@ -207,7 +207,7 @@ CREATE POLICY "Employees can update task status" ON public.tasks FOR UPDATE USIN
   status != 'completed'
 ) WITH CHECK (
   auth.uid() = "employeeId" AND
-  status IN ('in-progress', 'in-review')
+  status IN ('todo', 'in-progress', 'in-review')
 );
 
 -- Prevent employees from modifying fields other than status
