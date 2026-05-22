@@ -153,7 +153,7 @@ export default function TeamOperationsBoard({
                                       <Calendar className="w-3.5 h-3.5" /> Assigned: {formatDate(task.createdAt)}
                                     </div>
                                     <div className={`flex items-center gap-2 border px-3 py-1 rounded-lg font-black ${getDeadlineStyle(task.timelineEnd, task.status === "completed")}`}>
-                                      <Clock className={`w-3.5 h-3.5 ${task.timelineEnd && task.status !== "completed" ? "animate-pulse" : ""}`} /> Deadline: {task.timelineEnd || "Open Timeline"}
+                                       <Clock className={`w-3.5 h-3.5 ${task.timelineEnd && task.status !== "completed" ? "animate-pulse" : ""}`} /> Deadline: {task.timelineEnd ? formatDate(task.timelineEnd) : "Open Timeline"}
                                       {task.timelineEnd && task.status !== "completed" && (
                                         <span className="ml-auto px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-xs border border-emerald-500/10 font-black shadow-sm">{getTimeRemaining(task.timelineEnd)}</span>
                                       )}
@@ -249,7 +249,7 @@ export default function TeamOperationsBoard({
                                       <Calendar className="w-3.5 h-3.5" /> Assigned: {formatDate(task.createdAt)}
                                     </div>
                                     <div className={`flex items-center gap-2 border px-3 py-1 rounded-lg font-black ${getDeadlineStyle(task.timelineEnd, true)}`}>
-                                      <Clock className="w-3.5 h-3.5" /> Deadline: {task.timelineEnd || "Archived"}
+                                       <Clock className="w-3.5 h-3.5" /> Deadline: {task.timelineEnd ? formatDate(task.timelineEnd) : "Archived"}
                                     </div>
                                   </div>
                                 </div>
