@@ -39,3 +39,6 @@ awesome-design-md/
 
 # Agent guidelines (local only)
 karpathy-guidelines.md
+
+# Claude local settings
+.claude/settings.local.json
