@@ -17,7 +17,9 @@ index.html → src/main.tsx → App.tsx → AuthScreen | Dashboard
 ```
 - `Dashboard.tsx`: state-routing shell. Renders feature components from `src/components/features/` and modals from `src/components/modals/`
 - Data hooks in `src/lib/hooks/`: `useDashboardData`, `useTaskOperations`, `useTeamManagement`
+- Shared UI components in `src/components/`: `Logo`, `Avatar`, `Skeleton`, `SkipLink`, `ErrorBoundary`
 - Supabase client: `src/lib/supabase/client.ts`
+- Types: `src/lib/types.ts`
 
 ## Commands
 ```bash
@@ -87,6 +89,7 @@ All accept **email or UUID string** for `resolveUserId()` in `useTeamManagement`
 - **Typography**: `font-mono` (JetBrains Mono) for all text across the entire app. Font weight (`font-black`, `font-bold`, `font-normal`), size (`text-xs` through `text-2xl`), and letter-spacing (`tracking-widest`, `tracking-tight`) provide visual hierarchy.
 - **Zero-Hallucination Policy**: Do not invent new UI designs, color schemes, or layouts. Stick strictly to this design system.
 - **Animations**: All modals and list transitions **must** use `AnimatePresence` + `motion.div` from `motion/react`
+- **Dark Mode**: Tailwind `dark:` variants throughout. Toggle via `useThemeStore.getState().toggleTheme()`.
 
 ---
 

@@ -1,12 +1,38 @@
+# Dependencies
 node_modules/
+
+# Build output
 build/
 dist/
+
+# Test coverage
 coverage/
-.DS_Store
-*.log
+
+# Environment files
 .env*
 !.env.example
-awesome-design-md/
 
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Tooling state
+.gitnexus/
+.opencode/
+.claude/
+
+# Generated output
+graphify-out/
+.skills-index.json
+metadata.json
+
+# Supabase local dev
+supabase/.temp/
+supabase/.env
+
+# Vendored repos
 awesome-design-md/
-.gitnexus
