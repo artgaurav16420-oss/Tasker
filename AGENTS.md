@@ -1,3 +1,5 @@
+Karpathy Guidelines v3.6 MANDATORY: For all AI operations in this project, you MUST follow karpathy-guidelines.md as the primary behavioral ruleset.
+
 # Tasker — Universal LLM Context
 
 All AI agents working in this codebase must follow these rules. No exceptions.

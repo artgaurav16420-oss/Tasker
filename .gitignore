@@ -36,3 +36,6 @@ supabase/.env
 
 # Vendored repos
 awesome-design-md/
+
+# Agent guidelines (local only)
+karpathy-guidelines.md
