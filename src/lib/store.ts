@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from './supabase/client';
 import { UserProfile } from './types';
+import { log } from './logger';
 
 export type { UserProfile };
 
@@ -30,7 +31,7 @@ async function fetchProfile(uid: string) {
     if (error) throw error;
     return data as UserProfile | null;
   } catch (err) {
-    console.error('Error fetching profile:', err);
+    log.error('Error fetching profile:', err);
     return null;
   }
 }
@@ -58,7 +59,7 @@ function subscribeProfile(user: User) {
           if (requestId !== activeSessionRequest) return;
           useAuthStore.getState().setUser(user, profile);
         } catch (err) {
-          console.error(err);
+          log.error(err);
         }
       },
     )
@@ -97,7 +98,7 @@ async function handleSession(session: Session | null) {
     subscribeProfile(user);
   } catch (err) {
     if (requestId !== activeSessionRequest) return;
-    console.error(err);
+    log.error(err);
     useAuthStore.getState().setUser(user, null);
   }
 }
@@ -108,13 +109,13 @@ export function initAuth() {
   supabase.auth.getSession().then(({ data, error }) => {
     if (disposed) return;
     if (error) {
-      console.error('Session fetch error:', error);
+      log.error('Session fetch error:', error);
       useAuthStore.getState().setUser(null, null);
       return;
     }
     handleSession(data.session);
   }).catch((err) => {
-    console.error('Failed to get session:', err);
+    log.error('Failed to get session:', err);
     if (!disposed) {
       useAuthStore.getState().setUser(null, null);
     }

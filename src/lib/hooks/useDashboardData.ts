@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import type { RealtimePostgresChangesPayload, RealtimeChannel } from "@supabase/supabase-js";
 import { supabase } from "../supabase/client";
 import { Task, UserProfile, PersonalTask, Report } from "../types";
+import { log } from "../logger";
 
 const MAX_SUPERIORS_REALTIME = 10;
 
@@ -17,93 +18,23 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
 
   const [recoveryKey, setRecoveryKey] = useState(0);
 
-  const employeesRef = useRef(employees);
-  const myTasksRef = useRef(myTasks);
-  const teamTasksRef = useRef(teamTasks);
-  const managedReportsRef = useRef(managedReports);
-  const personalTasksRef = useRef(personalTasks);
-  const superiorsRef = useRef(superiors);
-  const profileRef = useRef(profile);
   const activeChannelsRef = useRef<Map<string, RealtimeChannel>>(new Map());
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const profileUidRef = useRef(profile?.uid ?? null);
+  const fetchAllRef = useRef<() => Promise<void>>(async () => {});
   const requestSeqRef = useRef(0);
   const initialFetchDoneRef = useRef(false);
   const superiorSeqRef = useRef(0);
   const mountedRef = useRef(true);
+  const stateRef = useRef({ employees, superiors });
 
   useEffect(() => {
     return () => { mountedRef.current = false; };
   }, []);
 
-  const refetch = useCallback(async () => {
-    try {
-      const uid = profileUidRef.current;
-      if (!uid) return;
-
-    // Cancel any pending debounced fetchAll from realtime handlers
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-      debounceTimerRef.current = null;
-    }
-
-    const seq = ++requestSeqRef.current;
-
-    setError(null);
-
-    const [employeesRes, myTasksRes, teamTasksRes, managedReportsRes, personalTasksRes, profileRes] = await Promise.all([
-      supabase.from("users").select("*").filter("managerIds", "cs", `{${uid}}`),
-      supabase.from("tasks").select("*").eq("employeeId", uid),
-      supabase.from("tasks").select("*").eq("managerId", uid),
-      supabase.from("reports").select("*").or(`managerId.eq.${uid},employeeId.eq.${uid}`),
-      supabase.from("personal_tasks").select("*").eq("userId", uid),
-      supabase.from("users").select("uid, managerIds").eq("uid", uid).maybeSingle(),
-    ]);
-
-    if (seq !== requestSeqRef.current) return;
-    if (!mountedRef.current) return;
-
-    const hasError = employeesRes.error || myTasksRes.error || teamTasksRes.error || managedReportsRes.error || personalTasksRes.error;
-    if (hasError) {
-      setError('Failed to load data. Please refresh the page.');
-      console.error('Data fetch error:', hasError);
-    }
-
-    if (employeesRes.data) setEmployees(employeesRes.data as UserProfile[]);
-    if (myTasksRes.data) setMyTasks(myTasksRes.data as Task[]);
-    if (teamTasksRes.data) setTeamTasks(teamTasksRes.data as Task[]);
-    if (managedReportsRes.data) setManagedReports(managedReportsRes.data as Report[]);
-    if (personalTasksRes.data) setPersonalTasks(personalTasksRes.data as PersonalTask[]);
-
-    const latestManagerIds = (profileRes.data as { managerIds?: string[] } | null)?.managerIds ?? [];
-    if (latestManagerIds.length > 0) {
-      const limited = latestManagerIds.slice(0, MAX_SUPERIORS_REALTIME);
-      const { data: superiorsData } = await supabase.from("users").select("*").in("uid", limited);
-      if (superiorsData) setSuperiors(superiorsData as UserProfile[]);
-    } else {
-      setSuperiors([]);
-    }
-
-    setIsLoading(false);
-    initialFetchDoneRef.current = true;
-  } catch (err) {
-    console.error('refetch failed:', err);
-  }
-  }, []);
-
-  const refetchRef = useRef(refetch);
-
+  // Keep stateRef current
   useEffect(() => {
-    employeesRef.current = employees;
-    myTasksRef.current = myTasks;
-    teamTasksRef.current = teamTasks;
-    managedReportsRef.current = managedReports;
-    personalTasksRef.current = personalTasks;
-    superiorsRef.current = superiors;
-    profileRef.current = profile;
-    profileUidRef.current = profile?.uid ?? null;
-    refetchRef.current = refetch;
-  }, [employees, myTasks, teamTasks, managedReports, personalTasks, superiors, profile, refetch]);
+    stateRef.current = { employees, superiors };
+  }, [employees, superiors]);
 
   // Fetch logic for superiors based on superiorIds
   useEffect(() => {
@@ -111,7 +42,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
     try {
       parsedIds = JSON.parse(superiorIds) as string[];
     } catch (e) {
-      console.error("Failed to parse superiorIds:", e);
+      log.error("Failed to parse superiorIds:", e);
       setSuperiors([]);
       return;
     }
@@ -135,13 +66,13 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
         .then(({ data, error }) => {
           if (cancelled) return;
           if (error) {
-            console.error('Superior fetch error:', error);
+            log.error('Superior fetch error:', error);
             return;
           }
           if (data) setSuperiors(data as UserProfile[]);
         })
     ).catch((err: unknown) => {
-      if (!cancelled) console.error('Superior fetch exception:', err);
+      if (!cancelled) log.error('Superior fetch exception:', err);
     });
 
     const currentIds = new Set(limitedIds);
@@ -214,12 +145,13 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
       }
       setError(null);
 
-      const [employeesRes, myTasksRes, teamTasksRes, managedReportsRes, personalTasksRes] = await Promise.all([
+      const [employeesRes, myTasksRes, teamTasksRes, managedReportsRes, personalTasksRes, profileRes] = await Promise.all([
         supabase.from("users").select("*").filter("managerIds", "cs", `{${profile.uid}}`),
         supabase.from("tasks").select("*").eq("employeeId", profile.uid),
         supabase.from("tasks").select("*").eq("managerId", profile.uid),
         supabase.from("reports").select("*").or(`managerId.eq.${profile.uid},employeeId.eq.${profile.uid}`),
         supabase.from("personal_tasks").select("*").eq("userId", profile.uid),
+        supabase.from("users").select("uid, managerIds").eq("uid", profile.uid).maybeSingle(),
       ]);
 
       if (cancelled || seq !== requestSeq) return;
@@ -227,7 +159,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
       const hasError = employeesRes.error || myTasksRes.error || teamTasksRes.error || managedReportsRes.error || personalTasksRes.error;
       if (hasError) {
         setError('Failed to load data. Please refresh the page.');
-        console.error('Data fetch error:', hasError);
+        log.error('Data fetch error:', hasError);
       }
 
       if (employeesRes.data) setEmployees(employeesRes.data as UserProfile[]);
@@ -236,10 +168,20 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
       if (managedReportsRes.data) setManagedReports(managedReportsRes.data as Report[]);
       if (personalTasksRes.data) setPersonalTasks(personalTasksRes.data as PersonalTask[]);
 
+      const latestManagerIds = (profileRes.data as { managerIds?: string[] } | null)?.managerIds ?? [];
+      if (latestManagerIds.length > 0) {
+        const limited = latestManagerIds.slice(0, MAX_SUPERIORS_REALTIME);
+        const { data: superiorsData } = await supabase.from("users").select("*").in("uid", limited);
+        if (superiorsData) setSuperiors(superiorsData as UserProfile[]);
+      } else {
+        setSuperiors([]);
+      }
+
       setIsLoading(false);
       initialFetchDoneRef.current = true;
     };
 
+    fetchAllRef.current = fetchAll;
     fetchAll();
 
     const parsePgArray = (val: unknown): string[] => {
@@ -268,8 +210,8 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
 
       const changedUid = (payload.new as Record<string, unknown>)?.uid as string | undefined || (payload.old as Record<string, unknown>)?.uid as string | undefined;
       const relevantIds = new Set([
-        ...employeesRef.current.map(e => e.uid),
-        ...superiorsRef.current.map(s => s.uid),
+        ...stateRef.current.employees.map(e => e.uid),
+        ...stateRef.current.superiors.map(s => s.uid),
         profile.uid
       ]);
 
@@ -411,7 +353,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
     const poll = () => {
       if (!mounted) return;
       if (document.visibilityState === 'visible') {
-        refetchRef.current().finally(() => {
+        fetchAllRef.current().finally(() => {
           if (mounted) setTimeout(poll, 3000);
         });
       } else {
@@ -421,7 +363,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
 
     const onVisible = () => {
       if (document.visibilityState === 'visible') {
-        refetchRef.current();
+        fetchAllRef.current();
       }
     };
     document.addEventListener('visibilitychange', onVisible);
@@ -434,6 +376,8 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
       document.removeEventListener('visibilitychange', onVisible);
     };
   }, []);
+
+  const refetch = useCallback(() => { void fetchAllRef.current(); }, []);
 
   return {
     employees,

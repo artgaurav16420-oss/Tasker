@@ -1,6 +1,7 @@
 import type { Dispatch, SetStateAction } from 'react';
 import { supabase } from '../supabase/client';
 import { UserProfile, ConfirmDialogState } from '../types';
+import { log } from '../logger';
 
 interface UseTeamManagementProps {
   profile: UserProfile | null;
@@ -74,7 +75,7 @@ export function useTeamManagement({
       if (superiorProfile) onSuperiorAdded?.(superiorProfile);
       refetchData?.();
     } catch (err: unknown) {
-      console.error(err);
+      log.error(err);
       const message = err instanceof Error ? err.message : "Failed to add manager. Check the code and try again.";
       showToast(message);
     } finally {
@@ -122,7 +123,7 @@ export function useTeamManagement({
       if (memberProfile) onEmployeeAdded?.(memberProfile);
       refetchData?.();
     } catch (err: unknown) {
-      console.error(err);
+      log.error(err);
       const message = err instanceof Error ? err.message : "Failed to add team member. Security protocols may be blocking this request.";
       showToast(message);
     } finally {
@@ -152,7 +153,7 @@ export function useTeamManagement({
           showToast("Successfully disconnected from superior");
           refetchData?.();
         } catch (error) {
-          console.error("Error removing superior:", error);
+          log.error("Error removing superior:", error);
           showToast("Failed to disconnect. Please try again.");
         } finally {
           setConfirmDialog((p) => ({ ...p, isOpen: false }));
@@ -184,7 +185,7 @@ export function useTeamManagement({
           showToast("Member removed from team");
           refetchData?.();
         } catch (error: unknown) {
-          console.error("Error removing employee:", error);
+          log.error("Error removing employee:", error);
           const errMsg = error instanceof Error ? error.message : '';
           if (errMsg.includes('function does not exist')) {
             showToast("Server-side function missing. Contact administrator.");

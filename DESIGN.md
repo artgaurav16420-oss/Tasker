@@ -1,5 +1,5 @@
 ---
-description: "Tactical task management system with military operations metaphor. Light-mode canvas with emerald primary accent, slate neutrals, and status colors (sky/orange/indigo). Dense technical typography using JetBrains Mono + Playfair Display. Hairline-bordered cards with subtle colored shadows. Framer Motion spring animations throughout."
+description: "Tactical task management system with military operations metaphor. Light/dark canvas with emerald primary accent, slate neutrals, and status colors (sky/orange/indigo). Dense technical typography using JetBrains Mono. Hairline-bordered cards with subtle colored shadows. Framer Motion spring animations throughout."
 ---
 
 # Tasker — Design System
@@ -55,18 +55,6 @@ description: "Tactical task management system with military operations metaphor.
 | `--color-info` | `#0ea5e9` (sky-500) | In-progress, info |
 | `--color-review` | `#6366f1` (indigo-500) | In-review, pending review |
 
-### Pastel Callout Tints
-| Token | Value | Role |
-|-------|-------|------|
-| `--color-callout-success-bg` | `rgba(16, 185, 129, 0.07)` | Success banner background |
-| `--color-callout-success-border` | `#a7f3d0` (emerald-200) | Success banner border |
-| `--color-callout-warning-bg` | `rgba(249, 115, 22, 0.07)` | Warning banner background |
-| `--color-callout-warning-border` | `#fed7aa` (orange-200) | Warning banner border |
-| `--color-callout-info-bg` | `rgba(14, 165, 233, 0.07)` | Info banner background |
-| `--color-callout-info-border` | `#bae6fd` (sky-200) | Info banner border |
-| `--color-callout-review-bg` | `rgba(99, 102, 241, 0.07)` | Review banner background |
-| `--color-callout-review-border` | `#c7d2fe` (indigo-200) | Review banner border |
-
 ### Avatar Colors (deterministic from name hash)
 `#10b981`, `#059669`, `#0891b2`, `#0284c7`, `#4f46e5`, `#7c3aed`, `#a855f7`, `#d946ef`, `#db2777`, `#e11d48`, `#ea580c`, `#ca8a04`
 
@@ -75,9 +63,9 @@ description: "Tactical task management system with military operations metaphor.
 ### Font Families
 | Variable | Font | Use |
 |----------|------|-----|
-| `--font-sans` | Inter, system-ui | Body text, general UI |
-| `--font-mono` | JetBrains Mono, monospace | Labels, metadata, technical text, buttons |
-| `--font-serif` | Playfair Display, serif | Headings, titles, descriptive prose |
+| `--font-mono` | JetBrains Mono, monospace | All text — labels, headings, body, buttons, metadata |
+
+**Typography is mono-only.** No sans-serif or serif fonts are loaded. Visual hierarchy comes from weight (`font-black`, `font-bold`, `font-normal`), size (`text-xs` through `text-2xl`), and letter-spacing (`tracking-widest`, `tracking-tight`).
 
 ### Type Scale
 | Name | Size | Weight | Line-height | Letter-spacing | Use |
@@ -92,12 +80,12 @@ description: "Tactical task management system with military operations metaphor.
 | Badge | 0.75rem (12px) | 900 | 1 | 0.15em | Mono badge text, uppercase |
 
 ### Typography Rules
-- **Display headings**: `font-serif text-2xl font-bold tracking-tight` (add `-tracking-[0.025em]` for polish)
+- **Display headings**: `font-mono text-2xl font-bold tracking-tight` (add `-tracking-[0.025em]` for polish)
 - **Section labels**: `font-mono text-xs font-black uppercase tracking-[0.35em] text-slate-400` — always paired with `w-3 h-3 bg-emerald-500` diamond indicator
 - **Button text**: `font-mono text-xs font-bold uppercase tracking-[0.2em]`
 - **Badge text**: `font-mono text-xs font-black uppercase tracking-widest`
 - **Input labels**: `font-mono text-xs font-black uppercase tracking-widest text-slate-400`
-- **Task titles**: `font-serif text-xl text-slate-900` (active), `font-serif text-base text-slate-700` (completed)
+- **Task titles**: `font-mono text-xl text-slate-900` (active), `font-mono text-base text-slate-700` (completed)
 
 ## 4. Component Stylings
 
@@ -130,7 +118,7 @@ All buttons: `focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:
 - Ring: `focus:ring-4 focus:ring-emerald-500/5`
 - Radius: `rounded-xl`
 - Padding: `py-4 px-4` (or `pl-12` with icon)
-- Text: `text-sm` (or `font-serif text-base` for form modals)
+- Text: `text-sm` (or `font-mono text-base` for form modals)
 
 ### Modals
 - Backdrop: `bg-slate-900/60 backdrop-blur-xl`
@@ -150,7 +138,7 @@ All buttons: `focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:
 - Container: `border-2 border-dashed border-slate-200 p-16 text-center rounded-3xl bg-white shadow-inner`
 - Icon wrapper: `w-16 h-16 mx-auto mb-6 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center`
 - Primary text: `font-mono text-xs uppercase tracking-[0.25em] text-slate-400 font-bold`
-- Secondary text: `font-serif text-sm text-slate-500 mt-3 max-w-md mx-auto`
+- Secondary text: `font-mono text-sm text-slate-500 mt-3 max-w-md mx-auto`
 
 ## 5. Layout Principles
 
@@ -208,7 +196,7 @@ All buttons: `focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:
 - Use hairline borders for subtle depth before reaching for shadows
 - Reserve colored shadows for primary CTAs and critical alerts
 - Use `font-mono font-black uppercase` for all technical labels
-- Use `font-serif italic` for headings to create typographic contrast
+- Use `font-mono` with weight/size variation for heading hierarchy
 - Stagger animation delays for list items (`idx * 0.05`)
 - Respect `useReducedMotion()` in all animations
 
@@ -240,7 +228,28 @@ All buttons: `focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:
 - Desktop: vertical sidebar nav with `space-y-3`
 - Task groups: collapsible with chevron toggle
 
-## 9. Agent Prompt Guide
+## 9. Dark Mode
+
+Dark mode is implemented via `@custom-variant dark (&:where(.dark, .dark *))` in `index.css`.
+
+### Surface Mappings (light → dark)
+| Light | Dark |
+|-------|------|
+| `bg-slate-50` | `dark:bg-slate-950` |
+| `bg-white` | `dark:bg-slate-800` |
+| `bg-slate-50` (inputs) | `dark:bg-slate-900` |
+| `border-slate-200` | `dark:border-slate-700` |
+| `text-slate-900` | `dark:text-slate-100` |
+| `text-slate-500` | `dark:text-slate-400` |
+| `text-slate-400` | `dark:text-slate-500` |
+| `shadow-sm` | `dark:shadow-slate-900/20` |
+| `shadow-xl` | `dark:shadow-slate-900/40` |
+
+**Toggle**: `useThemeStore.getState().toggleTheme()` — persists to `localStorage` under `tasker-theme`.
+
+**Rule**: Every component that uses light-mode colors MUST have a `dark:` counterpart. No exceptions.
+
+## 10. Agent Prompt Guide
 
 ### Quick Color Reference
 - **Primary action**: `emerald-500`
@@ -258,6 +267,6 @@ All buttons: `focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:
 5. All animations must respect `useReducedMotion()`
 
 ### Known Gaps
-- No dark mode defined (light mode only)
 - No icon size standardization beyond component-level usage
 - Chart styling (Recharts) uses inline styles — consider extracting to CSS
+- No ESLint/Prettier enforcement of design tokens

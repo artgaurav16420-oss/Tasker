@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../supabase/client';
 import { AuditLog } from '../types';
+import { log } from '../logger';
 
 export function useAuditLogs(taskId: string | null) {
   const [logs, setLogs] = useState<AuditLog[]>([]);
@@ -26,7 +27,7 @@ export function useAuditLogs(taskId: string | null) {
         if (cancelled) return;
         if (error) {
           setError('Failed to load audit logs.');
-          console.error(error);
+          log.error(error);
         } else if (data) {
           setLogs(data as AuditLog[]);
         }

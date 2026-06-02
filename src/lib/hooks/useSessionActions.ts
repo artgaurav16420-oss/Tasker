@@ -1,5 +1,6 @@
 import { supabase } from '../supabase/client';
 import { UserProfile } from '../types';
+import { log } from '../logger';
 
 interface UseSessionActionsParams {
   profile: UserProfile | null;
@@ -18,7 +19,7 @@ export function useSessionActions({ profile, showToast }: UseSessionActionsParam
       await navigator.clipboard.writeText(textToCopy);
       showToast('Identity Code copied to clipboard');
     } catch (err) {
-      console.error('Clipboard access denied:', err);
+      log.error('Clipboard access denied:', err);
       showToast('Browser blocked copy. Please select text manually.');
     }
   };

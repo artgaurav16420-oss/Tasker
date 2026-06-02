@@ -1,7 +1,7 @@
 // src/components/Dashboard.tsx
 import { useState, useEffect, useCallback, useMemo, useRef, FormEvent } from "react";
 import { useAuthStore } from "../lib/store";
-import { Task, UserProfile, PersonalTask, Report, NewTaskForm, NewPersonalTaskForm, ConfirmDialogState } from "../lib/types";
+import { Task, UserProfile, PersonalTask, Report } from "../lib/types";
 import { supabase } from "../lib/supabase/client";
 import { motion, AnimatePresence } from "motion/react";
 import { Users, LayoutGrid, CheckCircle, LogOut, Copy, Activity, Settings, SunMoon } from "lucide-react";
@@ -28,6 +28,7 @@ import { useThemeStore } from "../lib/hooks/useThemeStore";
 import { useTaskOperations } from "../lib/hooks/useTaskOperations";
 import { useTeamManagement } from "../lib/hooks/useTeamManagement";
 import { useDashboardData } from "../lib/hooks/useDashboardData";
+import { useDashboardModals } from "../lib/hooks/useDashboardModals";
 import { useSessionActions } from "../lib/hooks/useSessionActions";
 import { useReducedMotion } from "../lib/hooks/useReducedMotion";
 import { getDeadlineStyle } from "../lib/utils";
@@ -60,20 +61,24 @@ export default function Dashboard() {
 
   const [activeTab, setActiveTab] = useState<"command" | "assigned-to-me" | "my-tasks" | "team" | "personnel" | "settings">("assigned-to-me");
 
-  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [isPersonalTaskModalOpen, setIsPersonalTaskModalOpen] = useState(false);
-  const [newTask, setNewTask] = useState<NewTaskForm>({ title: "", description: "", employeeId: "", timelineEnd: "", priority: "medium" });
-  const [newPersonalTask, setNewPersonalTask] = useState<NewPersonalTaskForm>({ title: "", timelineEnd: "" });
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [selectedTaskDetails, setSelectedTaskDetails] = useState<Task | null>(null);
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
-  const [selectedEmployee, setSelectedEmployee] = useState<UserProfile | null>(null);
-  const [reportContent, setReportContent] = useState("");
-  const [isSubmittingReport, setIsSubmittingReport] = useState(false);
-  const [isCreatingTask, setIsCreatingTask] = useState(false);
-  const [isUpdatingTask, setIsUpdatingTask] = useState(false);
-  const [isDeletingTask, setIsDeletingTask] = useState(false);
-  const [isTogglingPersonalTask, setIsTogglingPersonalTask] = useState(false);
+  const {
+    isTaskModalOpen, setIsTaskModalOpen,
+    isPersonalTaskModalOpen, setIsPersonalTaskModalOpen,
+    newTask, setNewTask,
+    newPersonalTask, setNewPersonalTask,
+    selectedTask, setSelectedTask,
+    selectedTaskDetails, setSelectedTaskDetails,
+    editingTask, setEditingTask,
+    selectedEmployee, setSelectedEmployee,
+    reportContent, setReportContent,
+    isSubmittingReport, setIsSubmittingReport,
+    isCreatingTask, setIsCreatingTask,
+    isUpdatingTask, setIsUpdatingTask,
+    isDeletingTask, setIsDeletingTask,
+    isTogglingPersonalTask, setIsTogglingPersonalTask,
+    confirmDialog, setConfirmDialog,
+    isConfirming, setIsConfirming,
+  } = useDashboardModals();
   const [managerCode, setManagerCode] = useState("");
   const [isJoining, setIsJoining] = useState(false);
   const [memberCode, setMemberCode] = useState("");
@@ -113,15 +118,6 @@ export default function Dashboard() {
     });
     if (!available.includes(activeTab)) setActiveTab(available[0]);
   }, [isManager, isOperative]);
-
-  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState>({
-    isOpen: false,
-    title: "",
-    message: "",
-    onConfirm: () => {},
-    confirmText: "Confirm",
-  });
-  const [isConfirming, setIsConfirming] = useState(false);
 
   const showToast = useCallback((msg: string, type: 'success' | 'error' | 'info' = 'info') => {
     setToastQueue((prev) => [...prev, { message: msg, type }]);

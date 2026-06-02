@@ -1,6 +1,7 @@
 import type { FormEvent, Dispatch, SetStateAction } from 'react';
 import { supabase } from '../supabase/client';
 import { UserProfile, Task, PersonalTask, NewTaskForm, ConfirmDialogState, Report } from '../types';
+import { log } from '../logger';
 
 interface UseTaskOperationsParams {
   profile: UserProfile | null;
@@ -76,9 +77,9 @@ export function useTaskOperations({
         userId: profile.uid,
         event: 'TASK_CREATED',
         newValue: 'Operation Initialized'
-      }).then(({ error }) => { if (error) console.error('Failed to create audit log:', error); });
+      }).then(({ error }) => { if (error) log.error('Failed to create audit log:', error); });
     } catch (err) {
-      console.error(err);
+      log.error(err);
       showToast('Failed to create task. Please try again.', 'error');
     } finally {
       setIsCreatingTask?.(false);
@@ -122,7 +123,7 @@ export function useTaskOperations({
       }
       showToast('Task updated successfully', 'success');
     } catch (err) {
-      console.error(err);
+      log.error(err);
       showToast('Failed to update task. Please try again.', 'error');
     } finally {
       setIsUpdatingTask?.(false);
@@ -151,7 +152,7 @@ export function useTaskOperations({
           showToast('Task and associated reports purged.', 'success');
           setSelectedTaskDetails(null);
         } catch (err) {
-          console.error(err);
+          log.error(err);
           showToast('Failed to delete task. Please try again.', 'error');
         } finally {
           setIsDeletingTask?.(false);
@@ -197,9 +198,9 @@ export function useTaskOperations({
         event: 'STATUS_TRANSITION',
         oldValue: oldStatus,
         newValue: newStatus
-      }).then(({ error }) => { if (error) console.error('Failed to create audit log:', error); });
+      }).then(({ error }) => { if (error) log.error('Failed to create audit log:', error); });
     } catch (err) {
-      console.error(err);
+      log.error(err);
       showToast(`Failed to update status to ${newStatus}. Please try again.`, 'error');
     }
   };
@@ -232,7 +233,7 @@ export function useTaskOperations({
       setIsPersonalTaskModalOpen(false);
       showToast('Personal task added', 'success');
     } catch (err) {
-      console.error(err);
+      log.error(err);
       showToast('Failed to add personal task. Please try again.', 'error');
     }
   };
@@ -248,7 +249,7 @@ export function useTaskOperations({
         .throwOnError();
       onPersonalTaskToggled?.(taskId, newStatus as PersonalTask['status']);
     } catch (err) {
-      console.error(err);
+      log.error(err);
       showToast('Failed to update task. Please try again.', 'error');
     } finally {
       setIsTogglingPersonalTask?.(false);
@@ -268,7 +269,7 @@ export function useTaskOperations({
           onPersonalTaskDeleted?.(taskId);
           showToast('Task Deleted', 'success');
         } catch (err) {
-          console.error(err);
+          log.error(err);
           showToast('Operation failed. Please try again.', 'error');
         }
         setConfirmDialog((p) => ({ ...p, isOpen: false }));
@@ -316,7 +317,7 @@ export function useTaskOperations({
       setReportContent('');
       setSelectedTask(null);
     } catch (err) {
-      console.error(err);
+      log.error(err);
       showToast('Operation failed. Please try again.', 'error');
     } finally {
       setIsSubmittingReport(false);
