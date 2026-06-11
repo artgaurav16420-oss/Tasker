@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useAuthStore, initAuth } from './lib/store';
 import AuthScreen from './components/AuthScreen';
 import Dashboard from './components/Dashboard';
+import { ToastProvider } from './components/providers/ToastProvider';
 
 export default function App() {
   const { user, loading } = useAuthStore();
@@ -21,5 +22,5 @@ export default function App() {
     );
   }
 
-  return user ? <Dashboard /> : <AuthScreen />;
+  return user ? <ToastProvider><Dashboard /></ToastProvider> : <AuthScreen />;
 }

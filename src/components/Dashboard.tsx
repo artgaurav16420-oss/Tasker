@@ -24,6 +24,7 @@ import { Avatar } from "./Avatar";
 import { Skeleton } from "./Skeleton";
 import { SkipLink } from "./SkipLink";
 import { useThemeStore } from "../lib/hooks/useThemeStore";
+import { ToastProvider, useToast } from "./providers/ToastProvider";
 
 import { useTaskOperations } from "../lib/hooks/useTaskOperations";
 import { useTeamManagement } from "../lib/hooks/useTeamManagement";
@@ -83,15 +84,10 @@ export default function Dashboard() {
   const [isJoining, setIsJoining] = useState(false);
   const [memberCode, setMemberCode] = useState("");
   const [isAddingMember, setIsAddingMember] = useState(false);
-  interface Toast { message: string; type: 'success' | 'error' | 'info' }
-  const [toastQueue, setToastQueue] = useState<Toast[]>([]);
-  const toastTimersRef = useRef<number[]>([]);
-
   const superiorIdsCache = useMemo(() => {
-    if (!profile) return "[]";
-    const ids = new Set([...(profile.managerIds || [])]);
-    return JSON.stringify(Array.from(ids).sort());
-  }, [profile?.managerIds]);
+    if (!profile?.managerIds?.length) return "[]";
+    return JSON.stringify([...profile.managerIds].sort());
+  }, [JSON.stringify(profile?.managerIds)]);
 
   // Custom Hook for Data Fetching & Subscriptions
   const { employees, setEmployees, myTasks, setMyTasks, teamTasks, setTeamTasks, managedReports, setManagedReports, personalTasks, setPersonalTasks, superiors, setSuperiors, error, isLoading, refetch } = useDashboardData(profile, superiorIdsCache);
@@ -119,21 +115,7 @@ export default function Dashboard() {
     if (!available.includes(activeTab)) setActiveTab(available[0]);
   }, [isManager, isOperative]);
 
-  const showToast = useCallback((msg: string, type: 'success' | 'error' | 'info' = 'info') => {
-    setToastQueue((prev) => [...prev, { message: msg, type }]);
-    const timer = window.setTimeout(() => {
-      setToastQueue((prev) => prev.slice(1));
-      toastTimersRef.current = toastTimersRef.current.filter(t => t !== timer);
-    }, type === 'error' ? 6000 : 3000);
-    toastTimersRef.current.push(timer);
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      toastTimersRef.current.forEach(clearTimeout);
-      toastTimersRef.current = [];
-    };
-  }, []);
+  const showToast = useToast();
 
   useEffect(() => {
     if (selectedTask === null) setReportContent("");
@@ -550,17 +532,6 @@ export default function Dashboard() {
           )}
         </AnimatePresence>
 
-        <AnimatePresence>
-          {toastQueue[0] && (
-            <motion.div key={toastQueue[0].message + toastQueue[0].type} initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 50, scale: 0.9 }} animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }} exit={reducedMotion ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: 50, scale: 0.9, transition: { duration: 0.12 } }} transition={reducedMotion ? { duration: 0 } : { duration: 0.3, ease: "easeOut" }} role="status" aria-live="polite" className={`fixed bottom-10 right-10 z-[120] font-mono text-xs uppercase tracking-[0.25em] font-black px-10 py-5 border rounded-xl shadow-xl ${
-              toastQueue[0].type === 'error' ? 'bg-orange-500 text-white border-orange-400 shadow-orange-500/20' :
-              toastQueue[0].type === 'success' ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-emerald-500/20' :
-              'bg-slate-800 dark:bg-slate-900 text-white border-slate-700 shadow-slate-500/20'
-            }`}>
-              {toastQueue[0].message}
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
     </ErrorBoundary>
   );

@@ -13,8 +13,17 @@ export function useSessionActions({ profile, showToast }: UseSessionActionsParam
     if (!textToCopy) return;
 
     try {
-      if (!navigator.clipboard) {
-        throw new Error('Clipboard API not available');
+      if (!navigator.clipboard || !window.isSecureContext) {
+        const ta = document.createElement('textarea');
+        ta.value = textToCopy;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast('Identity Code copied to clipboard');
+        return;
       }
       await navigator.clipboard.writeText(textToCopy);
       showToast('Identity Code copied to clipboard');

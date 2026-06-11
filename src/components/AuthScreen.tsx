@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
-import { Mail, Lock, Eye, EyeOff, User as UserIcon, LogIn, UserPlus } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, User as UserIcon, LogIn, UserPlus, RotateCw } from 'lucide-react';
 import { supabase } from '../lib/supabase/client';
 import { Logo } from './Logo';
 import { useReducedMotion } from '../lib/hooks/useReducedMotion';
@@ -14,7 +14,28 @@ export default function AuthScreen() {
   const [loading, setLoading] = useState(false);
   const [verificationSent, setVerificationSent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
   const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (resendTimer <= 0) return;
+    const id = setInterval(() => setResendTimer((t) => t - 1), 1000);
+    return () => clearInterval(id);
+  }, [resendTimer]);
+
+  const handleResend = useCallback(async () => {
+    if (resendTimer > 0) return;
+    setError('');
+    const { error: resendError } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+    });
+    if (resendError) {
+      setError(resendError.message);
+    } else {
+      setResendTimer(60);
+    }
+  }, [email, resendTimer]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,11 +93,20 @@ export default function AuthScreen() {
             </div>
             <h2 className="font-mono font-black -tracking-[0.025em] uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100 mb-3">Verify Your Email</h2>
             <p className="font-mono text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-              A verification link has been sent to <span className="text-emerald-600 font-mono text-xs">{email}</span>. Click the link to activate your account, then log in.
+              A verification link has been sent to <span className="text-emerald-600 font-mono text-xs">{email}</span>.
+              Check your inbox (and spam folder) then click the link to activate your account.
             </p>
             <button
+              onClick={handleResend}
+              disabled={resendTimer > 0}
+              className="mt-4 w-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl py-3 font-mono font-bold text-xs uppercase tracking-[0.2em] hover:bg-slate-200 dark:hover:bg-slate-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+            >
+              <RotateCw className={`w-4 h-4 ${resendTimer > 0 ? '' : ''}`} />
+              {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend Verification Email'}
+            </button>
+            <button
               onClick={() => { setVerificationSent(false); setIsLogin(true); }}
-              className="mt-8 w-full bg-emerald-500 text-slate-950 rounded-xl py-4 font-mono font-bold text-xs uppercase tracking-[0.2em] hover:bg-emerald-400 transition-all focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+              className="mt-4 w-full bg-emerald-500 text-slate-950 rounded-xl py-4 font-mono font-bold text-xs uppercase tracking-[0.2em] hover:bg-emerald-400 transition-all focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
             >
               Back to Login
             </button>

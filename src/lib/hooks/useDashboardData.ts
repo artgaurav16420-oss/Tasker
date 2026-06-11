@@ -5,6 +5,10 @@ import { Task, UserProfile, PersonalTask, Report } from "../types";
 import { log } from "../logger";
 
 const MAX_SUPERIORS_REALTIME = 10;
+const INITIAL_POLL_INTERVAL = 3000;
+const MAX_POLL_INTERVAL = 30000;
+const BACKOFF_MULTIPLIER = 2;
+const POLL_RESET_EVENTS = 3;
 
 export function useDashboardData(profile: UserProfile | null, superiorIds: string) {
   const [employees, setEmployees] = useState<UserProfile[]>([]);
@@ -26,6 +30,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
   const superiorSeqRef = useRef(0);
   const mountedRef = useRef(true);
   const stateRef = useRef({ employees, superiors });
+  const channelActivityRef = useRef(0);
 
   useEffect(() => {
     return () => { mountedRef.current = false; };
@@ -195,6 +200,8 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
     };
 
     const handleUserChange = (payload: RealtimePostgresChangesPayload<{ uid: string; managerIds: string[]; name: string; email: string; createdAt: string }>) => {
+      if (cancelled) return;
+      channelActivityRef.current++;
       const newManagerIdsRaw = (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE')
         ? ((payload.new as Record<string, unknown>)?.managerIds as unknown)
         : undefined;
@@ -204,27 +211,45 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
       const safeNewManagerIds = parsePgArray(newManagerIdsRaw);
       const safeOldManagerIds = parsePgArray(oldManagerIdsRaw);
 
+      const changedUid = (payload.new as Record<string, unknown>)?.uid as string | undefined || (payload.old as Record<string, unknown>)?.uid as string | undefined;
+
       const relationshipTouchesViewer =
         safeNewManagerIds.includes(profile.uid) ||
         safeOldManagerIds.includes(profile.uid);
 
-      const changedUid = (payload.new as Record<string, unknown>)?.uid as string | undefined || (payload.old as Record<string, unknown>)?.uid as string | undefined;
       const relevantIds = new Set([
         ...stateRef.current.employees.map(e => e.uid),
         ...stateRef.current.superiors.map(s => s.uid),
         profile.uid
       ]);
 
+      if (changedUid === profile.uid && payload.eventType === 'UPDATE') {
+        const added = safeNewManagerIds.filter((id) => !safeOldManagerIds.includes(id));
+        const removed = safeOldManagerIds.filter((id) => !safeNewManagerIds.includes(id));
+        if (added.length > 0 || removed.length > 0) {
+          const limited = safeNewManagerIds.slice(0, MAX_SUPERIORS_REALTIME);
+          void supabase.from("users").select("*").in("uid", limited).then(({ data }) => {
+            if (data) setSuperiors(data as UserProfile[]);
+          });
+        }
+        const oldKeys = Object.keys(payload.old as Record<string, unknown>);
+        const nonManagerChanged = oldKeys.some(
+          (key) => key !== 'managerIds' && JSON.stringify((payload.old as Record<string, unknown>)[key]) !== JSON.stringify((payload.new as Record<string, unknown>)[key])
+        );
+        if (!nonManagerChanged && !relationshipTouchesViewer) return;
+      }
+
       if (relationshipTouchesViewer || (changedUid !== undefined && relevantIds.has(changedUid))) {
         if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
         debounceTimerRef.current = setTimeout(() => {
-          fetchAll();
+          if (!cancelled) fetchAll();
         }, 300);
       }
     };
 
     const handleTaskInsert = (payload: RealtimePostgresChangesPayload<Task>) => {
       if (cancelled) return;
+      channelActivityRef.current++;
       const task = payload.new as Task;
       if (task.employeeId === profile.uid) {
         setMyTasks((prev) => prev.some((t) => t.id === task.id) ? prev : [...prev, task]);
@@ -236,6 +261,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
 
     const handleTaskUpdate = (payload: RealtimePostgresChangesPayload<Task>) => {
       if (cancelled) return;
+      channelActivityRef.current++;
       const updated = payload.new as Task;
       const old = payload.old as Task;
       if (!updated?.id) return;
@@ -258,12 +284,15 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
 
       if (affectsViewer) {
         if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-        debounceTimerRef.current = setTimeout(() => fetchAll(), 300);
+        debounceTimerRef.current = setTimeout(() => {
+          if (!cancelled) fetchAll();
+        }, 300);
       }
     };
 
     const handleTaskDelete = (payload: RealtimePostgresChangesPayload<Task>) => {
       if (cancelled) return;
+      channelActivityRef.current++;
       const old = payload.old as Task;
       if (!old?.id) return;
 
@@ -277,6 +306,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
 
     const handleReportChange = async (payload: RealtimePostgresChangesPayload<Report>) => {
       if (cancelled) return;
+      channelActivityRef.current++;
       if (payload.eventType === 'INSERT') {
         const report = payload.new as Report;
         setManagedReports((prev) => prev.some((r) => r.id === report.id) ? prev : [...prev, report]);
@@ -293,6 +323,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
 
     const handlePersonalTaskInsert = (payload: RealtimePostgresChangesPayload<PersonalTask>) => {
       if (cancelled) return;
+      channelActivityRef.current++;
       const task = payload.new as PersonalTask;
       setPersonalTasks((prev) => {
         if (prev.some((t) => t.id === task.id)) return prev;
@@ -302,6 +333,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
 
     const handlePersonalTaskUpdate = (payload: RealtimePostgresChangesPayload<PersonalTask>) => {
       if (cancelled) return;
+      channelActivityRef.current++;
       const updated = payload.new as PersonalTask;
       if (!updated?.id) return;
       setPersonalTasks((prev) => prev.map((t) => t.id === updated.id ? updated : t));
@@ -309,6 +341,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
 
     const handlePersonalTaskDelete = (payload: RealtimePostgresChangesPayload<PersonalTask>) => {
       if (cancelled) return;
+      channelActivityRef.current++;
       const old = payload.old as PersonalTask;
       if (!old?.id) return;
       setPersonalTasks((prev) => prev.filter((t) => t.id !== old.id));
@@ -346,33 +379,74 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
     };
   }, [profile?.uid, recoveryKey]);
 
-  // Polling fallback: refetch every 3s when tab is visible
+  // Adaptive polling: exponential backoff 3s-30s, reset on realtime activity
   useEffect(() => {
     let mounted = true;
+    let pollTimer: ReturnType<typeof setTimeout> | null = null;
+    let emptyPollCount = 0;
+    let currentInterval = INITIAL_POLL_INTERVAL;
+    let lastActivityCount = 0;
+
+    const scheduleNext = () => {
+      if (!mounted) return;
+      pollTimer = setTimeout(poll, currentInterval);
+    };
 
     const poll = () => {
       if (!mounted) return;
-      if (document.visibilityState === 'visible') {
-        fetchAllRef.current().finally(() => {
-          if (mounted) setTimeout(poll, 3000);
-        });
-      } else {
-        if (mounted) setTimeout(poll, 3000);
+      if (document.visibilityState !== 'visible') {
+        scheduleNext();
+        return;
       }
+      fetchAllRef.current().finally(() => {
+        if (!mounted) return;
+        const activitySinceLastPoll = channelActivityRef.current - lastActivityCount;
+        lastActivityCount = channelActivityRef.current;
+        if (activitySinceLastPoll >= POLL_RESET_EVENTS) {
+          currentInterval = INITIAL_POLL_INTERVAL;
+          emptyPollCount = 0;
+        } else {
+          emptyPollCount++;
+          if (emptyPollCount >= 5) {
+            currentInterval = Math.min(currentInterval * BACKOFF_MULTIPLIER, MAX_POLL_INTERVAL);
+            emptyPollCount = 0;
+          }
+        }
+        scheduleNext();
+      });
     };
 
     const onVisible = () => {
       if (document.visibilityState === 'visible') {
+        currentInterval = INITIAL_POLL_INTERVAL;
+        emptyPollCount = 0;
+        lastActivityCount = channelActivityRef.current;
         fetchAllRef.current();
       }
     };
     document.addEventListener('visibilitychange', onVisible);
 
-    const timer = setTimeout(poll, 3000);
+    const healthCheck = setInterval(() => {
+      if (!mounted) return;
+      const channels = activeChannelsRef.current;
+      let unhealthyCount = 0;
+      channels.forEach((ch) => {
+        const state = ch.state;
+        if (state !== 'joined' && state !== 'joining') unhealthyCount++;
+      });
+      if (unhealthyCount > channels.size / 2 && channels.size > 0) {
+        currentInterval = INITIAL_POLL_INTERVAL;
+        emptyPollCount = 0;
+        lastActivityCount = channelActivityRef.current;
+      }
+    }, 60000);
+
+    scheduleNext();
 
     return () => {
       mounted = false;
-      clearTimeout(timer);
+      if (pollTimer) clearTimeout(pollTimer);
+      clearInterval(healthCheck);
       document.removeEventListener('visibilitychange', onVisible);
     };
   }, []);

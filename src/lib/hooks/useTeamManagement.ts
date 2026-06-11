@@ -2,6 +2,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import { supabase } from '../supabase/client';
 import { UserProfile, ConfirmDialogState } from '../types';
 import { log } from '../logger';
+import { mapPgError } from '../errors';
 
 interface UseTeamManagementProps {
   profile: UserProfile | null;
@@ -76,8 +77,7 @@ export function useTeamManagement({
       refetchData?.();
     } catch (err: unknown) {
       log.error(err);
-      const message = err instanceof Error ? err.message : "Failed to add manager. Check the code and try again.";
-      showToast(message);
+      showToast(mapPgError(err).message);
     } finally {
       setIsJoining(false);
     }
@@ -124,8 +124,7 @@ export function useTeamManagement({
       refetchData?.();
     } catch (err: unknown) {
       log.error(err);
-      const message = err instanceof Error ? err.message : "Failed to add team member. Security protocols may be blocking this request.";
-      showToast(message);
+      showToast(mapPgError(err).message);
     } finally {
       setIsAddingMember(false);
     }
@@ -154,7 +153,7 @@ export function useTeamManagement({
           refetchData?.();
         } catch (error) {
           log.error("Error removing superior:", error);
-          showToast("Failed to disconnect. Please try again.");
+          showToast(mapPgError(error).message);
         } finally {
           setConfirmDialog((p) => ({ ...p, isOpen: false }));
         }
@@ -190,7 +189,7 @@ export function useTeamManagement({
           if (errMsg.includes('function does not exist')) {
             showToast("Server-side function missing. Contact administrator.");
           } else {
-            showToast("Failed to remove member. Please try again.");
+            showToast(mapPgError(error).message);
           }
         } finally {
           setConfirmDialog((p) => ({ ...p, isOpen: false }));

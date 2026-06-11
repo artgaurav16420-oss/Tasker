@@ -32,7 +32,7 @@ export default function TeamOperationsBoard({
   const teamGroupedActiveTasks = useMemo(() => {
     const grouped: Record<string, Task[]> = {};
     teamTasks.filter((t) => t.status !== "completed").forEach((task) => {
-      const empId = task.employeeId || "unknown";
+      const empId = task.employeeId ?? "unassigned";
       if (!grouped[empId]) grouped[empId] = [];
       grouped[empId].push(task);
     });
@@ -42,7 +42,7 @@ export default function TeamOperationsBoard({
   const teamGroupedCompletedTasks = useMemo(() => {
     const grouped: Record<string, Task[]> = {};
     teamTasks.filter((t) => t.status === "completed").forEach((task) => {
-      const empId = task.employeeId || "unknown";
+      const empId = task.employeeId ?? "unassigned";
       if (!grouped[empId]) grouped[empId] = [];
       grouped[empId].push(task);
     });
@@ -83,7 +83,8 @@ export default function TeamOperationsBoard({
             )}
             {Object.entries(teamGroupedActiveTasks).map(([employeeId, tasks]) => {
               const employee = employees.find((e) => e.uid === employeeId);
-              const employeeName = employee?.name || (employeeId === "unknown" ? "Unassigned" : `Former Member [${employeeId.slice(0, 8)}]`);
+              const isDeleted = !employee && employeeId !== "unassigned";
+              const employeeName = employee?.name ?? (employeeId === "unassigned" ? "Unassigned" : `Former Member [${employeeId.slice(0, 8)}]`);
               const isCollapsed = collapsedGroups[`team_active_${employeeId}`];
               const toggleGroup = () => setCollapsedGroups((prev) => ({ ...prev, [`team_active_${employeeId}`]: !prev[`team_active_${employeeId}`] }));
 
@@ -93,11 +94,11 @@ export default function TeamOperationsBoard({
               return (
                 <div key={`team_active_${employeeId}`} className="space-y-6">
                   <div
-                    className={`flex items-center gap-6 px-1 cursor-pointer group/header ${!employee && employeeId !== "unknown" ? "opacity-60" : ""}`}
+                    className={`flex items-center gap-6 px-1 cursor-pointer group/header ${isDeleted ? "opacity-60" : ""}`}
                     onClick={toggleGroup}
                   >
-                    <div className={`w-2 h-2 rotate-45 shrink-0 shadow-sm ${!employee && employeeId !== "unknown" ? "bg-slate-400 shadow-slate-500/20" : "bg-emerald-500 shadow-emerald-500/20"}`}></div>
-                     <h3 className={`font-mono text-xs font-black uppercase tracking-[0.3em] whitespace-nowrap transition-colors border-none p-0 bg-transparent flex items-center ${!employee && employeeId !== "unknown" ? "text-slate-400 dark:text-slate-500 group-hover/header:text-slate-600 dark:group-hover/header:text-slate-400 line-through" : "text-slate-600 dark:text-slate-400 group-hover/header:text-emerald-600"}`}>
+                    <div className={`w-2 h-2 rotate-45 shrink-0 shadow-sm ${isDeleted ? "bg-slate-400 shadow-slate-500/20" : "bg-emerald-500 shadow-emerald-500/20"}`}></div>
+                     <h3 className={`font-mono text-xs font-black uppercase tracking-[0.3em] whitespace-nowrap transition-colors border-none p-0 bg-transparent flex items-center ${isDeleted ? "text-slate-400 dark:text-slate-500 group-hover/header:text-slate-600 dark:group-hover/header:text-slate-400 line-through" : "text-slate-600 dark:text-slate-400 group-hover/header:text-emerald-600"}`}>
                        Assigned To: {employeeName} <span className="ml-2 opacity-60 no-underline">({activeEmployeeTasks.length})</span>
                      </h3>
                      <div className="h-[1px] flex-1 bg-gradient-to-r from-slate-200 dark:from-slate-700 to-transparent"></div>
@@ -209,15 +210,16 @@ export default function TeamOperationsBoard({
             )}
             {Object.entries(teamGroupedCompletedTasks).map(([employeeId, tasks]) => {
               const employee = employees.find((e) => e.uid === employeeId);
-              const employeeName = employee?.name || (employeeId === "unknown" ? "Unassigned" : `Former Member [${employeeId.slice(0, 8)}]`);
+              const isDeleted = !employee && employeeId !== "unassigned";
+              const employeeName = employee?.name ?? (employeeId === "unassigned" ? "Unassigned" : `Former Member [${employeeId.slice(0, 8)}]`);
               const isCollapsed = collapsedGroups[`team_completed_${employeeId}`];
               const toggleGroup = () => setCollapsedGroups((prev) => ({ ...prev, [`team_completed_${employeeId}`]: !prev[`team_completed_${employeeId}`] }));
 
               return (
                 <div key={`team_completed_${employeeId}`} className="space-y-6">
-                  <div className={`flex items-center gap-6 px-1 cursor-pointer group/header ${!employee && employeeId !== "unknown" ? "opacity-60" : ""}`} onClick={toggleGroup}>
-                    <div className={`w-2 h-2 rotate-45 shrink-0 ${!employee && employeeId !== "unknown" ? "bg-slate-300" : "bg-slate-500"}`}></div>
-                    <h3 className={`font-mono text-xs font-black uppercase tracking-[0.3em] whitespace-nowrap transition-colors border-none p-0 bg-transparent flex items-center ${!employee && employeeId !== "unknown" ? "text-slate-400 dark:text-slate-500 group-hover/header:text-slate-600 dark:group-hover/header:text-slate-400 line-through" : "text-slate-700 dark:text-slate-300 group-hover/header:text-slate-900 dark:group-hover/header:text-slate-100"}`}>
+                  <div className={`flex items-center gap-6 px-1 cursor-pointer group/header ${isDeleted ? "opacity-60" : ""}`} onClick={toggleGroup}>
+                    <div className={`w-2 h-2 rotate-45 shrink-0 ${isDeleted ? "bg-slate-300" : "bg-slate-500"}`}></div>
+                    <h3 className={`font-mono text-xs font-black uppercase tracking-[0.3em] whitespace-nowrap transition-colors border-none p-0 bg-transparent flex items-center ${isDeleted ? "text-slate-400 dark:text-slate-500 group-hover/header:text-slate-600 dark:group-hover/header:text-slate-400 line-through" : "text-slate-700 dark:text-slate-300 group-hover/header:text-slate-900 dark:group-hover/header:text-slate-100"}`}>
                       Assigned To: {employeeName} <span className="ml-2 opacity-80 no-underline">({tasks.length})</span>
                     </h3>
                     <div className="h-[1px] flex-1 bg-gradient-to-r from-slate-200 dark:from-slate-700 to-transparent"></div>

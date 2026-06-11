@@ -4,6 +4,21 @@ Karpathy Guidelines v3.6 MANDATORY: For all AI operations in this project, you M
 
 All AI agents working in this codebase must follow these rules. No exceptions.
 
+## Quick Reference — Karpathy Rules (condensed)
+- **R1 Security**: User input → dangerous primitive = HALT
+- **R2 Simplify**: No unrequested abstractions; prefer stdlib
+- **R3 Touch Minimum**: Don't improve adjacent code; match existing style
+- **R4 Verify**: Define success criterion before coding; loop until passes
+- **R5 Observable**: Document perf/failure/API/UI changes before implementing
+- **Triviality Check**: Skip full verification only for <20 lines, no logic changes, no new imports/branches
+
+---
+
+## OpenCode Config
+- `.opencode/opencode.json`: Plugins (graphify, superpowers, karpathy, caveman, etc.), MCP (context7), permissions (.env* ask, npm commands ask)
+- Base skills auto-loaded: `karpathy-guidelines`, `caveman`, `auto-skill-select` (via global AGENTS.md hook)
+- Task skills auto-matched from `.skills-index.json` — re-runs on every task change
+
 ---
 
 ## Tech Stack
@@ -12,6 +27,7 @@ All AI agents working in this codebase must follow these rules. No exceptions.
 - Supabase (Auth, Postgres, Realtime). Auth uses `sessionStorage` — sessions don't survive tab close.
 - Framer Motion (`motion/react`), Lucide React (icons), Recharts (charts)
 - `@/` path alias maps to project root (not `src/`)
+- Logger (`src/lib/logger.ts`): dev-only console output. Use `log.error()`, `log.warn()`, `log.info()` — no raw `console.*` in app code.
 
 ## Entrypoint & Module Layout
 ```

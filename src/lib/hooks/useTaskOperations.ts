@@ -2,6 +2,7 @@ import type { FormEvent, Dispatch, SetStateAction } from 'react';
 import { supabase } from '../supabase/client';
 import { UserProfile, Task, PersonalTask, NewTaskForm, ConfirmDialogState, Report } from '../types';
 import { log } from '../logger';
+import { mapPgError } from '../errors';
 
 interface UseTaskOperationsParams {
   profile: UserProfile | null;
@@ -80,7 +81,7 @@ export function useTaskOperations({
       }).then(({ error }) => { if (error) log.error('Failed to create audit log:', error); });
     } catch (err) {
       log.error(err);
-      showToast('Failed to create task. Please try again.', 'error');
+      showToast(mapPgError(err).message, 'error');
     } finally {
       setIsCreatingTask?.(false);
     }
@@ -124,7 +125,7 @@ export function useTaskOperations({
       showToast('Task updated successfully', 'success');
     } catch (err) {
       log.error(err);
-      showToast('Failed to update task. Please try again.', 'error');
+      showToast(mapPgError(err).message, 'error');
     } finally {
       setIsUpdatingTask?.(false);
     }
@@ -153,7 +154,7 @@ export function useTaskOperations({
           setSelectedTaskDetails(null);
         } catch (err) {
           log.error(err);
-          showToast('Failed to delete task. Please try again.', 'error');
+          showToast(mapPgError(err).message, 'error');
         } finally {
           setIsDeletingTask?.(false);
           setConfirmDialog((p) => ({ ...p, isOpen: false }));
@@ -201,7 +202,7 @@ export function useTaskOperations({
       }).then(({ error }) => { if (error) log.error('Failed to create audit log:', error); });
     } catch (err) {
       log.error(err);
-      showToast(`Failed to update status to ${newStatus}. Please try again.`, 'error');
+      showToast(mapPgError(err).message, 'error');
     }
   };
 
@@ -234,7 +235,7 @@ export function useTaskOperations({
       showToast('Personal task added', 'success');
     } catch (err) {
       log.error(err);
-      showToast('Failed to add personal task. Please try again.', 'error');
+      showToast(mapPgError(err).message, 'error');
     }
   };
 
@@ -250,7 +251,7 @@ export function useTaskOperations({
       onPersonalTaskToggled?.(taskId, newStatus as PersonalTask['status']);
     } catch (err) {
       log.error(err);
-      showToast('Failed to update task. Please try again.', 'error');
+      showToast(mapPgError(err).message, 'error');
     } finally {
       setIsTogglingPersonalTask?.(false);
     }
@@ -270,7 +271,7 @@ export function useTaskOperations({
           showToast('Task Deleted', 'success');
         } catch (err) {
           log.error(err);
-          showToast('Operation failed. Please try again.', 'error');
+          showToast(mapPgError(err).message, 'error');
         }
         setConfirmDialog((p) => ({ ...p, isOpen: false }));
       },
@@ -318,7 +319,7 @@ export function useTaskOperations({
       setSelectedTask(null);
     } catch (err) {
       log.error(err);
-      showToast('Operation failed. Please try again.', 'error');
+      showToast(mapPgError(err).message, 'error');
     } finally {
       setIsSubmittingReport(false);
     }
