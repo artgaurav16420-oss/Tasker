@@ -1,6 +1,9 @@
 import { UserProfile } from '../../lib/types';
-import { Settings, Shield, ShieldAlert, LogOut, Copy, UserPlus, Users } from 'lucide-react';
+import { Settings, Shield, ShieldAlert, LogOut, Copy, UserPlus, Users, Lock } from 'lucide-react';
 import { useSessionActions } from '../../lib/hooks/useSessionActions';
+import { supabase } from '../../lib/supabase/client';
+import { log } from '../../lib/logger';
+import { useState } from 'react';
 
 interface SettingsPanelProps {
   profile: UserProfile | null;
@@ -37,6 +40,47 @@ export default function SettingsPanel({
 }: SettingsPanelProps) {
 
   const { copyId, handleLogout } = useSessionActions({ profile, showToast });
+
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [changingPasswordError, setChangingPasswordError] = useState('');
+  const [isChanging, setIsChanging] = useState(false);
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setChangingPasswordError('');
+    if (newPassword !== confirmPassword) {
+      setChangingPasswordError('Passwords do not match');
+      return;
+    }
+    if (newPassword.length < 8) {
+      setChangingPasswordError('Password must be at least 8 characters');
+      return;
+    }
+    setIsChanging(true);
+    try {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: profile?.email || '',
+        password: currentPassword,
+      });
+      if (signInError) throw signInError;
+      
+      const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
+      if (updateError) throw updateError;
+      
+      showToast('Password updated successfully');
+      setIsChangingPassword(false);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err) {
+      setChangingPasswordError(err instanceof Error ? err.message : 'Failed to update password');
+    } finally {
+      setIsChanging(false);
+    }
+  };
 
   return (
     <div className="space-y-8 pb-12">
@@ -142,6 +186,82 @@ export default function SettingsPanel({
                   ))}
                 </div>
               )}
+            </div>
+
+            <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-orange-100 dark:border-orange-500/30 shadow-sm shadow-orange-500/5 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full bg-orange-500"></div>
+              <h3 className="font-mono text-xs uppercase tracking-widest font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+                <Shield className="w-4 h-4 text-orange-500" /> Change Password
+              </h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                Enter your current password and a new password to update your credentials.
+              </p>
+              <form onSubmit={handleChangePassword} className="space-y-4">
+                <div className="space-y-2">
+                  <label htmlFor="current-password" className="text-sm text-slate-600 dark:text-slate-400">Current Password</label>
+                  <div className="relative group">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-500 group-focus-within:text-orange-500 transition-colors duration-150" />
+                    <input
+                      id="current-password"
+                      type="password"
+                      required
+                      autoComplete="current-password"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl py-3 pl-12 pr-4 text-sm focus:outline-none focus:border-orange-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-orange-500/5 transition-all text-slate-900 dark:text-slate-100"
+                      placeholder="Current password"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="new-password" className="text-sm text-slate-600 dark:text-slate-400">New Password</label>
+                  <div className="relative group">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-500 group-focus-within:text-orange-500 transition-colors duration-150" />
+                    <input
+                      id="new-password"
+                      type="password"
+                      required
+                      autoComplete="new-password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl py-3 pl-12 pr-4 text-sm focus:outline-none focus:border-orange-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-orange-500/5 transition-all text-slate-900 dark:text-slate-100"
+                      placeholder="New password"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="confirm-password" className="text-sm text-slate-600 dark:text-slate-400">Confirm New Password</label>
+                  <div className="relative group">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-500 group-focus-within:text-orange-500 transition-colors duration-150" />
+                    <input
+                      id="confirm-password"
+                      type="password"
+                      required
+                      autoComplete="new-password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl py-3 pl-12 pr-4 text-sm focus:outline-none focus:border-orange-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-orange-500/5 transition-all text-slate-900 dark:text-slate-100"
+                      placeholder="Confirm new password"
+                    />
+                  </div>
+                </div>
+
+                {changingPasswordError && (
+                  <div className="p-3 bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/30 rounded-xl text-orange-600 dark:text-orange-400 text-xs font-mono">
+                    {changingPasswordError}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isChanging}
+                  className="w-full py-3 bg-orange-500 text-white rounded-xl font-mono text-xs font-bold uppercase tracking-widest hover:bg-orange-600 transition-colors duration-150 disabled:opacity-50"
+                >
+                  {isChanging ? "Updating..." : "Update Password"}
+                </button>
+              </form>
             </div>
 
             <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-indigo-100 dark:border-indigo-500/30 shadow-sm shadow-indigo-500/5 relative overflow-hidden">
