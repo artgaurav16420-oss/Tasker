@@ -27,15 +27,14 @@ export function useTeamManagement({
 }: UseTeamManagementProps) {
 
   const resolveUserId = async (input: string) => {
-    const isEmail = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(input);
-    if (isEmail) {
-      const { data, error } = await supabase.from('users').select('uid').eq('email', input).maybeSingle();
-      if (error || !data) {
-        throw new Error("No user found with this email.");
-      }
-      return data.uid;
+    const isUUID = /^[0-9a-f-]{36}$/i.test(input);
+    if (isUUID) return input;
+    const fullEmail = input.includes('@') ? input : `${input}@rrcat.gov.in`;
+    const { data, error } = await supabase.from('users').select('uid').eq('email', fullEmail).maybeSingle();
+    if (error || !data) {
+      throw new Error("No user found with this email.");
     }
-    return input;
+    return data.uid;
   };
 
   const handleUpdateManager = async (

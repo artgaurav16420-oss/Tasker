@@ -9,6 +9,15 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
+// Capture URL hash before Supabase async init clears it
+const initialHash = typeof window !== 'undefined' ? window.location.hash : '';
+
+export function isRecoveryFlow() {
+  if (!initialHash) return false;
+  const params = new URLSearchParams(initialHash.substring(1));
+  return params.get('type') === 'recovery';
+}
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     storage: sessionStorage,

@@ -23,8 +23,15 @@ export default defineConfig({
     },
   },
   server: {
+    host: '0.0.0.0',
     // HMR is disabled in AI Studio via DISABLE_HMR env var.
     // Do not modify—file watching is disabled to prevent flickering during agent edits.
     hmr: process.env.DISABLE_HMR !== 'true',
+    proxy: {
+      '/rest/v1': { target: 'http://10.34.2.206:54421', changeOrigin: true },
+      '/auth/v1': { target: 'http://10.34.2.206:54421', changeOrigin: true },
+      '/realtime/v1': { target: 'http://10.34.2.206:54421', changeOrigin: true, ws: true },
+      '/storage/v1': { target: 'http://10.34.2.206:54421', changeOrigin: true },
+    },
   },
 });

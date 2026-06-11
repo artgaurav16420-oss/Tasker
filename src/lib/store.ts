@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { Session, User } from '@supabase/supabase-js';
-import { supabase } from './supabase/client';
+import { supabase, isRecoveryFlow } from './supabase/client';
 import { UserProfile } from './types';
 import { log } from './logger';
 
@@ -10,16 +10,24 @@ interface AuthState {
   user: User | null;
   profile: UserProfile | null;
   loading: boolean;
+  recoveryMode: boolean;
+  changePasswordMode: boolean;
   setUser: (user: User | null, profile?: UserProfile | null) => void;
   setLoading: (loading: boolean) => void;
+  setRecovery: (recovery: boolean) => void;
+  setChangePasswordMode: (mode: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   profile: null,
   loading: true,
+  recoveryMode: false,
+  changePasswordMode: false,
   setUser: (user, profile = null) => set({ user, profile, loading: false }),
   setLoading: (loading) => set({ loading }),
+  setRecovery: (recovery) => set({ recoveryMode: recovery, loading: false }),
+  setChangePasswordMode: (mode) => set({ changePasswordMode: mode }),
 }));
 
 let globalProfileChannel: ReturnType<typeof supabase.channel> | null = null;
@@ -106,22 +114,26 @@ async function handleSession(session: Session | null) {
 export function initAuth() {
   let disposed = false;
 
-  supabase.auth.getSession().then(({ data, error }) => {
-    if (disposed) return;
-    if (error) {
-      log.error('Session fetch error:', error);
-      useAuthStore.getState().setUser(null, null);
-      return;
-    }
-    handleSession(data.session);
-  }).catch((err) => {
-    log.error('Failed to get session:', err);
-    if (!disposed) {
-      useAuthStore.getState().setUser(null, null);
-    }
-  });
+  if (isRecoveryFlow()) {
+    useAuthStore.getState().setRecovery(true);
+  } else {
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (disposed) return;
+      if (error) {
+        log.error('Session fetch error:', error);
+        useAuthStore.getState().setUser(null, null);
+        return;
+      }
+      handleSession(data.session);
+    }).catch((err) => {
+      log.error('Failed to get session:', err);
+      if (!disposed) {
+        useAuthStore.getState().setUser(null, null);
+      }
+    });
+  }
 
-  const subscription = supabase.auth.onAuthStateChange((_event, session) => {
+  const subscription = supabase.auth.onAuthStateChange((event, session) => {
     if (disposed) return;
     handleSession(session);
   });

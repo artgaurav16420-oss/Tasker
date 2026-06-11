@@ -70,7 +70,7 @@ export default function PersonnelRoster({
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {employees.map((emp, idx) => (
+          {[...employees].sort((a, b) => a.name.localeCompare(b.name)).map((emp, idx) => (
             <motion.div
               key={emp.uid}
               initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}

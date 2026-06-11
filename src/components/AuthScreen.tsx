@@ -1,21 +1,45 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
-import { Mail, Lock, Eye, EyeOff, User as UserIcon, LogIn, UserPlus, RotateCw } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Shield, User as UserIcon, LogIn, UserPlus, RotateCw, AlertCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase/client';
+import { useAuthStore } from '../lib/store';
 import { Logo } from './Logo';
 import { useReducedMotion } from '../lib/hooks/useReducedMotion';
 
 export default function AuthScreen() {
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
   const [email, setEmail] = useState('');
+  const [resetEmail, setResetEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [verificationSent, setVerificationSent] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
+  const [isChangePassword, setIsChangePassword] = useState(false);
+  const [currentPw, setCurrentPw] = useState('');
+  const [changeNewPw, setChangeNewPw] = useState('');
+  const [changeConfirmPw, setChangeConfirmPw] = useState('');
   const reducedMotion = useReducedMotion();
+  const recoveryMode = useAuthStore((s) => s.recoveryMode);
+  const setRecovery = useAuthStore((s) => s.setRecovery);
+  const changePasswordMode = useAuthStore((s) => s.changePasswordMode);
+  const setChangePasswordMode = useAuthStore((s) => s.setChangePasswordMode);
+  const currentUser = useAuthStore((s) => s.user);
+
+  useEffect(() => {
+    if (recoveryMode) {
+      setIsResetting(true);
+      setIsLogin(false);
+      setIsForgotPassword(false);
+    }
+  }, [recoveryMode]);
 
   useEffect(() => {
     if (resendTimer <= 0) return;
@@ -28,7 +52,7 @@ export default function AuthScreen() {
     setError('');
     const { error: resendError } = await supabase.auth.resend({
       type: 'signup',
-      email,
+      email: email + '@rrcat.gov.in',
     });
     if (resendError) {
       setError(resendError.message);
@@ -37,10 +61,102 @@ export default function AuthScreen() {
     }
   }, [email, resendTimer]);
 
+  const handleResendReset = useCallback(async () => {
+    if (resendTimer > 0) return;
+    setError('');
+    const { error: resendError } = await supabase.auth.resetPasswordForEmail(resetEmail + '@rrcat.gov.in', {
+      redirectTo: window.location.origin,
+    });
+    if (resendError) {
+      setError(resendError.message);
+    } else {
+      setResendTimer(60);
+    }
+  }, [resetEmail, resendTimer]);
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(resetEmail + '@rrcat.gov.in', {
+        redirectTo: window.location.origin,
+      });
+      if (resetError) throw resetError;
+      setResetSent(true);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to send reset email.';
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+    if (newPassword.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
+      if (updateError) throw updateError;
+      setRecovery(false);
+      setIsResetting(false);
+      setIsLogin(true);
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to update password.';
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    if (changeNewPw !== changeConfirmPw) {
+      setError('Passwords do not match.');
+      return;
+    }
+    if (changeNewPw.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: currentUser?.email || '',
+        password: currentPw,
+      });
+      if (signInError) throw signInError;
+      const { error: updateError } = await supabase.auth.updateUser({ password: changeNewPw });
+      if (updateError) throw updateError;
+      setChangePasswordMode(false);
+      setCurrentPw('');
+      setChangeNewPw('');
+      setChangeConfirmPw('');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to update password.';
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+    const fullEmail = email + '@rrcat.gov.in';
 
     try {
       if (!isLogin && password.length < 8) {
@@ -49,11 +165,11 @@ export default function AuthScreen() {
         return;
       }
       if (isLogin) {
-        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+        const { error: signInError } = await supabase.auth.signInWithPassword({ email: fullEmail, password });
         if (signInError) throw signInError;
       } else {
         const { data, error: signUpError } = await supabase.auth.signUp({
-          email,
+          email: fullEmail,
           password,
           options: {
             emailRedirectTo: window.location.origin,
@@ -83,7 +199,60 @@ export default function AuthScreen() {
     }
   };
 
-  if (verificationSent) {
+  if (isForgotPassword) {
+    return (
+      <div className="min-h-dvh bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex items-center justify-center p-4 font-mono">
+        <div className="w-full max-w-md text-center space-y-6">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-10 shadow-xl shadow-slate-200/40 dark:shadow-slate-900/40">
+            <div className="w-16 h-16 bg-orange-50/70 dark:bg-orange-500/20 border border-orange-200 dark:border-orange-500/20 rounded-2xl mx-auto flex items-center justify-center mb-6">
+              <AlertCircle className="w-8 h-8 text-orange-600 dark:text-orange-400" />
+            </div>
+            <h2 className="font-mono font-black -tracking-[0.025em] uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100 mb-3">Reset Your Password</h2>
+            <p className="font-mono text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+              Enter your email address and we'll send you a link to reset your password.
+            </p>
+            <form onSubmit={handleForgotPassword} className="mt-6 space-y-4">
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-500 group-focus-within:text-emerald-500 transition-colors duration-150 z-10" />
+                <div className="flex items-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden focus-within:border-emerald-500 focus-within:bg-white dark:focus-within:bg-slate-800 focus-within:ring-4 focus-within:ring-emerald-500/5 transition-all">
+                  <input
+                    id="reset-email"
+                    type="text"
+                    required
+                    autoComplete="email"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value.replace(/@.*$/, ''))}
+                    className="flex-1 bg-transparent border-none py-4 pl-12 pr-2 text-sm focus:outline-none text-slate-900 dark:text-slate-100 placeholder-slate-300 dark:placeholder-slate-500"
+                    placeholder="name"
+                  />
+                  <span className="pr-4 text-sm text-slate-400 dark:text-slate-500 font-mono whitespace-nowrap">@rrcat.gov.in</span>
+                </div>
+              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-emerald-500 text-slate-950 rounded-xl py-4 font-mono font-bold text-xs uppercase tracking-[0.2em] hover:bg-emerald-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-3 shadow-lg shadow-emerald-500/10 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+              >
+                {loading ? (
+                  <motion.div animate={reducedMotion ? undefined : { rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} className="w-5 h-5 border-2 border-slate-950 border-t-transparent rounded-full" />
+                ) : (
+                  <>Send Reset Link</>
+                )}
+              </button>
+            </form>
+            <button
+              onClick={() => { setIsForgotPassword(false); setResetEmail(''); setError(''); }}
+              className="mt-4 w-full text-xs font-mono text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 uppercase tracking-widest transition-colors duration-150"
+            >
+              Back to Login
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (resetSent) {
     return (
       <div className="min-h-dvh bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex items-center justify-center p-4 font-mono">
         <div className="w-full max-w-md text-center space-y-6">
@@ -91,24 +260,210 @@ export default function AuthScreen() {
             <div className="w-16 h-16 bg-emerald-50/70 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl mx-auto flex items-center justify-center mb-6">
               <Mail className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <h2 className="font-mono font-black -tracking-[0.025em] uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100 mb-3">Verify Your Email</h2>
+            <h2 className="font-mono font-black -tracking-[0.025em] uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100 mb-3">Check Your Email</h2>
             <p className="font-mono text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-              A verification link has been sent to <span className="text-emerald-600 font-mono text-xs">{email}</span>.
-              Check your inbox (and spam folder) then click the link to activate your account.
+              A password reset link has been sent to <span className="text-emerald-600 font-mono text-xs">{resetEmail}</span>.
+              Click the link to set a new password.
             </p>
             <button
-              onClick={handleResend}
+              onClick={handleResendReset}
               disabled={resendTimer > 0}
               className="mt-4 w-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl py-3 font-mono font-bold text-xs uppercase tracking-[0.2em] hover:bg-slate-200 dark:hover:bg-slate-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
             >
               <RotateCw className={`w-4 h-4 ${resendTimer > 0 ? '' : ''}`} />
-              {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend Verification Email'}
+              {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend Reset Link'}
             </button>
             <button
-              onClick={() => { setVerificationSent(false); setIsLogin(true); }}
+              onClick={() => { setResetSent(false); setIsForgotPassword(false); }}
               className="mt-4 w-full bg-emerald-500 text-slate-950 rounded-xl py-4 font-mono font-bold text-xs uppercase tracking-[0.2em] hover:bg-emerald-400 transition-all focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
             >
               Back to Login
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isResetting) {
+    return (
+      <div className="min-h-dvh bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex items-center justify-center p-4 font-mono">
+        <div className="w-full max-w-md text-center space-y-6">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-10 shadow-xl shadow-slate-200/40 dark:shadow-slate-900/40">
+            <div className="w-16 h-16 bg-emerald-50/70 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl mx-auto flex items-center justify-center mb-6">
+              <Lock className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <h2 className="font-mono font-black -tracking-[0.025em] uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100 mb-3">Set New Password</h2>
+            <p className="font-mono text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+              Enter your new password below.
+            </p>
+            <form onSubmit={handleResetPassword} className="mt-6 space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="new-password" className="text-xs font-mono text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-bold">New Password</label>
+                <div className="relative group">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-500 group-focus-within:text-emerald-500 transition-colors duration-150" />
+                  <input
+                    id="new-password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    autoComplete="new-password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl py-4 pl-12 pr-12 text-sm focus:outline-none focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-emerald-500/5 transition-all text-slate-900 dark:text-slate-100 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 dark:text-slate-500 hover:text-slate-500 transition-colors duration-150 p-1 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="confirm-password" className="text-xs font-mono text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-bold">Confirm New Password</label>
+                <div className="relative group">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-500 group-focus-within:text-emerald-500 transition-colors duration-150" />
+                  <input
+                    id="confirm-password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    autoComplete="new-password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl py-4 pl-12 pr-12 text-sm focus:outline-none focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-emerald-500/5 transition-all text-slate-900 dark:text-slate-100 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                    placeholder="••••••••"
+                  />
+                </div>
+              </div>
+
+              {error && (
+                <div className="p-3 bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/30 rounded-xl text-orange-600 dark:text-orange-400 text-xs font-mono font-bold">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-emerald-500 text-slate-950 rounded-xl py-4 font-mono font-bold text-xs uppercase tracking-[0.2em] hover:bg-emerald-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-3 shadow-lg shadow-emerald-500/10 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+              >
+                {loading ? (
+                  <motion.div animate={reducedMotion ? undefined : { rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} className="w-5 h-5 border-2 border-slate-950 border-t-transparent rounded-full" />
+                ) : (
+                  <>Update Password</>
+                )}
+              </button>
+            </form>
+            <button
+              onClick={() => { setIsResetting(false); setIsLogin(true); setNewPassword(''); setConfirmPassword(''); }}
+              className="mt-4 w-full text-xs font-mono text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 uppercase tracking-widest transition-colors duration-150"
+            >
+              Back to Login
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isChangePassword || changePasswordMode) {
+    return (
+      <div className="min-h-dvh bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex items-center justify-center p-4 font-mono">
+        <div className="w-full max-w-md text-center space-y-6">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-10 shadow-xl shadow-slate-200/40 dark:shadow-slate-900/40">
+            <div className="w-16 h-16 bg-orange-50/70 dark:bg-orange-500/20 border border-orange-200 dark:border-orange-500/20 rounded-2xl mx-auto flex items-center justify-center mb-6">
+              <Shield className="w-8 h-8 text-orange-600 dark:text-orange-400" />
+            </div>
+            <h2 className="font-mono font-black -tracking-[0.025em] uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100 mb-3">Change Password</h2>
+            <p className="font-mono text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+              Enter your current password and a new password.
+            </p>
+            <form onSubmit={handleChangePassword} className="mt-6 space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="change-current-pw" className="text-xs font-mono text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-bold">Current Password</label>
+                <div className="relative group">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-500 group-focus-within:text-orange-500 transition-colors duration-150" />
+                  <input
+                    id="change-current-pw"
+                    type="password"
+                    required
+                    autoComplete="current-password"
+                    value={currentPw}
+                    onChange={(e) => setCurrentPw(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:border-orange-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-orange-500/5 transition-all text-slate-900 dark:text-slate-100 focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2"
+                    placeholder="Current password"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="change-new-pw" className="text-xs font-mono text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-bold">New Password</label>
+                <div className="relative group">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-500 group-focus-within:text-orange-500 transition-colors duration-150" />
+                  <input
+                    id="change-new-pw"
+                    type="password"
+                    required
+                    autoComplete="new-password"
+                    value={changeNewPw}
+                    onChange={(e) => setChangeNewPw(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:border-orange-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-orange-500/5 transition-all text-slate-900 dark:text-slate-100 focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2"
+                    placeholder="New password"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="change-confirm-pw" className="text-xs font-mono text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-bold">Confirm New Password</label>
+                <div className="relative group">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-500 group-focus-within:text-orange-500 transition-colors duration-150" />
+                  <input
+                    id="change-confirm-pw"
+                    type="password"
+                    required
+                    autoComplete="new-password"
+                    value={changeConfirmPw}
+                    onChange={(e) => setChangeConfirmPw(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:border-orange-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-orange-500/5 transition-all text-slate-900 dark:text-slate-100 focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2"
+                    placeholder="Confirm new password"
+                  />
+                </div>
+              </div>
+
+              {error && (
+                <div className="p-3 bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/30 rounded-xl text-orange-600 dark:text-orange-400 text-xs font-mono font-bold">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-orange-500 text-white rounded-xl py-4 font-mono font-bold text-xs uppercase tracking-[0.2em] hover:bg-orange-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-3 shadow-lg shadow-orange-500/10 focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2"
+              >
+                {loading ? (
+                  <motion.div animate={reducedMotion ? undefined : { rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} className="w-5 h-5 border-2 border-white border-t-transparent rounded-full" />
+                ) : (
+                  <>Update Password</>
+                )}
+              </button>
+            </form>
+            <button
+              onClick={() => {
+                if (changePasswordMode) setChangePasswordMode(false);
+                setIsChangePassword(false);
+                setError('');
+                setCurrentPw('');
+                setChangeNewPw('');
+                setChangeConfirmPw('');
+              }}
+              className="mt-4 w-full text-xs font-mono text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 uppercase tracking-widest transition-colors duration-150"
+            >
+              {changePasswordMode ? 'Back to Settings' : 'Back to Login'}
             </button>
           </div>
         </div>
@@ -175,17 +530,20 @@ export default function AuthScreen() {
           <div className="space-y-2">
             <label htmlFor="auth-email" className="text-xs font-mono text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-bold">Email Address</label>
             <div className="relative group">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-500 group-focus-within:text-emerald-500 transition-colors duration-150" />
-              <input
-                id="auth-email"
-                type="email"
-                required
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-emerald-500/5 transition-all text-slate-900 dark:text-slate-100 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
-                placeholder="name@rrcat.gov.in"
-              />
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-500 group-focus-within:text-emerald-500 transition-colors duration-150 z-10" />
+              <div className="flex items-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden focus-within:border-emerald-500 focus-within:bg-white dark:focus-within:bg-slate-800 focus-within:ring-4 focus-within:ring-emerald-500/5 transition-all">
+                <input
+                  id="auth-email"
+                  type="text"
+                  required
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value.replace(/@.*$/, ''))}
+                  className="flex-1 bg-transparent border-none py-4 pl-12 pr-2 text-sm focus:outline-none text-slate-900 dark:text-slate-100 placeholder-slate-300 dark:placeholder-slate-500"
+                  placeholder="name"
+                />
+                <span className="pr-4 text-sm text-slate-400 dark:text-slate-500 font-mono whitespace-nowrap">@rrcat.gov.in</span>
+              </div>
             </div>
           </div>
 
@@ -212,6 +570,32 @@ export default function AuthScreen() {
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
+
+          {isLogin && (
+            <div className="mt-4 flex items-center justify-center gap-6">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsForgotPassword(true);
+                  setResetEmail(email);
+                  setError('');
+                }}
+                className="text-xs font-mono text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-bold uppercase tracking-widest transition-colors duration-150"
+              >
+                Forgot password?
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsChangePassword(true);
+                  setError('');
+                }}
+                className="text-xs font-mono text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-bold uppercase tracking-widest transition-colors duration-150"
+              >
+                Change password
+              </button>
+            </div>
+          )}
           </div>
 
           <button

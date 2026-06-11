@@ -5,7 +5,7 @@ import Dashboard from './components/Dashboard';
 import { ToastProvider } from './components/providers/ToastProvider';
 
 export default function App() {
-  const { user, loading } = useAuthStore();
+  const { user, loading, recoveryMode, changePasswordMode } = useAuthStore();
 
   useEffect(() => {
     const cleanup = initAuth();
@@ -22,5 +22,5 @@ export default function App() {
     );
   }
 
-  return user ? <ToastProvider><Dashboard /></ToastProvider> : <AuthScreen />;
+  return user && !recoveryMode && !changePasswordMode ? <ToastProvider><Dashboard /></ToastProvider> : <AuthScreen />;
 }
