@@ -4,7 +4,7 @@ import { useAuthStore } from "../lib/store";
 import { Task, UserProfile, PersonalTask, Report } from "../lib/types";
 import { supabase } from "../lib/supabase/client";
 import { motion, AnimatePresence } from "motion/react";
-import { Users, LayoutGrid, CheckCircle, LogOut, Copy, Activity, Settings, SunMoon } from "lucide-react";
+import { Users, LayoutGrid, CheckCircle, LogOut, Activity, Settings, SunMoon } from "lucide-react";
 
 import ErrorBoundary from "./ErrorBoundary";
 import TaskAssignmentModal from "./modals/TaskAssignmentModal";
@@ -30,7 +30,7 @@ import { useTaskOperations } from "../lib/hooks/useTaskOperations";
 import { useTeamManagement } from "../lib/hooks/useTeamManagement";
 import { useDashboardData } from "../lib/hooks/useDashboardData";
 import { useDashboardModals } from "../lib/hooks/useDashboardModals";
-import { useSessionActions } from "../lib/hooks/useSessionActions";
+import { useLogout } from "../lib/hooks/useSessionActions";
 import { useReducedMotion } from "../lib/hooks/useReducedMotion";
 import { getDeadlineStyle } from "../lib/utils";
 
@@ -224,7 +224,7 @@ export default function Dashboard() {
     setSelectedTask(task);
   }, []);
 
-  const { copyId, handleLogout } = useSessionActions({ profile, showToast });
+  const { handleLogout } = useLogout(showToast);
 
   if (!profile) {
     return (
@@ -308,15 +308,6 @@ export default function Dashboard() {
             <p className="md:hidden text-xs font-mono uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 font-bold">RRCAT</p>
           </div>
           <div className="flex items-center gap-4 justify-self-end">
-            <button type="button" className="text-right hidden sm:flex flex-col items-end group cursor-pointer" onClick={copyId} aria-label="Copy User Code">
-              <div className="text-xs font-mono uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400 font-bold mb-1 group-hover:text-emerald-600 transition-colors">User Code</div>
-              <div className="flex items-center gap-2 px-3 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl group-hover:border-emerald-500 group-hover:bg-emerald-50 transition-all duration-150 shadow-sm">
-                <span className="font-mono text-xs text-slate-500 dark:text-slate-400 select-all max-w-[100px] truncate" title={profile.uid}>{profile.uid}</span>
-                <button type="button" className="hover:scale-110 transition-transform min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" aria-label="Copy User Code">
-                  <Copy className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 group-hover:text-emerald-600" />
-                </button>
-              </div>
-            </button>
             <button
               onClick={() => useThemeStore.getState().toggleTheme()}
               className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all duration-150 shadow-sm min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100"

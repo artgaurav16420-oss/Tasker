@@ -1,6 +1,6 @@
 import { UserProfile } from '../../lib/types';
-import { Settings, Shield, ShieldAlert, LogOut, Copy, UserPlus, Users } from 'lucide-react';
-import { useSessionActions } from '../../lib/hooks/useSessionActions';
+import { Settings, Shield, ShieldAlert, LogOut, UserPlus, Users } from 'lucide-react';
+import { useLogout } from '../../lib/hooks/useSessionActions';
 
 interface SettingsPanelProps {
   profile: UserProfile | null;
@@ -36,7 +36,7 @@ export default function SettingsPanel({
   showToast
 }: SettingsPanelProps) {
 
-  const { copyId, handleLogout } = useSessionActions({ profile, showToast });
+  const { handleLogout } = useLogout(showToast);
 
   return (
     <div className="space-y-8 pb-12">
@@ -48,8 +48,8 @@ export default function SettingsPanel({
           </div>
         </div>
         
-        <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="space-y-6">
+        <div className="p-6 grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-8">
+          <div className="space-y-6 max-w-xs">
             <div>
               <label className="text-xs uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400 mb-2 block">Your Identity Information</label>
               <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-700 font-mono text-sm space-y-2">
@@ -64,22 +64,6 @@ export default function SettingsPanel({
               </div>
             </div>
 
-            <div className="space-y-3">
-              <label className="text-xs uppercase tracking-widest font-bold text-slate-500 dark:text-slate-400 block">Your Connector ID</label>
-              <div className="flex overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
-                <div className="bg-slate-50 dark:bg-slate-900 px-4 py-3 font-mono text-sm text-slate-600 dark:text-slate-400 flex-1 break-all truncate">
-                  {profile?.uid}
-                </div>
-                <button
-                  onClick={copyId}
-                  className="bg-white dark:bg-slate-800 px-4 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/20 transition-colors duration-150 border-l border-slate-200 dark:border-slate-700 flex items-center gap-2"
-                >
-                  <Copy className="w-4 h-4" /> <span className="font-mono text-xs font-bold uppercase tracking-widest">Copy</span>
-                </button>
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Share this ID or your email with your manager to be added to their team.</p>
-            </div>
-
             <div className="pt-4 border-t border-slate-100 dark:border-slate-700">
               <button
                 onClick={handleLogout}
@@ -90,14 +74,14 @@ export default function SettingsPanel({
             </div>
           </div>
 
-          <div className="space-y-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-emerald-100 dark:border-emerald-500/30 shadow-sm shadow-emerald-500/5 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
               <h3 className="font-mono text-xs uppercase tracking-widest font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
                 <UserPlus className="w-4 h-4 text-emerald-500" /> Connect to Superior
               </h3>
               <label htmlFor="manager-code" className="text-sm text-slate-600 dark:text-slate-400 mb-4 block">
-                Enter your manager's email address or connector ID to join their reporting structure.
+                Enter your manager's email address to join their reporting structure.
               </label>
               <form onSubmit={handleUpdateManager} className="flex gap-2">
                 <input
@@ -150,7 +134,7 @@ export default function SettingsPanel({
                 <Users className="w-4 h-4 text-indigo-500" /> Add to Team Roster
               </h3>
               <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                Enter an operative's email address or connector ID to add them to your team.
+                Enter an operative's email address to add them to your team.
               </p>
               <form onSubmit={handleAddMember} className="flex gap-2">
                 <input

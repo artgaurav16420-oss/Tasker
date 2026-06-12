@@ -9,7 +9,6 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-// Capture URL hash before Supabase async init clears it
 const initialHash = typeof window !== 'undefined' ? window.location.hash : '';
 
 export function isRecoveryFlow() {
@@ -18,12 +17,21 @@ export function isRecoveryFlow() {
   return params.get('type') === 'recovery';
 }
 
+export function getRecoverySession() {
+  if (!initialHash) return null;
+  const params = new URLSearchParams(initialHash.substring(1));
+  const accessToken = params.get('access_token');
+  const refreshToken = params.get('refresh_token');
+  if (!accessToken) return null;
+  return { access_token: accessToken, refresh_token: refreshToken || undefined };
+}
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     storage: sessionStorage,
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true,
+    detectSessionInUrl: false,
   },
   realtime: {
     params: {

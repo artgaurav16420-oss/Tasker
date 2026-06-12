@@ -19,10 +19,12 @@ export default function AuthScreen() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [verificationSent, setVerificationSent] = useState(false);
-  const [resetSent, setResetSent] = useState(false);
+  const [resetOtp, setResetOtp] = useState('');
+  const [needsOtp, setNeedsOtp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
   const [isChangePassword, setIsChangePassword] = useState(false);
+  const [changeEmail, setChangeEmail] = useState('');
   const [currentPw, setCurrentPw] = useState('');
   const [changeNewPw, setChangeNewPw] = useState('');
   const [changeConfirmPw, setChangeConfirmPw] = useState('');
@@ -83,7 +85,9 @@ export default function AuthScreen() {
         redirectTo: window.location.origin,
       });
       if (resetError) throw resetError;
-      setResetSent(true);
+      setIsForgotPassword(false);
+      setIsResetting(true);
+      setNeedsOtp(true);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to send reset email.';
       setError(message);
@@ -103,17 +107,32 @@ export default function AuthScreen() {
       setError('Password must be at least 8 characters.');
       return;
     }
+    if (needsOtp && !resetOtp) {
+      setError('Please enter the recovery code from the email.');
+      return;
+    }
     setLoading(true);
     try {
+      if (needsOtp) {
+        const { error: verifyError } = await supabase.auth.verifyOtp({
+          email: resetEmail + '@rrcat.gov.in',
+          token: resetOtp,
+          type: 'recovery',
+        });
+        if (verifyError) throw verifyError;
+      }
       const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
       if (updateError) throw updateError;
       setRecovery(false);
       setIsResetting(false);
       setIsLogin(true);
+      setNeedsOtp(false);
+      setResetOtp('');
+      setResetEmail('');
       setNewPassword('');
       setConfirmPassword('');
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to update password.';
+      const message = err instanceof Error ? err.message : 'Failed to reset password.';
       setError(message);
     } finally {
       setLoading(false);
@@ -131,16 +150,22 @@ export default function AuthScreen() {
       setError('Password must be at least 8 characters.');
       return;
     }
+    const targetEmail = changeEmail
+      ? changeEmail.includes('@') ? changeEmail : changeEmail + '@rrcat.gov.in'
+      : currentUser?.email || '';
+    if (!targetEmail) { setError('Email is required.'); setLoading(false); return; }
     setLoading(true);
     try {
       const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: currentUser?.email || '',
+        email: targetEmail,
         password: currentPw,
       });
       if (signInError) throw signInError;
       const { error: updateError } = await supabase.auth.updateUser({ password: changeNewPw });
       if (updateError) throw updateError;
       setChangePasswordMode(false);
+      setIsChangePassword(false);
+      setChangeEmail('');
       setCurrentPw('');
       setChangeNewPw('');
       setChangeConfirmPw('');
@@ -252,39 +277,6 @@ export default function AuthScreen() {
     );
   }
 
-  if (resetSent) {
-    return (
-      <div className="min-h-dvh bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex items-center justify-center p-4 font-mono">
-        <div className="w-full max-w-md text-center space-y-6">
-          <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-10 shadow-xl shadow-slate-200/40 dark:shadow-slate-900/40">
-            <div className="w-16 h-16 bg-emerald-50/70 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl mx-auto flex items-center justify-center mb-6">
-              <Mail className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
-            </div>
-            <h2 className="font-mono font-black -tracking-[0.025em] uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100 mb-3">Check Your Email</h2>
-            <p className="font-mono text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-              A password reset link has been sent to <span className="text-emerald-600 font-mono text-xs">{resetEmail}</span>.
-              Click the link to set a new password.
-            </p>
-            <button
-              onClick={handleResendReset}
-              disabled={resendTimer > 0}
-              className="mt-4 w-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl py-3 font-mono font-bold text-xs uppercase tracking-[0.2em] hover:bg-slate-200 dark:hover:bg-slate-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
-            >
-              <RotateCw className={`w-4 h-4 ${resendTimer > 0 ? '' : ''}`} />
-              {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend Reset Link'}
-            </button>
-            <button
-              onClick={() => { setResetSent(false); setIsForgotPassword(false); }}
-              className="mt-4 w-full bg-emerald-500 text-slate-950 rounded-xl py-4 font-mono font-bold text-xs uppercase tracking-[0.2em] hover:bg-emerald-400 transition-all focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
-            >
-              Back to Login
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   if (isResetting) {
     return (
       <div className="min-h-dvh bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex items-center justify-center p-4 font-mono">
@@ -295,9 +287,24 @@ export default function AuthScreen() {
             </div>
             <h2 className="font-mono font-black -tracking-[0.025em] uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100 mb-3">Set New Password</h2>
             <p className="font-mono text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-              Enter your new password below.
+              {needsOtp ? 'Enter the recovery code from your email and your new password.' : 'Enter your new password below.'}
             </p>
             <form onSubmit={handleResetPassword} className="mt-6 space-y-4">
+              {needsOtp && (
+                <div className="space-y-2">
+                  <label htmlFor="reset-otp" className="text-xs font-mono text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-bold">Recovery Code</label>
+                  <input
+                    id="reset-otp"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    value={resetOtp}
+                    onChange={(e) => setResetOtp(e.target.value.replace(/\D/g, ''))}
+                    placeholder="Enter the code from email"
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl py-4 px-4 text-sm text-center text-slate-900 dark:text-slate-100 placeholder-slate-300 dark:placeholder-slate-500 font-mono tracking-[0.3em] focus:outline-none focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-emerald-500/5 transition-all focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                  />
+                </div>
+              )}
               <div className="space-y-2">
                 <label htmlFor="new-password" className="text-xs font-mono text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-bold">New Password</label>
                 <div className="relative group">
@@ -358,8 +365,18 @@ export default function AuthScreen() {
                 )}
               </button>
             </form>
+            {needsOtp && (
+              <button
+                onClick={handleResendReset}
+                disabled={resendTimer > 0}
+                className="w-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl py-3 font-mono font-bold text-xs uppercase tracking-[0.2em] hover:bg-slate-200 dark:hover:bg-slate-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+              >
+                <RotateCw className={`w-4 h-4 ${resendTimer > 0 ? '' : ''}`} />
+                {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend Reset Link'}
+              </button>
+            )}
             <button
-              onClick={() => { setIsResetting(false); setIsLogin(true); setNewPassword(''); setConfirmPassword(''); }}
+              onClick={() => { setIsResetting(false); setIsLogin(true); setNeedsOtp(false); setResetOtp(''); setResetEmail(''); setNewPassword(''); setConfirmPassword(''); }}
               className="mt-4 w-full text-xs font-mono text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 uppercase tracking-widest transition-colors duration-150"
             >
               Back to Login
@@ -383,6 +400,25 @@ export default function AuthScreen() {
               Enter your current password and a new password.
             </p>
             <form onSubmit={handleChangePassword} className="mt-6 space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="change-email" className="text-xs font-mono text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-bold">Email Address</label>
+                <div className="relative group">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-500 group-focus-within:text-orange-500 transition-colors duration-150 z-10" />
+                  <div className="flex items-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden focus-within:border-orange-500 focus-within:bg-white dark:focus-within:bg-slate-800 focus-within:ring-4 focus-within:ring-orange-500/5 transition-all">
+                    <input
+                      id="change-email"
+                      type="text"
+                      required
+                      autoComplete="email"
+                      value={changeEmail}
+                      onChange={(e) => setChangeEmail(e.target.value.replace(/@.*$/, ''))}
+                      className="flex-1 bg-transparent border-none py-4 pl-12 pr-2 text-sm focus:outline-none text-slate-900 dark:text-slate-100 placeholder-slate-300 dark:placeholder-slate-500"
+                      placeholder="name"
+                    />
+                    <span className="pr-4 text-sm text-slate-400 dark:text-slate-500 font-mono whitespace-nowrap">@rrcat.gov.in</span>
+                  </div>
+                </div>
+              </div>
               <div className="space-y-2">
                 <label htmlFor="change-current-pw" className="text-xs font-mono text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-bold">Current Password</label>
                 <div className="relative group">
@@ -457,6 +493,7 @@ export default function AuthScreen() {
                 if (changePasswordMode) setChangePasswordMode(false);
                 setIsChangePassword(false);
                 setError('');
+                setChangeEmail('');
                 setCurrentPw('');
                 setChangeNewPw('');
                 setChangeConfirmPw('');
@@ -588,6 +625,7 @@ export default function AuthScreen() {
                 type="button"
                 onClick={() => {
                   setIsChangePassword(true);
+                  setChangeEmail(email);
                   setError('');
                 }}
                 className="text-xs font-mono text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-bold uppercase tracking-widest transition-colors duration-150"

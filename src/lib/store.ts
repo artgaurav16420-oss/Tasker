@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { Session, User } from '@supabase/supabase-js';
-import { supabase, isRecoveryFlow } from './supabase/client';
+import { supabase, isRecoveryFlow, getRecoverySession } from './supabase/client';
 import { UserProfile } from './types';
 import { log } from './logger';
 
@@ -115,6 +115,16 @@ export function initAuth() {
   let disposed = false;
 
   if (isRecoveryFlow()) {
+    const session = getRecoverySession();
+    if (session) {
+      supabase.auth.setSession({ access_token: session.access_token, refresh_token: session.refresh_token || '' }).then(({ error }) => {
+        if (error) {
+          log.error('Recovery session error:', error);
+          useAuthStore.getState().setRecovery(true);
+        }
+      });
+    }
+    try { history.replaceState({}, '', '/'); } catch {}
     useAuthStore.getState().setRecovery(true);
   } else {
     supabase.auth.getSession().then(({ data, error }) => {
