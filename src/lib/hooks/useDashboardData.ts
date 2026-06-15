@@ -64,11 +64,11 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
     const limitedIds = parsedIds.slice(0, MAX_SUPERIORS_REALTIME);
 
     void Promise.resolve(
-      supabase
-        .from("users")
-        .select("*")
-        .in("uid", limitedIds)
-        .then(({ data, error }) => {
+        supabase
+          .from("users")
+          .select("uid, name, email, managerIds, createdAt")
+          .in("uid", limitedIds)
+          .then(({ data, error }) => {
           if (cancelled) return;
           if (error) {
             log.error('Superior fetch error:', error);
@@ -98,7 +98,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
             { event: "*", schema: "public", table: "users", filter: `uid=eq.${id}` },
             async (payload) => {
               const seq = ++superiorSeqRef.current;
-              const { data } = await supabase.from("users").select("*").eq("uid", id).maybeSingle();
+              const { data } = await supabase.from("users").select("uid, name, email, managerIds, createdAt").eq("uid", id).maybeSingle();
               if (cancelled || seq !== superiorSeqRef.current) return;
               if (data) {
                 setSuperiors((prev) => {
@@ -151,10 +151,10 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
       setError(null);
 
       const [employeesRes, myTasksRes, teamTasksRes, managedReportsRes, personalTasksRes, profileRes] = await Promise.all([
-        supabase.from("users").select("*").filter("managerIds", "cs", `{${profile.uid}}`),
+        supabase.from("users").select("uid, name, email, managerIds, createdAt").filter("managerIds", "cs", `{${profile.uid}}`),
         supabase.from("tasks").select("*").eq("employeeId", profile.uid),
         supabase.from("tasks").select("*").eq("managerId", profile.uid),
-        supabase.from("reports").select("*").or(`managerId.eq.${profile.uid},employeeId.eq.${profile.uid}`),
+        supabase.from("reports").select("id, taskId, employeeId, managerId, content, createdAt").or(`managerId.eq.${profile.uid},employeeId.eq.${profile.uid}`),
         supabase.from("personal_tasks").select("*").eq("userId", profile.uid),
         supabase.from("users").select("uid, managerIds").eq("uid", profile.uid).maybeSingle(),
       ]);
@@ -176,7 +176,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
       const latestManagerIds = (profileRes.data as { managerIds?: string[] } | null)?.managerIds ?? [];
       if (latestManagerIds.length > 0) {
         const limited = latestManagerIds.slice(0, MAX_SUPERIORS_REALTIME);
-        const { data: superiorsData } = await supabase.from("users").select("*").in("uid", limited);
+        const { data: superiorsData } = await supabase.from("users").select("uid, name, email, managerIds, createdAt").in("uid", limited);
         if (superiorsData) setSuperiors(superiorsData as UserProfile[]);
       } else {
         setSuperiors([]);
@@ -228,7 +228,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
         const removed = safeOldManagerIds.filter((id) => !safeNewManagerIds.includes(id));
         if (added.length > 0 || removed.length > 0) {
           const limited = safeNewManagerIds.slice(0, MAX_SUPERIORS_REALTIME);
-          void supabase.from("users").select("*").in("uid", limited).then(({ data }) => {
+          void supabase.from("users").select("uid, name, email, managerIds, createdAt").in("uid", limited).then(({ data }) => {
             if (data) setSuperiors(data as UserProfile[]);
           });
         }
@@ -314,7 +314,7 @@ export function useDashboardData(profile: UserProfile | null, superiorIds: strin
       }
       const { data } = await supabase
         .from("reports")
-        .select("*")
+        .select("id, taskId, employeeId, managerId, content, createdAt")
         .or(`managerId.eq.${profile.uid},employeeId.eq.${profile.uid}`);
       if (data && !cancelled) {
         setManagedReports(data as Report[]);

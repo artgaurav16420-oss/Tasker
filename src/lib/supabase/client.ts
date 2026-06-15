@@ -26,6 +26,8 @@ export function getRecoverySession() {
   return { access_token: accessToken, refresh_token: refreshToken || undefined };
 }
 
+export const ORG_EMAIL_DOMAIN = import.meta.env.VITE_ORG_EMAIL_DOMAIN || 'rrcat.gov.in';
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     storage: sessionStorage,

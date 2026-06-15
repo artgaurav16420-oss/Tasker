@@ -35,7 +35,7 @@ let activeSessionRequest = 0;
 
 async function fetchProfile(uid: string) {
   try {
-    const { data, error } = await supabase.from('users').select('*').eq('uid', uid).maybeSingle();
+    const { data, error } = await supabase.from('users').select('uid, email, name, managerIds, createdAt').eq('uid', uid).maybeSingle();
     if (error) throw error;
     return data as UserProfile | null;
   } catch (err) {

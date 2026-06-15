@@ -1,4 +1,5 @@
 import { Component, ReactNode } from 'react';
+import { log } from '../lib/logger';
 
 interface Props { children: ReactNode; onRetry?: () => void }
 interface State { hasError: boolean; error: Error | null; resetKey: number }
@@ -11,7 +12,7 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
-    console.error('ErrorBoundary caught:', error, info);
+    log.error('ErrorBoundary caught:', error, info);
   }
 
   handleReset = () => {

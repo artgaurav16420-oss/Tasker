@@ -33,6 +33,7 @@ import { useDashboardModals } from "../lib/hooks/useDashboardModals";
 import { useLogout } from "../lib/hooks/useSessionActions";
 import { useReducedMotion } from "../lib/hooks/useReducedMotion";
 import { getDeadlineStyle } from "../lib/utils";
+import { log } from "../lib/logger";
 
 export default function Dashboard() {
   const { profile } = useAuthStore();
@@ -322,7 +323,7 @@ export default function Dashboard() {
           </div>
         </nav>
 
-        <div id="main-content" className="max-w-[1600px] mx-auto p-6 grid grid-cols-12 gap-8 mt-4 md:mt-6">
+        <main id="main-content" className="max-w-[1600px] mx-auto p-6 grid grid-cols-12 gap-8 mt-4 md:mt-6">
           {/* Mobile horizontal tab bar */}
           <div className="col-span-12 md:hidden overflow-x-auto flex gap-2 px-2 py-3 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
             {isOperative && (
@@ -466,7 +467,7 @@ export default function Dashboard() {
               </ErrorBoundary>
             )}
           </div>
-        </div>
+        </main>
 
         {/* Modals */}
         <ErrorBoundary>
@@ -505,7 +506,7 @@ export default function Dashboard() {
                       try {
                         await Promise.resolve(confirmDialog.onConfirm());
                       } catch (err) {
-                        console.error('Confirm dialog error:', err);
+                        log.error('Confirm dialog error:', err);
                       } finally {
                         setIsConfirming(false);
                       }

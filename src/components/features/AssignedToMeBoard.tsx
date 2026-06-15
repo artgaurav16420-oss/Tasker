@@ -90,7 +90,7 @@ export default function AssignedToMeBoard({
                   key={task.id}
                   initial={reducedMotion ? { opacity: 1 } : { opacity: 0, x: -20 }}
                   animate={reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
-                  className={`group relative bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 rounded-2xl hover:shadow-xl hover:shadow-slate-200/40 dark:hover:shadow-slate-900/40 transition-all border-l-4 border-l-emerald-500 shadow-sm dark:shadow-slate-900/20 cursor-pointer active:scale-[0.98] ${openDropdownId === task.id ? 'z-30' : ''}`}
+                  className={`group relative bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 rounded-2xl hover:shadow-xl hover:shadow-slate-200/40 dark:hover:shadow-slate-900/40 transition-all border-l-4 border-l-emerald-500 shadow-sm dark:shadow-slate-900/20 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 ${openDropdownId === task.id ? 'z-30' : ''}`}
                   onClick={() => setSelectedTaskDetails(task)}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedTaskDetails(task); } }}
                   role="button"
@@ -233,7 +233,7 @@ export default function AssignedToMeBoard({
             {completedTasks.map((task) => (
               <div 
                 key={task.id} 
-                className="bg-slate-50/50 dark:bg-slate-900/50 border border-slate-200/60 dark:border-slate-700 p-5 rounded-2xl flex items-center justify-between group cursor-pointer hover:bg-white dark:hover:bg-slate-700 transition-all"
+                className="bg-slate-50/50 dark:bg-slate-900/50 border border-slate-200/60 dark:border-slate-700 p-5 rounded-2xl flex items-center justify-between group cursor-pointer hover:bg-white dark:hover:bg-slate-700 transition-all focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
                 onClick={() => setSelectedTaskDetails(task)}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedTaskDetails(task); } }}
                 role="button"

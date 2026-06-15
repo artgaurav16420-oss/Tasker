@@ -44,3 +44,12 @@
   --z-confirm: 100;
   --z-toast: 120;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin,
+  .animate-pulse,
+  .animate-bounce,
+  .animate-ping {
+    animation: none !important;
+  }
+}

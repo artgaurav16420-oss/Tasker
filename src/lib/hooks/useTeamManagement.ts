@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
-import { supabase } from '../supabase/client';
+import { supabase, ORG_EMAIL_DOMAIN } from '../supabase/client';
 import { UserProfile, ConfirmDialogState } from '../types';
 import { log } from '../logger';
 import { mapPgError } from '../errors';
@@ -29,7 +29,7 @@ export function useTeamManagement({
   const resolveUserId = async (input: string) => {
     const isUUID = /^[0-9a-f-]{36}$/i.test(input);
     if (isUUID) return input;
-    const fullEmail = input.includes('@') ? input : `${input}@rrcat.gov.in`;
+    const fullEmail = input.includes('@') ? input : `${input}@${ORG_EMAIL_DOMAIN}`;
     const { data, error } = await supabase.from('users').select('uid').eq('email', fullEmail).maybeSingle();
     if (error || !data) {
       throw new Error("No user found with this email.");
@@ -61,7 +61,7 @@ export function useTeamManagement({
       }
 
       let superiorProfile: UserProfile | null = null;
-      const { data: profileData } = await supabase.from("users").select("*").eq("uid", targetUid).maybeSingle();
+      const { data: profileData } = await supabase.from("users").select("uid, name, email, managerIds, createdAt").eq("uid", targetUid).maybeSingle();
       superiorProfile = profileData as UserProfile | null;
 
       const { error } = await supabase.rpc('member_join_team', {
@@ -100,7 +100,7 @@ export function useTeamManagement({
       }
 
       let memberProfile: UserProfile | null = null;
-      const { data: profileData } = await supabase.from("users").select("*").eq("uid", targetUid).maybeSingle();
+      const { data: profileData } = await supabase.from("users").select("uid, name, email, managerIds, createdAt").eq("uid", targetUid).maybeSingle();
       memberProfile = profileData as UserProfile | null;
 
       const { error: rpcError } = await supabase.rpc('add_team_member', {

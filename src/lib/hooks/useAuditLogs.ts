@@ -29,7 +29,7 @@ export function useAuditLogs(taskId: string | null) {
 
     supabase
       .from('logs')
-      .select('*')
+      .select('id, taskId, userId, event, oldValue, newValue, createdAt')
       .eq('taskId', taskId)
       .order('createdAt', { ascending: false })
       .then(({ data, error }) => {

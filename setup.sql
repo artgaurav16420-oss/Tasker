@@ -52,6 +52,15 @@ CREATE TABLE IF NOT EXISTS public.personal_tasks (
     "createdAt" TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Indexes for query performance
+CREATE INDEX IF NOT EXISTS idx_tasks_employee_id ON public.tasks("employeeId");
+CREATE INDEX IF NOT EXISTS idx_tasks_manager_id ON public.tasks("managerId");
+CREATE INDEX IF NOT EXISTS idx_reports_manager_id ON public.reports("managerId");
+CREATE INDEX IF NOT EXISTS idx_reports_employee_id ON public.reports("employeeId");
+CREATE INDEX IF NOT EXISTS idx_personal_tasks_user_id ON public.personal_tasks("userId");
+CREATE INDEX IF NOT EXISTS idx_logs_task_id ON public.logs("taskId");
+CREATE INDEX IF NOT EXISTS idx_users_manager_ids ON public.users USING GIN("managerIds");
+
 -- 2. Security Functions (RPC)
 -- Hardened RPC for adding a team member (Cross-row mutation)
 CREATE OR REPLACE FUNCTION add_team_member(admin_uid UUID, member_uid UUID)
@@ -228,7 +237,7 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 DROP TRIGGER IF EXISTS enforce_employee_task_update ON public.tasks;
 CREATE TRIGGER enforce_employee_task_update
@@ -266,7 +275,6 @@ CREATE POLICY "Users can insert logs" ON public.logs FOR INSERT WITH CHECK (
     WHERE public.tasks.id = logs."taskId"
     AND (public.tasks."managerId" = auth.uid() OR public.tasks."employeeId" = auth.uid())
   )
-  OR auth.uid() = logs."userId"
 );
 
 -- Enable Realtime for all main tables (required for cross-session live updates)
@@ -295,6 +303,12 @@ BEGIN
     WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'personal_tasks'
   ) THEN
     ALTER PUBLICATION supabase_realtime ADD TABLE public.personal_tasks;
+  END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'logs'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.logs;
   END IF;
 END;
 $$;

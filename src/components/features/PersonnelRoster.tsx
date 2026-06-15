@@ -76,7 +76,7 @@ export default function PersonnelRoster({
               initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
               animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
               transition={reducedMotion ? undefined : { delay: idx * 0.05 }}
-              className="group relative bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-6 hover:shadow-xl hover:shadow-slate-200/40 dark:hover:shadow-slate-900/40 hover:border-emerald-500/30 transition-all duration-150 cursor-pointer shadow-sm dark:shadow-slate-900/20 active:scale-[0.98]"
+              className="group relative bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-6 hover:shadow-xl hover:shadow-slate-200/40 dark:hover:shadow-slate-900/40 hover:border-emerald-500/30 transition-all duration-150 cursor-pointer shadow-sm dark:shadow-slate-900/20 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
               onClick={() => setSelectedEmployee(emp)}
               onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelectedEmployee(emp); } }}
               role="button"

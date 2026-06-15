@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { Mail, Lock, Eye, EyeOff, Shield, User as UserIcon, LogIn, UserPlus, RotateCw, AlertCircle } from 'lucide-react';
-import { supabase } from '../lib/supabase/client';
+import { supabase, ORG_EMAIL_DOMAIN } from '../lib/supabase/client';
 import { useAuthStore } from '../lib/store';
 import { Logo } from './Logo';
 import { useReducedMotion } from '../lib/hooks/useReducedMotion';
+import { log } from '../lib/logger';
 
 export default function AuthScreen() {
   const [isLogin, setIsLogin] = useState(true);
@@ -54,7 +55,7 @@ export default function AuthScreen() {
     setError('');
     const { error: resendError } = await supabase.auth.resend({
       type: 'signup',
-      email: email + '@rrcat.gov.in',
+      email: email + '@' + ORG_EMAIL_DOMAIN,
     });
     if (resendError) {
       setError(resendError.message);
@@ -66,7 +67,7 @@ export default function AuthScreen() {
   const handleResendReset = useCallback(async () => {
     if (resendTimer > 0) return;
     setError('');
-    const { error: resendError } = await supabase.auth.resetPasswordForEmail(resetEmail + '@rrcat.gov.in', {
+    const { error: resendError } = await supabase.auth.resetPasswordForEmail(resetEmail + '@' + ORG_EMAIL_DOMAIN, {
       redirectTo: window.location.origin,
     });
     if (resendError) {
@@ -81,7 +82,7 @@ export default function AuthScreen() {
     setError('');
     setLoading(true);
     try {
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(resetEmail + '@rrcat.gov.in', {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(resetEmail + '@' + ORG_EMAIL_DOMAIN, {
         redirectTo: window.location.origin,
       });
       if (resetError) throw resetError;
@@ -115,7 +116,7 @@ export default function AuthScreen() {
     try {
       if (needsOtp) {
         const { error: verifyError } = await supabase.auth.verifyOtp({
-          email: resetEmail + '@rrcat.gov.in',
+          email: resetEmail + '@' + ORG_EMAIL_DOMAIN,
           token: resetOtp,
           type: 'recovery',
         });
@@ -151,7 +152,7 @@ export default function AuthScreen() {
       return;
     }
     const targetEmail = changeEmail
-      ? changeEmail.includes('@') ? changeEmail : changeEmail + '@rrcat.gov.in'
+      ? changeEmail.includes('@') ? changeEmail : changeEmail + '@' + ORG_EMAIL_DOMAIN
       : currentUser?.email || '';
     if (!targetEmail) { setError('Email is required.'); setLoading(false); return; }
     setLoading(true);
@@ -181,7 +182,7 @@ export default function AuthScreen() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    const fullEmail = email + '@rrcat.gov.in';
+    const fullEmail = email + '@' + ORG_EMAIL_DOMAIN;
 
     try {
       if (!isLogin && password.length < 8) {
@@ -210,7 +211,7 @@ export default function AuthScreen() {
         }
       }
     } catch (err: unknown) {
-      console.error(err);
+      log.error(err);
       const message = err instanceof Error ? err.message : 'Operation failed. Please try again.';
       if (err instanceof Error && 'code' in err && (err as { code: string }).code === 'user_already_exists') {
         setError('Email is already in use.');
